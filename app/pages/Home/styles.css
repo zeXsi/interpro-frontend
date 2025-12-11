@@ -1,0 +1,80 @@
+.Home {
+  display: flex;
+  flex-direction: column;
+  max-width: 100vw;
+
+  .Home-title.hidden {
+    position: absolute;
+    left: -100%;
+    bottom: -100%;;
+    inset: 0;
+  }
+  .motion-main {
+    z-index: 2;
+    margin-top: 100vh;
+    max-width: 100%;
+    display: flex;
+    flex-direction: column;
+    background-color: #fff;
+    min-height: min-content;
+    transition: all 0.5s linear;
+  }
+  .Hero {
+    position: fixed;
+    top: 0;
+  }
+
+  .ExpoStands,
+  .TeamBoostSection {
+    margin-top: clamp(1.5rem, calc(1.136rem + 1.553vw), 3rem); /* min: 24px, max: 48px */
+  }
+  .ExpoStands {
+    margin-bottom: clamp(4rem, calc(2.667rem + 2.778vw), 6rem);
+    /* min: 64px, max: 96px */
+    /* viewPort: 768-1920 */
+  }
+
+  .MediaSection.SECTION_1 {
+    margin-bottom: clamp(2rem, calc(1.333rem + 1.389vw), 3rem); 
+    /* min: 32px, max: 48px */
+    /* viewPort: 768-1920 */
+    @media (max-width: 768px) {
+      margin-bottom: clamp(1.5rem, calc(1.023rem + 2.036vw), 2rem); 
+      /* min: 24px, max: 32px */
+      /* viewPort: 375-768 */
+    }
+  }
+
+  .WorkflowSection,
+  .FAQSection {
+    margin-top: clamp(3.75rem, calc(2.083rem + 3.472vw), 6.25rem); /* min: 60px, max: 100px */
+  }
+  .MediaSection.SECTION_2 {
+    margin-top: clamp(3.75rem, calc(2.083rem + 3.472vw), 6.25rem);
+    /* min: 60px, max: 100px */
+    /* viewPort: 768-1920 */
+    @media (max-width: 768px) {
+      margin-top: clamp(3.25rem, calc(2.773rem + 2.036vw), 3.75rem);
+      /* min: 52px, max: 60px */
+      /* viewPort: 375-768 */
+    }
+  }
+
+  .ContactForm,
+  .DocOverview,
+  .AboutUsMedia {
+    margin-top:clamp(7.75rem, calc(4.583rem + 6.597vw), 12.5rem); 
+    /* min: 124px, max: 200px */ /* viewPort: 768-1920 */
+    @media (max-width: 768px) {
+      margin-top: clamp(6rem, calc(4.33rem + 7.125vw), 7.75rem); 
+      /* min: 96px, max: 124px */ /* viewPort: 375-768 */
+    }
+  }
+
+  @media (max-width: 768px) {
+    .WorkflowSection,
+    .FAQSection {
+      margin-top: clamp(3.25rem, calc(2.773rem + 2.036vw), 3.75rem); /* min: 52px, max: 60px */
+    }
+  }
+}

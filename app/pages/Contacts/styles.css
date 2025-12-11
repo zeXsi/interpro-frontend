@@ -1,0 +1,75 @@
+.Contacts {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+
+  padding-top: clamp(4rem, calc(3.515rem + 2.071vw), 6rem); /* min: 64px, max: 96px */
+  padding-bottom: clamp(4rem, calc(3.515rem + 2.071vw), 6rem);
+  /* min: 64px, max: 96px */
+
+  .Contacts_info {
+    margin-bottom: clamp(4rem, calc(3.333rem + 1.389vw), 5rem); 
+    /* min: 64px, max: 80px */ /* viewPort: 768-1920 */;
+    --gap: clamp(7.75rem, calc(4.583rem + 6.597vw), 12.5rem);
+    /* min: 124px, max: 200px */ /* viewPort: 768-1920 */
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    grid-template-rows: repeat(2, 1fr);
+    gap: var(--gap) 0;
+    .Contacts_info-item {
+      display: grid;
+      grid-template-rows: repeat(1, 1fr);
+      gap: var(--gap);
+    }
+    .InfoList.__group-1 {
+      grid-column: 1/3;
+      grid-row: 1/2;
+    }
+    .InfoList.__group-2 {
+      grid-column: 1/3;
+      grid-row: 2/2;
+    }
+    .InfoList.__group-3 {
+      grid-column: 4/6;
+      grid-row: 1/2;
+    }
+
+    .InfoList.__group-4 {
+      grid-column: 4/6;
+      grid-row: 2/2;
+    }
+    @media (max-width: 768px) {
+      --gap: clamp(6rem, calc(4.33rem + 7.125vw), 7.75rem);
+      /* min: 96px, max: 124px */
+      /* viewPort: 375-768 */
+      grid-template-columns: repeat(2, 1fr);
+      grid-template-rows: unset;
+      .InfoList.__group-1,
+      .InfoList.__group-2,
+      .InfoList.__group-3,
+      .InfoList.__group-4 {
+        grid-column: 1/3;
+        grid-row: unset;
+      }
+      .InfoList.__group-2 {
+        .InfoList-container * {
+          word-break: break-all;
+        }
+      }
+    }
+  }
+
+  .Contacts_map {
+    margin-top: clamp(0.125rem, calc(-3.573rem + 15.776vw), 4rem);
+    /* min: 2px, max: 64px */ /* viewPort: 375-768 */
+    margin-bottom: clamp(7.75rem, calc(4.583rem + 6.597vw), 12.5rem);
+
+    /* min: 124px, max: 200px */
+    /* viewPort: 768-1920 */
+    @media (max-width: 768px) {
+      margin-bottom: clamp(6rem, calc(4.33rem + 7.125vw), 7.75rem);
+      /* min: 96px, max: 124px */
+      /* viewPort: 375-768 */
+    }
+  }
+}

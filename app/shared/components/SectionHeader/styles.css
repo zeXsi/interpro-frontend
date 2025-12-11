@@ -1,0 +1,36 @@
+.SectionHeader {
+  --maxWidth: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin: auto;
+  max-width: var(--maxWidth);
+  gap: clamp(1rem, calc(0.879rem + 0.518vw), 1.5rem);
+  /* min: 16px, max: 24px */
+
+  .SectionHeader-title {
+    font-family: var(--font-family);
+    font-weight: 400;
+    font-size: clamp(3rem, calc(1rem + 4.167vw), 6rem);
+     /* min: 48px, max: 96px */
+    line-height: 120%;
+    letter-spacing: -0.04em;
+    text-align: center;
+    color: #000;
+  }
+
+  @media (max-width: 1200px) {
+    width: auto;
+    padding: 0 20px;
+  }
+
+  @media (max-width: 768px) {
+    gap: 16px;
+    padding: 0;
+    width: clamp(22.5rem, calc(12.004rem + 44.784vw), 33.5rem); /* min: 360px, max: 536px */
+
+    .SectionHeader-title {
+      font-size: clamp(2rem, calc(1.046rem + 4.071vw), 3rem); /* min: 32px, max: 48px */
+    }
+  }
+}

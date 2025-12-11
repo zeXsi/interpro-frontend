@@ -1,0 +1,19 @@
+@starting-style {
+  .StartPage {
+    opacity: 0;
+  }
+}
+.StartPage {
+  width: 100%;
+  padding-top: var(--height-header);
+  transition:
+    opacity 1s ease,
+    display 1s;
+  transition-delay: 0.2s;
+  &[remove] {
+    transition:
+      opacity 0s ease,
+      display 1s;
+    opacity: 0;
+  }
+}

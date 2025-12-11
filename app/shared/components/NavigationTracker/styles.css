@@ -1,0 +1,26 @@
+.NavigationTracker {
+  display: flex;
+  gap: 8px;
+  margin-right: auto;
+  flex-wrap: wrap;
+  margin-top: clamp(1.25rem, calc(0.947rem + 1.294vw), 2.5rem); /* min: 20px, max: 40px */;
+  span  {
+    font-family: var(--font-family);
+    font-weight: 500;
+    font-size: clamp(0.75rem, calc(0.631rem + 0.509vw), 0.875rem); 
+    /* min: 12px, max: 14px */ /* viewPort: 375-768 */
+    line-height: 100%;
+    text-transform: uppercase;
+    color: #000;
+    opacity: 0.5;
+    cursor: pointer;
+    /* text-wrap: nowrap; */
+    &.line {
+      cursor: auto;
+    }
+    &.active {
+      opacity: 1;
+      pointer-events: none;
+    }
+  }
+}

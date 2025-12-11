@@ -1,0 +1,33 @@
+.Preloader {
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  color: #000;
+  padding-bottom: clamp(5.375rem, calc(4.958rem + 0.868vw), 6rem);
+
+  /* min: 86px, max: 96px */
+  span {
+    font-family: var(--font-family);
+    font-weight: 500;
+    font-size: clamp(1.125rem, calc(0.852rem + 1.165vw), 2.25rem);
+    /* min: 18px, max: 36px */
+    line-height: 110%;
+    letter-spacing: -0.06em;
+    color: #ffffff;
+    transition: opacity 0.3s ease-out;
+  }
+
+  &.hidePreloader {
+    span {
+      opacity: 0;
+    }
+  }
+
+  @media (max-width: 760px) {
+    align-items: center;
+
+    span {
+      transform: translateY(10vh);
+    }
+  }
+}

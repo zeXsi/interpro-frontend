@@ -1,0 +1,50 @@
+.DesktopTemplate {
+
+  .wrapper {
+    display: grid;
+    grid-template-columns: 1fr 0.95fr 1fr 1fr 1fr;
+    gap: 16px;
+  }
+
+  .DesktopTemplate_left {
+    grid-column: span 2;
+    gap: 16px;
+    display: flex;
+    flex-direction: column;
+
+    .AnimatedLabel:nth-child(2) {
+      /* margin-top: clamp(1rem, calc(0.757rem + 1.036vw), 2rem); */
+      /* min: 16px, max: 32px */
+      /* margin-bottom: 16px; */
+    }
+  }
+
+  .wrapUserInfo {
+    display: flex;
+    width: 100%;
+    grid-column: 3/6;
+    position: relative;
+    height: 100%;
+  }
+  .UserInfo {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 20px;
+    position: sticky;
+    top: 78px;
+    height: fit-content;
+    .UserInfo_container {
+      grid-column: 2/4;
+      .UserInfo_description {
+        overflow: hidden;
+        text-overflow: ellipsis;
+        display: -webkit-box;
+        line-clamp: 14;
+        -webkit-line-clamp: 14;
+        -webkit-box-orient: vertical;
+        margin: 0;
+        padding: 0;
+      }
+    }
+  }
+}

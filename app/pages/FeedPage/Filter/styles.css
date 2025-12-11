@@ -1,0 +1,27 @@
+.Filter {
+  display: flex;
+  gap: 28px;
+  width: fit-content;
+  list-style: none;
+
+  .Filter-item {
+    font-family: var(--font-family);
+    font-weight: 400;
+    font-size: clamp(1.5rem, calc(1.167rem + 0.694vw), 2rem); 
+    /* min: 24px, max: 32px */ /* viewPort: 768-1920 */
+    line-height: 110%;
+    letter-spacing: -0.04em;
+    color: #000;
+    opacity: 0.5;
+    transition: opacity 0.3s ease-out;
+    cursor: pointer;
+
+    &.active {
+      opacity: 1;
+    }
+    @media (max-width: 768px) {
+      font-size: clamp(1.125rem, calc(0.767rem + 1.527vw), 1.5rem); 
+      /* min: 18px, max: 24px */ /* viewPort: 375-768 */
+    }
+  }
+}

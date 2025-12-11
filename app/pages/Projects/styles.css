@@ -1,0 +1,244 @@
+.ProjectPage {
+  --gap: clamp(6rem, calc(-2.5rem + 17.708vw), 18.75rem);
+  /* min: 96px, max: 300px */
+  /* viewPort: 768-1920 */
+
+  @media (max-width: 768px) {
+    --gap: clamp(4rem, calc(2.092rem + 8.142vw), 6rem);
+    /* min: 64px, max: 96px */
+    /* viewPort: 375-768 */
+  }
+
+  .FilterProject {
+    display: flex;
+    flex-direction: column;
+    gap: inherit;
+
+    @media (max-width: 768px) {
+      width: 100%;
+    }
+    .FilterItem {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: inherit;
+
+      .FilterItem-container {
+        grid-column: span 3;
+        gap: 24px;
+
+        .FilterItem-item-cancel {
+          flex-basis: 100%;
+        }
+      }
+
+      @media (max-width: 1440px) {
+        grid-template-columns: repeat(5, 1fr);
+
+        .FilterItem-title {
+          grid-column: span 2;
+        }
+      }
+
+      @media (max-width: 768px) {
+        grid-template-columns: 1fr 1fr;
+        grid-template-rows: 1fr;
+        .FilterItem-title {
+          grid-column: unset;
+        }
+        &.active .FilterItem-container {
+          grid-column: 1/6;
+        }
+        .FilterItem-container {
+          display: grid;
+          grid-template-columns: 1fr 1fr;
+          min-width: 100%;
+
+          flex-direction: column;
+          .FilterItem-item-cancel {
+            grid-column: 1/2;
+          }
+          .FilterItem-item {
+            display: flex;
+            justify-content: start;
+            width: 100%;
+          }
+        }
+      }
+      @media (max-width: 450px) {
+        .FilterItem-container {
+          grid-template-columns: 1fr;
+        }
+      }
+    }
+  }
+
+  .ProjectPage-title {
+    gap: 32px;
+    display: flex;
+    gap: clamp(1rem, calc(0.307rem + 1.411vw), 2rem);
+    /* min: 16px, max: 32px */
+    margin-top: clamp(1.5rem, calc(1.379rem + 0.518vw), 2rem);
+    /* min: 24px, max: 32px */
+
+    text-wrap: nowrap;
+    @media (max-width: 404px) {
+      justify-content: space-between;
+    }
+    font-family: var(--font-family);
+    font-weight: 400;
+    font-size: clamp(4rem, calc(2.667rem + 2.778vw), 6rem);
+    /* min: 64px, max: 96px */
+    /* viewPort: 768-1920 */
+
+    @media (max-width: 768px) {
+      font-size: clamp(2.75rem, calc(1.557rem + 5.089vw), 4rem);
+      /* min: 44px, max: 64px */
+      /* viewPort: 375-768 */
+    }
+
+    line-height: 110%;
+    letter-spacing: -0.04em;
+    color: #000;
+  }
+
+  .ProjectPage_filter-ModeSwitcher {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 64px 20px;
+    margin-top: 44px;
+
+    .FilterProject {
+      grid-column: span 4;
+      gap: 16px 20px;
+    }
+    .ModeSwitcher {
+      margin-top: auto;
+      margin-left: auto;
+    }
+
+    @media (max-width: 1440px) {
+      .FilterProject {
+        grid-column: 1 / -1;
+      }
+    }
+
+    @media (max-width: 768px) {
+      display: flex;
+      flex-direction: column;
+      gap: clamp(2.75rem, calc(1.557rem + 5.089vw), 4rem); /* min: 64px, max: 44px */
+      .ModeSwitcher {
+        gap: 8px;
+      }
+      .FilterProject {
+        gap: 16px;
+
+        .FilterItem {
+          display: flex;
+          flex-direction: column;
+          gap: 0;
+
+          .FilterItem-container {
+            gap: 16px 8px;
+            margin-top: 32px;
+          }
+
+          .FilterItem-item-cancel {
+            margin-top: 8px;
+          }
+        }
+      }
+    }
+  }
+
+  .ProjectPage_container {
+    display: grid;
+    grid-template-columns: 1fr 1fr 0.9fr 1fr 1fr;
+    gap: 20px;
+
+    margin-top: clamp(2.75rem, calc(0.583rem + 4.514vw), 6rem);
+    /* min: 44px, max: 96px */
+    /* viewPort: 768-1920 */
+    @media (max-width: 768px) {
+      margin-top: clamp(2rem, calc(1.284rem + 3.053vw), 2.75rem);
+      /* min: 32px, max: 44px */
+      /* viewPort: 375-768 */
+    }
+
+    .ProjectPage_container-left {
+      display: flex;
+      flex-direction: column;
+      grid-column: 1/3;
+      div:first-child {
+        .ProjectCardTable {
+          padding-top: 0;
+        }
+      }
+    }
+    &.__desktop_grid,
+    &.__mobile_grid {
+      .ProjectPage_container-left {
+        gap: var(--gap);
+      }
+    }
+
+    &.__mobile_grid,
+    &.__desktop_list,
+    &.__mobile_list {
+      .ProjectCard {
+        width: 100%;
+      }
+      grid-template-columns: 1fr;
+      .ProjectPage_container-left {
+        grid-column: 1/6;
+      }
+    }
+    .ProjectPage_container-right {
+      grid-column: 3/6;
+      &:not(&.__desktop_grid) {
+        display: none;
+      }
+
+      .ProjectCardImg {
+        position: sticky;
+        top: var(--HeaderHeight);
+        transition: all 0.2s ease-out;
+        width: 100%;
+        overflow: hidden;
+        cursor: pointer;
+        aspect-ratio: 1096/722;
+        @starting-style {
+          opacity: 0.8;
+        }
+        &.isHover img {
+          transform: scale(1.05);
+        }
+        img {
+          width: 100%;
+          height: 100%;
+          transition: transform 0.3s ease-out;
+          object-fit: cover;
+          @media (hover: hover) {
+            &:hover {
+              transform: scale(1.05);
+            }
+          }
+          &:active,
+          &:focus-visible {
+            transform: scale(1.05);
+          }
+        }
+      }
+    }
+  }
+
+  .ContactForm {
+    margin-top: clamp(7.75rem, calc(4.583rem + 6.597vw), 12.5rem);
+    /* min: 124px, max: 200px */
+    /* viewPort: 768-1920 */
+    @media (max-width: 768px) {
+      margin-top: clamp(6rem, calc(4.33rem + 7.125vw), 7.75rem);
+      /* min: 96px, max: 124px */
+      /* viewPort: 375-768 */
+    }
+  }
+}

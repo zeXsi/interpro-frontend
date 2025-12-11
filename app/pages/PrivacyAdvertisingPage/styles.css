@@ -1,0 +1,17 @@
+.Advertising {
+  margin-top: 96px;
+  .Advertising-title {
+    font-family: var(--font-family);
+    font-weight: 400;
+    font-size: clamp(2rem, calc(1.515rem + 2.071vw), 4rem); /* min: 32px, max: 64px */
+    line-height: 120%;
+    letter-spacing: -0.04em;
+    color: #000;
+    margin-bottom: clamp(1.75rem, calc(1.447rem + 1.294vw), 3rem); /* min: 28px, max: 48px */
+  }
+  .Link {
+    text-decoration: underline;
+    display: unset !important;
+    color: unset !important;
+  }
+}

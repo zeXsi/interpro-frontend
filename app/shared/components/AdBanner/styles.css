@@ -1,0 +1,84 @@
+.AdBanner {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: var(--adBanner-height);
+  display: flex;
+  justify-content: center;
+  background: #ecf89b;
+  z-index: 990;
+  cursor: pointer;
+  transition: all 200ms ease-out;
+  &,
+  .ButtonArrow .Button {
+    font-family: var(--font-family);
+    font-weight: 500;
+    font-size: clamp(0.875rem, calc(0.636rem + 1.018vw), 1.125rem);
+    /* 14px @375px → 18px @768px */
+
+    line-height: 136%;
+    letter-spacing: -0.02em;
+    text-align: center;
+    color: #000;
+  }
+  .ButtonArrow .ButtonArrow-icon {
+    margin-top: -2px !important ;
+    --size: clamp(1.25rem, calc(1.011rem + 1.018vw), 1.5rem);
+    /* 20px @375px → 24px @768px */
+    min-height: var(--size) !important;
+    min-width: var(--size) !important;
+  }
+
+  .AdBanner_text {
+    display: flex;
+    align-items: center;
+    gap: clamp(0.25rem, calc(0.011rem + 1.018vw), 0.5rem);
+    /* 4px @375px → 8px @768px */
+
+    .AdBanner_text-li {
+      display: flex;
+      align-items: center;
+      position: relative;
+      gap: clamp(0.5rem, calc(0.261rem + 1.018vw), 0.75rem);
+      /* 8px @375px → 12px @768px */
+      &::before {
+        content: '';
+        display: block;
+        position: relative;
+        --size: 8px;
+        width: var(--size);
+        height: var(--size);
+        margin-right: 3px;
+        background-color: #000;
+        border-radius: 50%;
+      }
+    }
+    .ButtonArrow {
+      .Button {
+        padding-bottom: 4px;
+        &::before {
+          top: calc(100% - 2px);
+        }
+      }
+    }
+  }
+
+  &.is-hover {
+    background-color: #edfe7b;
+  }
+  &:hover {
+    background-color: #edfe7b;
+    .ButtonArrow {
+      opacity: 0.6;
+      .Button,
+      svg {
+        opacity: 0.5;
+      }
+    }
+  }
+  @media (max-width: 1024px) {
+    display: flex;
+    justify-content: center;
+  }
+}

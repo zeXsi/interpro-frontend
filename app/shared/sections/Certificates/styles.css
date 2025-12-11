@@ -1,0 +1,13 @@
+.Certificates {
+  display: flex;
+  flex-direction: column;
+  gap: clamp(4rem, calc(-1.667rem + 11.806vw), 12.5rem);
+
+  /* min: 64px, max: 200px */
+  /* viewPort: 768-1920 */
+  @media (max-width: 768px) {
+    gap: clamp(2.75rem, calc(1.557rem + 5.089vw), 4rem);
+    /* min: 44px, max: 64px */
+    /* viewPort: 375-768 */
+  }
+}

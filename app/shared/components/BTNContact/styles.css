@@ -1,0 +1,20 @@
+.BTNContact.BTNContact {
+  position: fixed;
+  bottom: 16px;
+  width: fit-content;
+  z-index: 40;
+  opacity: 0;
+  &.primary {
+    --px: clamp(1.688rem, calc(1.993rem - 0.636vw), 1.844rem);
+    /* 29.5px @375px → 27px @768px */
+    padding: 20px var(--px);
+    font-size: clamp(1rem, calc(0.523rem + 2.036vw), 1.5rem);
+    /* 16px @375px → 24px @768px */
+  }
+  &.hidePreloader {
+    opacity: 1;
+  }
+  @media (min-width: 1024px) {
+    display: none;
+  }
+}

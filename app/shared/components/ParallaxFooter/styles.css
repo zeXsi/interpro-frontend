@@ -1,0 +1,22 @@
+.ParallaxFooter-preElement {
+  width: 100%;
+  z-index: 20;
+  /* background-color: #fff; */
+}
+
+.ParallaxFooter_element {
+  position: relative;
+  overflow: hidden;
+  width: 100%;
+  .ParallaxFooter_element-origin {
+    position: absolute;
+    z-index: 10;
+    will-change: transform;
+    transition: transform 300ms ease-out;
+  }
+  .ParallaxFooter_element-fake {
+    opacity: 0;
+    z-index: -1;
+    pointer-events: none;
+  }
+}

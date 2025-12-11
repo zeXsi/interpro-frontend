@@ -1,0 +1,18 @@
+.CertificatesPage {
+  .TitlePage {
+    width: min(790px, 100%);
+    @media (max-width: 768px) {
+      font-size: clamp(2.75rem, calc(1.557rem + 5.089vw), 4rem); 
+      /* min: 44px, max: 64px */ /* viewPort: 375-768 */
+    }
+  }
+  .ContactForm {
+    margin-top: clamp(7.75rem, calc(4.583rem + 6.597vw), 12.5rem);
+
+    /* min: 124px, max: 200px */ /* viewPort: 768-1920 */
+    @media (max-width: 768px) {
+      margin-top: clamp(6rem, calc(4.33rem + 7.125vw), 7.75rem);
+      /* min: 96px, max: 124px */ /* viewPort: 375-768 */
+    }
+  }
+}

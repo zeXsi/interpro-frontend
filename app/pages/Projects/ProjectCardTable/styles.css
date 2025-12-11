@@ -1,0 +1,40 @@
+.ProjectCardTable {
+  --offset: clamp(2rem, calc(1.284rem + 3.053vw), 2.75rem);
+    /* min: 32px, max: 44px */
+    /* viewPort: 375-768 */
+
+  padding-bottom: var(--offset);
+  padding-top: var(--offset);
+  border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+
+  
+  .ProjectCardTable_head {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    cursor: pointer;
+    .ProjectCardTable_head-title {
+      font-family: var(--font-family);
+      font-weight: 400;
+      font-size: clamp(2.75rem, calc(0.961rem + 7.634vw), 4.625rem);
+      /* min: 44px, max: 74px */
+      letter-spacing: -0.04em;
+      color: #111;
+    }
+    .ProjectCardTable_head-svg {
+      --size: clamp(2rem, calc(1.284rem + 3.053vw), 2.75rem);
+      /* min: 32px, max: 44px */
+      width: var(--size);
+      height: var(--size);
+      cursor: pointer;
+    }
+  }
+  .ProjectCardTable_main {
+    width: clamp(14.75rem, calc(2.524rem + 52.163vw), 27.563rem);
+    /* min: 236px, max: 441px */
+    display: flex;
+    justify-content: space-between;
+    margin-top: clamp(1.5rem, calc(1.023rem + 2.036vw), 2rem);
+    /* min: 24px, max: 32px */
+  }
+}

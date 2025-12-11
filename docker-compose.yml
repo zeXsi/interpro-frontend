@@ -1,0 +1,17 @@
+services:
+  frontend:
+    build: ./
+    container_name: interpro-frontend
+    restart: unless-stopped
+    networks: [app-network]
+    expose: ["5027"]
+    environment:
+      - PORT=5027
+      - NODE_ENV=production
+
+networks:
+  app-network:
+    external: true
+
+volumes:
+  node_modules:

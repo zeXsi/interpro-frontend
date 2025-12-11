@@ -1,0 +1,277 @@
+.Popup.MWForm {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  .Popup_container {
+    display: flex;
+    position: relative;
+
+    height: fit-content;
+    justify-content: center;
+    align-items: center;
+    .MWForm-inner {
+      display: flex;
+      overflow: hidden;
+      overflow-y: auto;
+      width: 100%;
+      height: 95svh;
+      width: 90vw;
+
+      .MWForm-wpinner {
+        display: contents;
+      }
+      @media (max-width: 1024px) {
+        width: 95.573vw;
+        height: 75.741svh;
+      }
+
+      @media (max-width: 720px) {
+        height: 77.34svh;
+      }
+    }
+    .MWForm_header {
+      width: 100%;
+      position: absolute;
+      top: 0;
+      display: flex;
+      justify-content: flex-end;
+      padding: max(clamp(1rem, calc(0.523rem + 2.036vw), 1.5rem), 1.25vw);
+      /* 16px @375px → 24px @768px */
+      .MWImage-close {
+        --size: max(clamp(2.75rem, calc(1.438rem + 5.598vw), 4.125rem), 3.438vw);
+        /* 44px @375px → 66px @768px */
+        width: var(--size);
+        height: var(--size);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        background: #fff;
+        border-radius: 50%;
+        cursor: pointer;
+        z-index: 99;
+        transition: opacity 0.3s ease-out;
+        @media (hover: hover) {
+          &:hover {
+            opacity: 0.6;
+          }
+        }
+        &:focus-visible,
+        &:active,
+        &:focus {
+          opacity: 0.6;
+        }
+        svg {
+          --size: max(clamp(1.563rem, calc(0.906rem + 2.799vw), 2.25rem), 1.875vw);
+          /* 25px @375px → 36px @768px */
+          min-width: var(--size);
+          min-height: var(--size);
+          z-index: 99;
+          cursor: pointer;
+        }
+      }
+    }
+  }
+}
+
+.Form {
+  width: 100%;
+  .MWForm-bg {
+    width: 100%;
+    height: 100%;
+    user-select: none;
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    img {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      object-fit: fill;
+      z-index: -1;
+    }
+  }
+  .ContactForm {
+    z-index: 20;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    height: fit-content;
+    width: 100%;
+    padding: unset;
+
+    padding-inline: var(--px);
+    padding-bottom: max(32px, 1.667vw);
+    padding-top: max(clamp(2.75rem, calc(-3.333rem + 25.954vw), 9.125rem), 7.604vw);
+    /* 44px @375px → 146px @768px */
+    .Input {
+      position: relative;
+      .Input-label,
+      .Input-self,
+      .Input-message {
+        color: #fff;
+      }
+    }
+    .ContactForm-form {
+      max-width: min(100%, max(438px, 22.813vw));
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: unset;
+
+      gap: max(clamp(1.5rem, calc(2.477rem - 2.036vw), 2rem), 1.25vw);
+      /* 32px @375px → 24px @768px */
+      margin-bottom: max(clamp(2.5rem, calc(2rem + 1.042vw), 3.25rem), 2.708vw);
+      /* 40px @768px → 52px @1920px */
+      @media (max-width: 768px) {
+        margin-bottom: max(clamp(2.5rem, calc(3.477rem - 2.036vw), 3rem), 2.083vw);
+        /* 48px @375px → 40px @768px */
+      }
+      .Input {
+        .Input-label,
+        .Input-self {
+          font-family: var(--font-family);
+          font-weight: 500;
+          font-size: max(16px, 0.833vw);
+          line-height: 120%;
+          letter-spacing: -0.02em;
+          text-transform: uppercase;
+          color: #fff;
+          padding: unset;
+        }
+
+        .Input-label {
+          /* min-height: max(30px, 1.563vw); */
+          min-height: unset;
+          position: absolute;
+          top: calc(-1 * max(0.833vw, 16px));
+        }
+
+        &:focus-within,
+        &.noEmpty {
+          .Input-label {
+            font-size: max(clamp(0.563rem, calc(0.875rem - 0.26vw), 0.75rem), 0.469vw);
+            /* 12px @768px → 9px @1920px */
+
+            opacity: 0.5;
+            transform: unset;
+          }
+        }
+        .Input-self {
+          opacity: 0.6;
+          &:placeholder {
+            color: #fff;
+          }
+        }
+      }
+    }
+    .ContactForm_footer {
+      max-width: max(503px, 26.198vw);
+      .ButtonArrow {
+        margin-bottom: max(44px, 2.292vw);
+        svg * {
+          fill: #fff;
+        }
+        .Button {
+          font-family: var(--font-family);
+          font-weight: 500;
+          font-size: max(24px, 1.25vw);
+          line-height: 120%;
+          letter-spacing: -0.04em;
+          text-transform: uppercase;
+
+          text-align: center;
+          color: #fff;
+          &:before {
+            background: #fff;
+          }
+        }
+      }
+
+      .ConsentCheckbox {
+        width: min(100%, max(503px, 26.198vw)) !important;
+
+        &.ad {
+          margin-top: max(16px, 0.833vw);
+        }
+
+        .ConsentCheckbox-error {
+          display: none;
+        }
+        .wrapper {
+          padding: 0;
+          margin: 0;
+        }
+        .ConsentCheckbox-text {
+          font-family: var(--font-family);
+          font-weight: 500;
+          font-size: max(clamp(0.75rem, calc(0.631rem + 0.509vw), 0.875rem), 0.729vw);
+          /* 12px @375px → 14px @768px */
+          line-height: 136%;
+          letter-spacing: -0.02em;
+          color: #fff;
+        }
+        .ConsentCheckbox_checkbox {
+          background: none;
+          border: 1px solid #fff;
+          opacity: 0.6;
+          --size: max(1.25vw, 24px);
+          min-width: var(--size);
+          min-height: var(--size);
+        }
+
+        &.error .ConsentCheckbox-text {
+          opacity: 1;
+        }
+      }
+    }
+  }
+
+  &.Form {
+    .Subtitle {
+      font-family: var(--font-family);
+      font-weight: 400;
+      font-size: max(clamp(1rem, calc(0.523rem + 2.036vw), 1.5rem), 1.25vw);
+      /* 16px @375px → 24px @768px */
+
+      line-height: 88%;
+      letter-spacing: -0.04em;
+      text-align: center;
+      color: #fff;
+      opacity: 1;
+    }
+    .ContactForm-title {
+      --width: max(clamp(42.125rem, calc(31.125rem + 22.917vw), 58.625rem), 48.854vw);
+      /* 674px @768px → 938px @1920px */
+      width: min(100%, var(--width));
+      font-family: var(--font-family);
+      font-weight: 700;
+      font-size: max(clamp(3rem, calc(2.333rem + 1.389vw), 4rem), 3.333vw);
+      /* 48px @768px → 64px @1920px */
+      line-height: 97%;
+      letter-spacing: -0.04em;
+      text-transform: uppercase;
+      text-align: center;
+      color: #fff;
+      margin-bottom: max(clamp(3rem, calc(2.333rem + 1.389vw), 4rem), 3.333vw);
+      /* 48px @768px → 64px @1920px */
+      @media (max-width: 768px) {
+        font-size: max(clamp(2rem, calc(1.046rem + 4.071vw), 3rem), 2.5vw);
+        /* 32px @375px → 48px @768px */
+      }
+    }
+  }
+}
+.Popup.MWForm {
+  transition: all 150ms ease-out;
+
+  &.isRemove {
+    opacity: 0;
+  }
+  @starting-style {
+    opacity: 0;
+  }
+  &::before {
+    background: rgb(0, 0, 0, 0.8);
+  }
+}

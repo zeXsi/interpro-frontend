@@ -1,0 +1,128 @@
+.ProjectCard {
+  width: min(724px, 100%);
+
+  .ProjectCard-title {
+    word-wrap: break-word;
+    cursor: pointer;
+    font-family: var(--font-family);
+    font-weight: 400;
+    line-height: 100%;
+    max-width: 100%;
+    letter-spacing: -0.04em;
+    color: #000;
+    padding-bottom: 8px;
+    /* word-break: break-all; */
+    font-size: 6.667vw;
+
+    @media (max-width: 1024px) {
+      font-size: clamp(4rem, calc(2.092rem + 8.142vw), 6rem);
+      /* min: 64px, max: 96px */
+      /* viewPort: 375-768 */
+    }
+  }
+
+  .ProjectCard-description {
+    width: min(642px, 100%);
+    text-wrap: balance;
+    font-family: var(--font-family);
+    font-weight: 400;
+    font-size: 32px;
+    line-height: 120%;
+    letter-spacing: -0.04em;
+    color: #000;
+    opacity: 0.5;
+  }
+
+  .ProjectCard_footer {
+    display: flex;
+    width: 100%;
+    .Tag {
+      width: fit-content !important;
+    }
+  }
+
+  .ProjectCard-img {
+    width: 100%;
+    anchor-scope: 2/2;
+    cursor: pointer;
+    overflow: hidden;
+
+    img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transition: 0.3s transform;
+      @media (hover: hover) {
+        &:hover {
+          transform: scale(1.05);
+        }
+      }
+      &:active,
+      &:focus-visible {
+        transform: scale(1.05);
+      }
+    }
+  }
+
+  .ProjectCard-btn {
+    margin-top: 124px;
+  }
+
+  @media (min-width: 1024px) {
+    .ProjectCard-description {
+      margin-top: clamp(1.5rem, calc(1.197rem + 1.294vw), 2.75rem);
+      /* min: 24px, max: 44px */
+      margin-bottom: 72px;
+    }
+
+    .ProjectCard_footer {
+      display: flex;
+      flex-direction: row;
+      flex-wrap: wrap;
+      /* display: grid;
+      grid-template-columns: 1fr 1fr 1fr; */
+      gap: 20px;
+    }
+
+    .ProjectCard-img {
+      display: none;
+      .Tag {
+        width: fit-content;
+      }
+    }
+  }
+
+  @media (max-width: 1024px) {
+    .ProjectCard-btn {
+      display: none;
+    }
+    .ProjectCard-description {
+      display: none;
+    }
+
+    .Tag.__typeStand {
+      display: none;
+    }
+    .ProjectCard-img {
+      pointer-events: unset;
+      cursor: pointer;
+      height: clamp(46rem, calc(33.542rem + 25.955vw), 64.688rem);
+      /* min: 736px, max: 1035px */
+      /* viewPort: 768-1920 */
+
+      @media (max-width: 1440px) {
+        height: clamp(22.438rem, calc(-0.046rem + 95.929vw), 46rem);
+        /* min: 359px, max: 736px */
+        /* viewPort: 375-768 */
+      }
+    }
+    .ProjectCard_footer {
+      display: flex;
+      margin: clamp(1.5rem, calc(1.379rem + 0.518vw), 2rem) 0;
+      /* min: 24px, max: 32px */
+      gap: clamp(5.125rem, calc(-4.894rem + 42.748vw), 15.625rem);
+      /* min: 82px, max: 250px */
+      /* viewPort: 375-768 */
+    }
+  }
+}

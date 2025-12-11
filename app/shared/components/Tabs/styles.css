@@ -1,0 +1,13 @@
+.Tabs {
+  width: max(343px, 100%);
+  .Tabs-inner {
+    display: flex;
+    align-items: center;
+    list-style-type: none;
+    li {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+  }
+}

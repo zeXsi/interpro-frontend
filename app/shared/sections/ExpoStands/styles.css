@@ -1,0 +1,68 @@
+.ExpoStands {
+  display: flex;
+  flex-direction: column;
+
+  .Button {
+    margin-left: auto;
+    margin-top: 19px;
+  }
+
+  .ExpoStands_text {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin: auto;
+    width: min(1468px, 100%);
+    gap: clamp(1rem, calc(0.879rem + 0.518vw), 1.5rem);
+    /* min: 16px, max: 24px */
+
+    .ExpoStands-subtitle {
+      font-family: var(--font-family);
+      font-weight: 500;
+      font-size: clamp(0.875rem, calc(0.723rem + 0.647vw), 1.5rem);
+      /* min: 14px, max: 24px */
+
+      letter-spacing: -0.02em;
+      text-transform: uppercase;
+      color: #000;
+      opacity: 0.4;
+    }
+
+    .ExpoStands-title {
+      font-family: var(--font-family);
+      font-weight: 400;
+      font-size: clamp(2rem, calc(1.029rem + 4.142vw), 6rem);
+      /* min: 32px, max: 96px */
+      line-height: 120%;
+      letter-spacing: -0.04em;
+      text-align: center;
+      color: #000;
+    }
+  }
+
+  .MarqueeCarousel-wrapper {
+    gap: clamp(4rem, calc(2.786rem + 5.178vw), 9rem);
+    /* min: 64px, max: 144px */
+    opacity: 0.4;
+    justify-content: space-around;
+    margin-top: clamp(4rem, calc(2.667rem + 2.778vw), 6rem);
+    /* min: 64px, max: 96px */
+    /* viewPort: 768-1920 */
+    svg {
+      width: auto;
+      height: 100%;
+    }
+    height: clamp(4rem, calc(2.5rem + 3.125vw), 6.25rem);
+    /* min: 64px, max: 100px */
+    /* viewPort: 768-1920 */
+    @media (max-width: 768px) {
+      height: clamp(2.625rem, calc(1.313rem + 5.598vw), 4rem);
+      /* min: 42px, max: 64px */
+      /* viewPort: 375-768 */
+
+      margin-top: clamp(2rem, calc(0.092rem + 8.142vw), 4rem);
+      /* min: 32px, max: 64px */
+      /* viewPort: 375-768 */
+    }
+  }
+}

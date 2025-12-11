@@ -1,0 +1,34 @@
+.ContactMe {
+  position: fixed;
+  bottom: 0;
+  margin-bottom: calc(env(safe-area-inset-bottom) + 16px);
+  z-index: 99;
+  display: none;
+  transition: opacity 0.3s;
+  transition-delay: 0.25s;
+
+  &.btn {
+    font-family: var(--font-family);
+    font-weight: 400;
+    font-size: clamp(1rem, calc(0.523rem + 2.036vw), 1.5rem);
+    /* min: 16px, max: 24px */
+    /* viewPort: 375-768 */
+    line-height: 100%;
+    letter-spacing: -0.04em;
+    text-transform: uppercase;
+    color: #fff;
+  }
+
+
+  &.hidePreloader {
+    opacity: 1;
+  }
+  &.showPreloader,
+  &.isOpenMWCookies {
+    opacity: 0;
+    pointer-events: none;
+  }
+  @media (max-width: 935px) {
+    display: block;
+  }
+}

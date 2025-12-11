@@ -1,0 +1,46 @@
+.CompaniesGrid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+
+  position: relative;
+
+  &:before {
+    content: '';
+    position: absolute;
+    top:0;bottom:0;
+      box-shadow: inset 1px 0 rgba(255, 255, 255), inset -1px 0 rgba(255, 255, 255);
+    min-width: 100%;
+    min-height: 100%;
+    pointer-events: none;
+
+  
+  }
+
+  .CompaniesGrid-item {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    --size: clamp(8.813rem, calc(0.021rem + 18.316vw), 22rem);
+    /* min: 141px, max: 352px */
+    /* viewPort: 768-1920 */
+    min-width: var(--size);
+    height: var(--size);
+    background: white;
+    box-shadow: inset 0 0 0 0.5px rgb(0, 0, 0, 0.1);
+    
+    svg {
+      height: 54%;
+      width: 54%;
+    }
+  }
+
+  @media (max-width: 768px) {
+    grid-template-columns: repeat(2, 1fr);
+
+    .CompaniesGrid-item {
+      --size: max(8.813rem, calc(6.785rem + 8.651vw), 10.938rem);
+      /* min: 141px, max: 175px */
+      /* viewPort: 375-768 */
+    }
+  }
+}

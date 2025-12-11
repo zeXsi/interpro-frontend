@@ -1,0 +1,44 @@
+.ISOCard {
+  display: flex;
+  justify-content: space-between;
+  gap: clamp(1.5rem, calc(1.167rem + 0.694vw), 2rem);
+
+  /* min: 24px, max: 32px */
+  /* viewPort: 768-1920 */
+  .ISOCard_head {
+    display: flex;
+    flex-direction: column;
+    gap: clamp(1.5rem, calc(-0.885rem + 10.178vw), 4rem);
+    /* min: 24px, max: 64px */
+    /* viewPort: 375-768 */
+
+    .Tag {
+      a {
+        display: flex;
+        text-decoration: none;
+      }
+      .Tag-title {
+        text-transform: uppercase;
+        font-size: clamp(3rem, calc(2.333rem + 1.389vw), 4rem); 
+        /* min: 48px, max: 64px */ /* viewPort: 768-1920 */
+        @media (max-width: 768px) {
+          font-size: clamp(2.25rem, calc(1.534rem + 3.053vw), 3rem); 
+          /* min: 36px, max: 48px */ /* viewPort: 375-768 */
+        }
+      }
+      .Tag-subtitle {
+        font-size: clamp(1.125rem, calc(0.875rem + 0.521vw), 1.5rem); 
+        /* min: 18px, max: 24px */ /* viewPort: 768-1920 */
+        @media (max-width: 768px) {
+          font-size: clamp(0.875rem, calc(0.636rem + 1.018vw), 1.125rem);
+           /* min: 14px, max: 18px */ /* viewPort: 375-768 */
+        }
+      }
+    }
+  }
+
+  @media (max-width: 1440px) {
+    justify-content: unset;
+    flex-direction: column;
+  }
+}

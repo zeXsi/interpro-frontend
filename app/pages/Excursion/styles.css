@@ -1,0 +1,5 @@
+.Excursion {
+  position: relative;
+  width: 100vw;
+  margin-top: clamp(1.5rem, calc(1.167rem + 0.694vw), 2rem);
+}

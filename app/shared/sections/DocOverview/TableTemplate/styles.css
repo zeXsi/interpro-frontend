@@ -1,0 +1,44 @@
+.TableTemplate {
+  .Subtitle {
+    display: block;
+    padding-bottom: 24px;
+  }
+  .Accordion {
+    width: 100%;
+    padding: 0;
+    .AnimatedLabel-title {
+      opacity: 1;
+    }
+
+    &:not(&:last-child) {
+      .Accordion_content {
+        margin-bottom: 16px;
+        .UserInfo {
+          padding-bottom: calc(64px - 16px);
+        }
+      }
+    }
+  }
+  .UserInfo {
+    .User {
+      width: fit-content;
+      margin-bottom: clamp(1.5rem, calc(1.379rem + 0.518vw), 2rem);
+    }
+    .UserInfo_description {
+      opacity: 0.5;
+    }
+  }
+}
+
+.Button.btn-allFeedbacks {
+  font-family: var(--font-family);
+  font-weight: 400;
+  font-size: clamp(1.75rem, calc(-0.397rem + 9.16vw), 4rem);
+   /* min: 28px, max: 64px */ /* viewPort: 375-768 */
+  line-height: 120%;
+  letter-spacing: -0.04em;
+  text-align: center;
+  &::first-letter {
+    text-transform: uppercase;
+  }
+}

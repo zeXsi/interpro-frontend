@@ -1,0 +1,11 @@
+.WorkflowSection {
+  width: 100%;
+  .WorkflowSection_container {
+    margin-top: clamp(2.75rem, calc(2.447rem + 1.294vw), 4rem); /* min: 44px, max: 64px */
+    padding: 0 var(--px);
+  }
+  .swiper-wrapper {
+    width: min-content;
+    margin: auto;
+  }
+}

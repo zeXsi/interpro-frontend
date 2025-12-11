@@ -1,0 +1,34 @@
+.IconPlus {
+  display: grid;
+  place-content: center;
+  width: 32px;
+  height: 32px;
+
+  &.active {
+    .IconPlus-line {
+      opacity: 1;
+
+      &::before {
+        transform: rotate(-90deg);
+      }
+    }
+  }
+
+  .IconPlus-line {
+    position: relative;
+    height: 2px;
+    width: 22px;
+    background-color: #000;
+    opacity: 0.3;
+    transition: opacity 0.3s ease-out;
+
+    &:before {
+      content: '';
+      width: 100%;
+      height: 100%;
+      background-color: #000;
+      position: absolute;
+      transition: transform 0.3s ease-out;
+    }
+  }
+}

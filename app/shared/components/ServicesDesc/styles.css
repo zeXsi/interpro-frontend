@@ -1,0 +1,64 @@
+.InfoList.ServicesDesc {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+
+  gap: clamp(1rem, calc(0.667rem + 0.694vw), 1.5rem);
+  /* min: 16px, max: 24px */
+  /* viewPort: 768-1920 */
+
+  margin-bottom: clamp(7.75rem, calc(4.583rem + 6.597vw), 12.5rem);
+  /* min: 124px, max: 200px */
+  /* viewPort: 768-1920 */
+
+  .InfoList-title {
+    grid-column: 1/1;
+    font-family: var(--font-family);
+    font-weight: 500;
+    font-size: clamp(1.25rem, calc(1.083rem + 0.347vw), 1.5rem);
+    /* min: 20px, max: 24px */
+    /* viewPort: 768-1920 */
+    letter-spacing: -0.02em;
+
+    color: #000;
+
+    @media (max-width: 768px) {
+      font-size: clamp(0.875rem, calc(0.517rem + 1.527vw), 1.25rem);
+      /* min: 14px, max: 20px */
+      /* viewPort: 375-768 */
+    }
+  }
+
+  .InfoList-container {
+    grid-column: 3/6;
+  }
+
+  .InfoList-item {
+    font-family: var(--font-family);
+    font-weight: 400;
+    font-size: clamp(2.25rem, calc(1.75rem + 1.042vw), 3rem);
+    /* min: 36px, max: 48px */
+    /* viewPort: 768-1920 */
+    line-height: 120%;
+    letter-spacing: -0.04em;
+    color: #000;
+    text-transform: unset;
+    &::first-letter {
+      text-transform: uppercase;
+    }
+    @media (max-width: 768px) {
+      font-size: clamp(1.5rem, calc(0.784rem + 3.053vw), 2.25rem);
+      /* min: 24px, max: 36px */
+      /* viewPort: 375-768 */
+    }
+  }
+
+  @media (max-width: 768px) {
+    display: flex;
+    flex-direction: column;
+    gap: clamp(1rem, calc(0.523rem + 2.036vw), 1.5rem);
+    /* min: 16px, max: 24px */
+    /* viewPort: 375-768 */
+    margin-bottom: clamp(6rem, calc(4.33rem + 7.125vw), 7.75rem);
+    /* min: 96px, max: 124px */ /* viewPort: 375-768 */
+  }
+}

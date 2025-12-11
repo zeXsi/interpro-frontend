@@ -1,0 +1,57 @@
+.ProjectCardList {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  width: 100%;
+  gap: 20px;
+  padding: 64px 0;
+  cursor: pointer;
+  transition: background 0.3s ease-out;
+  overflow: hidden;
+  @media (hover: hover) {
+    &:hover {
+      &::before {
+        transform: translateX(0);
+      }
+    }
+  }
+  &.active {
+    &::before {
+      transform: translateX(0);
+    }
+  }
+  position: relative;
+  &::before {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    width: 100%;
+    transform: translateX(-100%);
+    transition: transform 0.8s ease-out;
+    height: 2px;
+    background: #000;
+  }
+  border-bottom: 1px solid rgb(0, 0, 0, 0.1);
+  .ProjectCardList-title {
+    word-wrap: break-word;
+    font-family: var(--font-family);
+    font-weight: 400;
+    font-size: clamp(4rem, calc(2.667rem + 2.778vw), 6rem);
+    /* min: 64px, max: 96px */
+    /* viewPort: 768-1920 */
+    line-height: 100%;
+    letter-spacing: -0.04em;
+    color: #000;
+    grid-column: 1/3;
+  }
+  .Tag {
+    &.__exhibition {
+      grid-column: 3/3;
+    }
+    &.__typeStand {
+      grid-column: 4/4;
+    }
+    &.__year {
+      grid-column: 5/5;
+    }
+  }
+}

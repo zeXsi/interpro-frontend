@@ -1,0 +1,13 @@
+.Degree {
+  sup {
+    font-family: var(--font-family);
+    font-size: 18px;
+    color: #000;
+    margin-left: 4px;
+    @media (max-width: 768px) {
+      font-size: clamp(0.75rem, calc(0.392rem + 1.527vw), 1.125rem);
+      /* min: 12px, max: 18px */
+      /* viewPort: 375-768 */
+    }
+  }
+}

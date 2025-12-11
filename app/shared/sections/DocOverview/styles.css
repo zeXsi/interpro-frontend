@@ -1,0 +1,24 @@
+.DocOverview {
+  .Subtitle {
+    margin-bottom: clamp(1rem, calc(0.757rem + 1.036vw), 2rem);
+    /* min: 32px, max: 16px */
+  }
+
+  font-family: var(--font-family);
+  font-weight: 400;
+  font-size: 18px;
+  line-height: 136%;
+  letter-spacing: -0.02em;
+  color: #000;
+  .TableTemplate {
+    display: none;
+  }
+  @media (max-width: 1080px) {
+    .DesktopTemplate {
+      display: none;
+    }
+    .TableTemplate {
+      display: block;
+    }
+  }
+}

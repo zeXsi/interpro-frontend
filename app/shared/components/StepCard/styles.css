@@ -1,0 +1,90 @@
+.StepCard {
+  padding: 24px;
+  width: clamp(17rem, calc(-1rem + 20vw), 23rem); /* min: 272px, max: 368px */
+  height: clamp(22.063rem, calc(20.848rem + 2.53vw), 23.125rem); /* min: 353px, max: 370px */
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  border-top: 1px solid rgba(0, 0, 0, 0.1);
+  transition: background 0.3s ease-out;
+
+  @media not all and (hover: hover) {
+    background: #f6f6f6;
+  }
+
+  @media (hover: hover) {
+    &:hover {
+      background: #f6f6f6;
+      .StepCard_header-description {
+        opacity: 1;
+      }
+    }
+
+    &.active {
+      background: #f6f6f6;
+      .StepCard_header-description {
+        opacity: 1;
+      }
+    }
+    .StepCard_header-description {
+      opacity: 0;
+    }
+  }
+
+  .StepCard_header {
+    display: flex;
+    flex-direction: column;
+    gap: clamp(0.5rem, calc(0.379rem + 0.518vw), 1rem); /* min: 8px, max: 16px */
+    .StepCard_header-index {
+      font-family: var(--font-family);
+      font-weight: 500;
+      font-size: 18px;
+      line-height: 120%;
+      letter-spacing: -0.02em;
+      text-transform: uppercase;
+      color: #000;
+      opacity: 0.5;
+    }
+    .StepCard_header-title {
+      font-family: var(--font-family);
+      font-weight: 500;
+      font-size: clamp(1.75rem, calc(1rem + 0.833vw), 2rem); /* min: 28px, max: 32px */    
+      line-height: 110%;
+      letter-spacing: -0.02em;
+      text-transform: uppercase;
+      color: #0c0c0c;
+    }
+  }
+
+  .StepCard_header-description {
+    font-family: var(--font-family);
+    font-weight: 400;
+    font-size: 18px;
+    line-height: 136%;
+    letter-spacing: -0.02em;
+    color: #0c0c0c;
+    text-wrap: balance;
+
+    transition: opacity 0.3s ease-out;
+  }
+
+  @media (max-width: 1440px) {
+    .StepCard_header {
+      .StepCard_header-title {
+        font-size: clamp(1.75rem, calc(1.464rem + 0.595vw), 2rem); /* min: 32px, max: 28px */
+      }
+    }
+  }
+
+  @media (max-width: 768px) {
+    height: clamp(21.313rem, calc(20.597rem + 3.053vw), 22.063rem); /* min: 341px, max: 353px */
+    .StepCard_header {
+      .StepCard_header-index {
+        font-size: clamp(1rem, calc(0.881rem + 0.509vw), 1.125rem); /* min: 16px, max: 18px */
+      }
+      .StepCard_header-title {
+        font-size: clamp(1.5rem, calc(1.023rem + 2.036vw), 2rem); /* min: 24px, max: 32px */
+      }
+    }
+  }
+}

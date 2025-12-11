@@ -1,0 +1,43 @@
+.ThankYouPage {
+  margin-bottom: 200px;
+
+  @media (max-width: 1040px) {
+    margin-bottom: clamp(28.313rem, calc(22.528rem + 24.682vw), 34.375rem);
+    /* min: 453px, max: 550px */
+    /* viewPort: 375-768 */
+  }
+  .ThankYouPage-title {
+    font-family: var(--font-family);
+    font-weight: 400;
+    font-size: clamp(4rem, calc(1.5rem + 5.208vw), 7.75rem);
+    /* min: 64px, max: 124px */
+    /* viewPort: 768-1920 */
+
+    line-height: 110%;
+    letter-spacing: -0.04em;
+    color: #000;
+    width: min(1468px, 100%);
+    text-wrap: balance;
+    margin-top: clamp(1rem, calc(0.667rem + 0.694vw), 1.5rem);
+    /* min: 16px, max: 24px */
+    /* viewPort: 768-1920 */
+    margin-bottom: clamp(4rem, calc(2.667rem + 2.778vw), 6rem);
+    /* min: 64px, max: 96px */
+    /* viewPort: 768-1920 */
+
+    @media (max-width: 768px) {
+      font-size: clamp(2rem, calc(0.092rem + 8.142vw), 4rem);
+      /* min: 32px, max: 64px */
+      /* viewPort: 375-768 */
+    }
+  }
+  .ButtonArrow {
+    font-size:clamp(2rem, calc(1.333rem + 1.389vw), 3rem); 
+    /* min: 32px, max: 48px */
+    /* viewPort: 768-1920 */
+    @media (max-width: 768px) {
+      font-size: clamp(1.5rem, calc(1.023rem + 2.036vw), 2rem); /* min: 24px, max: 32px */
+      /* viewPort: 375-768 */
+    }
+  }
+}

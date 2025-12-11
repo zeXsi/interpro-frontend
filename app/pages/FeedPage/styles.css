@@ -1,0 +1,90 @@
+.FeedPage {
+  display: flex;
+  flex-direction: column;
+
+  .FeedPage-title {
+    display: flex;
+    gap: clamp(2rem, calc(1rem + 2.083vw), 3.5rem);
+    /* min: 32px, max: 56px */ /* viewPort: 768-1920 */
+    margin: 0 auto;
+    font-family: var(--font-family);
+    font-weight: 400;
+    font-size: clamp(4rem, calc(1.5rem + 5.208vw), 7.75rem);
+    /* min: 64px, max: 124px */ /* viewPort: 768-1920 */
+    line-height: 110%;
+    letter-spacing: -0.04em;
+    color: #000;
+
+    span {
+      cursor: pointer;
+      transition: opacity 0.3s ease-out;
+      &.active {
+        opacity: 0.3;
+        &:hover {
+          opacity: 0.2;
+        }
+      }
+      &:not(&.active) {
+        opacity: 1;
+        &:hover {
+          opacity: 0.5;
+        }
+      }
+    }
+    margin-top: clamp(1.5rem, calc(1.167rem + 0.694vw), 2rem);
+    /* min: 24px, max: 32px */ /* viewPort: 768-1920 */
+    @media (max-width: 768px) {
+      gap: clamp(1.5rem, calc(1.167rem + 0.694vw), 2rem);
+      /* min: 24px, max: 32px */ /* viewPort: 768-1920 */
+      font-size: clamp(2.75rem, calc(1.557rem + 5.089vw), 4rem);
+      /* min: 44px, max: 64px */ /* viewPort: 375-768 */
+    }
+  }
+
+  .Filter {
+    margin: auto;
+    margin-top: clamp(5.125rem, calc(2.542rem + 5.382vw), 9rem);
+    /* min: 82px, max: 144px */ /* viewPort: 768-1920 */
+    margin-bottom: clamp(2.75rem, calc(1.917rem + 1.736vw), 4rem);
+    /* min: 44px, max: 64px */ /* viewPort: 768-1920 */
+    @media (max-width: 768px) {
+      margin-top: clamp(2.75rem, calc(0.484rem + 9.669vw), 5.125rem);
+      /* min: 44px, max: 82px */ /* viewPort: 375-768 */
+      margin-bottom: clamp(1.5rem, calc(0.307rem + 5.089vw), 2.75rem);
+      /* min: 24px, max: 44px */ /* viewPort: 375-768 */
+    }
+  }
+
+  .FeedPage_container {
+    display: flex;
+    flex-direction: column;
+    width: min(1096px, 100%);
+    --gap: clamp(2rem, calc(1.284rem + 3.053vw), 2.75rem);
+    /* min: 32px, max: 44px */ /* viewPort: 375-768 */
+    gap: var(--gap);
+    margin: auto;
+    padding-top: var(--gap);
+    border-top: 1px solid rgb(0, 0, 0, 0.1);
+    .Article {
+      padding-bottom: var(--gap);
+      border-bottom: 1px solid rgb(0, 0, 0, 0.1);
+    }
+  }
+
+  .Pagination {
+    margin-top: clamp(4rem, calc(2.542rem + 3.038vw), 6.188rem);
+    /* min: 64px, max: 99px */ /* viewPort: 768-1920 */
+    @media (max-width: 768px) {
+      margin-top: clamp(2.75rem, calc(1.557rem + 5.089vw), 4rem);
+      /* min: 44px, max: 64px */ /* viewPort: 375-768 */
+    }
+  }
+  .ContactForm {
+    margin: clamp(7.75rem, calc(4.583rem + 6.597vw), 12.5rem) 0;
+    /* min: 124px, max: 200px */ /* viewPort: 768-1920 */
+    @media (max-width: 768px) {
+      margin: clamp(6rem, calc(4.33rem + 7.125vw), 7.75rem) 0;
+      /* min: 96px, max: 124px */ /* viewPort: 375-768 */
+    }
+  }
+}

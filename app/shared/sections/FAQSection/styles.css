@@ -1,0 +1,165 @@
+.FAQSection {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 0 20px;
+  padding-top: clamp(4rem, calc(2.5rem + 3.125vw), 6.25rem); /* min: 64px, max: 100px */
+  padding-bottom: clamp(4rem, calc(2.5rem + 3.125vw), 6.25rem); /* min: 64px, max: 100px */
+  position: relative;
+
+  .FAQSection-left {
+    grid-column: 1 / 3;
+    display: flex;
+    flex-direction: column;
+    gap: 96px;
+    height: fit-content;
+    top: var(--heightHeader);
+    position: sticky;
+
+    .FAQSection-title {
+      font-family: var(--font-family);
+      font-weight: 400;
+      font-size: clamp(3rem, calc(2.333rem + 1.389vw), 4rem); /* min: 48px, max: 64px */
+      line-height: 120%;
+      letter-spacing: -0.04em;
+      color: #000;
+    }
+
+    .InfoList {
+      .InfoList-container {
+        gap: 8px;
+      }
+    }
+  }
+  .FAQSection_right {
+    grid-column: 4 / 6;
+
+    .ButtonArrow.FAQSection_right-btn {
+      margin-top: clamp(4rem, calc(2.667rem + 2.778vw), 6rem);
+
+      /* min: 64px, max: 96px */
+      /* viewPort: 768-1920 */
+      @media (max-width: 768px) {
+        margin-top: clamp(2.75rem, calc(1.557rem + 5.089vw), 4rem);
+        /* min: 44px, max: 64px */
+        /* viewPort: 375-768 */
+      }
+      .Button {
+        font-family: var(--font-family);
+        font-weight: 400;
+        font-size: clamp(
+          1.5rem,
+          calc(1.023rem + 2.036vw),
+          2rem
+        ); /* min: 24px, max: 32px */ /* viewPort: 375-768 */
+        line-height: 120%;
+        letter-spacing: -0.04em;
+        text-align: center;
+        color: #000;
+        text-underline-offset: unset;
+      }
+      .ButtonArrow-icon {
+        --size: clamp(2rem, calc(1.5rem + 1.042vw), 2.75rem);
+        /* min: 32px, max: 44px */ /* viewPort: 768-1920 */
+        @media (max-width: 768px) {
+          --size: clamp(1.5rem, calc(1.023rem + 2.036vw), 2rem);
+          /* min: 24px, max: 32px */ /* viewPort: 375-768 */
+          /* min: 32px, max: 44px */ /* viewPort: 768-1920 */
+        }
+      }
+    }
+  }
+
+  .InfoList {
+    .InfoList-title {
+      font-weight: 600;
+    }
+    .InfoList-container {
+      .Button {
+        font-weight: 600;
+      }
+    }
+  }
+
+  .Accordion {
+    border-top: 1px solid rgb(0, 0, 0, 0.1);
+    border-bottom: 1px solid rgb(0, 0, 0, 0.1);
+
+    &.active {
+      .Accordion_header-icon {
+        transform: rotate(45deg);
+      }
+    }
+
+    .Accordion_header-title {
+      font-family: var(--font-family);
+      font-weight: 400;
+      font-size: clamp(1.5rem, calc(1.167rem + 0.694vw), 2rem); /* min: 24px, max: 32px */
+      line-height: 120%;
+      letter-spacing: -0.04em;
+      color: #000;
+    }
+
+    .Accordion_header-icon {
+      --size: 32px;
+
+      min-width: var(--size);
+      min-height: var(--size);
+      transition: transform 0.3s ease-out;
+      path {
+        fill: #000;
+      }
+    }
+    .Accordion_content-description {
+      width: 100%;
+      max-height: 100%;
+      font-family: var(--font-family);
+      font-weight: 400;
+      font-size: 18px;
+      line-height: 136%;
+      letter-spacing: -0.02em;
+      color: #000;
+      opacity: 0.5;
+    }
+  }
+
+  @media (max-width: 1000px) {
+    padding-top: clamp(2.75rem, calc(1.557rem + 5.089vw), 4rem); /* min: 44px, max: 64px */
+    padding-bottom: clamp(2.75rem, calc(1.557rem + 5.089vw), 4rem); /* min: 44px, max: 64px */
+
+    display: flex;
+    flex-direction: column;
+    gap: clamp(1.5rem, calc(0.307rem + 5.089vw), 2.75rem); /* min: 24px, max: 44px */
+
+    .FAQSection-left {
+      position: static;
+      .InfoList {
+        display: none;
+      }
+      .FAQSection-title {
+        font-size: clamp(2rem, calc(1.046rem + 4.071vw), 3rem);
+        /* min: 32px, max: 48px */
+        line-height: 110%;
+      }
+    }
+    .FAQSection_right {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .Accordion {
+      .Accordion_header-title {
+        font-size: clamp(1.25rem, calc(1.011rem + 1.018vw), 1.5rem); /* min: 20px, max: 24px */
+      }
+      .Accordion_header-icon {
+        --size: clamp(1.5rem, calc(1.023rem + 2.036vw), 2rem); /* min: 24px, max: 32px */
+      }
+    }
+  }
+
+  @media (max-width: 470px) {
+    .FAQSection-title {
+      width: 360px;
+    }
+  }
+}

@@ -1,0 +1,69 @@
+.UserInfo {
+  .UserInfo_container {
+    .UserInfo_description {
+      font-family: var(--font-family);
+      font-weight: 400;
+      font-size: 28px;
+      line-height: 136%;
+      letter-spacing: -0.06em;
+      text-wrap: balance;
+      color: #000;
+    }
+  }
+
+  .UserInfo_footer {
+    display: flex;
+    margin-top: 80px;
+    gap: 8px;
+    flex-direction: column;
+
+    span {
+      font-family: var(--font-family);
+      font-weight: 400;
+      font-size: 24px;
+      line-height: 120%;
+      letter-spacing: -0.04em;
+      color: #000;
+    }
+
+    .Button {
+      font-size: 48px;
+    }
+  }
+
+  @media (max-width: 1440px) {
+    .UserInfo_container {
+      .UserInfo_description {
+        font-size: clamp(1.125rem, calc(0.411rem + 1.488vw), 1.75rem); /* min: 18px, max: 28px */
+      }
+    }
+
+    .UserInfo_footer {
+      margin-top: clamp(2.75rem, calc(0.179rem + 5.357vw), 5rem); /* min: 44px, max: 80px */
+
+      span {
+        font-size: clamp(1.125rem, calc(0.696rem + 0.893vw), 1.5rem); /* min: 18px, max: 24px */
+      }
+
+      .Button {
+        font-size: clamp(2rem, calc(0.857rem + 2.381vw), 3rem); /* min: 32px, max: 48px */
+      }
+    }
+  }
+
+  @media (max-width: 768px) {
+    .UserInfo_container {
+      .UserInfo_description {
+        letter-spacing: -0.02em;
+      }
+    }
+
+    .UserInfo_footer {
+      margin-top: clamp(2rem, calc(1.284rem + 3.053vw), 2.75rem); /* min: 32px, max: 44px */
+
+      .Button {
+        font-size: clamp(1.5rem, calc(1.023rem + 2.036vw), 2rem); /* min: 24px, max: 32px */
+      }
+    }
+  }
+}

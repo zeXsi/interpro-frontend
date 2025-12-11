@@ -1,0 +1,30 @@
+.MarqueeCarousel {
+  display: flex;
+  width: 100vw;
+  gap: clamp(4rem, calc(2.695rem + 5.566vw), 9.375rem);
+  overflow: hidden;
+
+  &.active .MarqueeCarousel-wrapper {
+    animation: marquee-animation 50s infinite linear;
+  }
+  .MarqueeCarousel-wrapper {
+    display: flex;
+    white-space: nowrap;
+    will-change: transform;
+
+    align-items: center;
+    transform: translate3d(0, 0, 0);
+
+    & > * {
+      height: 100%;
+    }
+  }
+}
+@keyframes marquee-animation {
+  0% {
+    transform: translateX(0%);
+  }
+  100% {
+    transform: translateX(-30%);
+  }
+}

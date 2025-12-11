@@ -1,0 +1,84 @@
+.AnimatedLabel {
+  --sizeIcon: clamp(1.5rem, calc(0.307rem + 5.089vw), 2.75rem);
+  /* min: 24px, max: 44px */
+  /* viewPort: 375-768 */
+  --gap: 15px;
+
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  gap: var(--gap);
+  cursor: pointer;
+  min-width: fit-content;
+
+  &.isFull {
+    min-width: 100%;
+    .AnimatedLabel-icon-second {
+      display: block;
+    }
+  }
+  .AnimatedLabel-icon,
+  .AnimatedLabel-icon-second {
+    transition: transform 0.3s ease-in-out;
+    width: var(--sizeIcon) !important;
+    height: var(--sizeIcon) !important;
+    flex-shrink: 0;
+  }
+
+  .AnimatedLabel-icon {
+    transform: translateX(-100%);
+  }
+  .AnimatedLabel-icon-second {
+    margin-left: auto;
+    display: none;
+  }
+  .AnimatedLabel-title {
+    font-family: var(--font-family);
+    font-weight: 400;
+    font-size: 64px;
+    line-height: 110%;
+    letter-spacing: -0.04em;
+    color: #000;
+    transform: translateX(calc(-0px - var(--sizeIcon) - var(--gap)));
+    transition: all 0.3s ease-in-out;
+    opacity: 0.5;
+  }
+
+  &.isHover {
+    @media (hover: hover) {
+      &:hover {
+        .AnimatedLabel-title {
+          transform: translateX(0);
+          opacity: 1;
+        }
+
+        .AnimatedLabel-icon {
+          transform: translateX(0);
+        }
+        .AnimatedLabel-icon-second {
+          transform: translateX(100%);
+        }
+      }
+    }
+  }
+
+  &.isActive {
+    .AnimatedLabel-title {
+      transform: translateX(0);
+      opacity: 1;
+    }
+
+    .AnimatedLabel-icon {
+      transform: translateX(0);
+    }
+    .AnimatedLabel-icon-second {
+      transform: translateX(100%);
+    }
+  }
+
+  @media (max-width: 768px) {
+    .AnimatedLabel-title {
+      font-size: clamp(1.75rem, calc(-0.397rem + 9.16vw), 4rem); /* min: 28px, max: 64px */
+    }
+  }
+}

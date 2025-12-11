@@ -1,0 +1,41 @@
+{
+  "clampExtension.baseFontSize": 16,
+  "clampExtension.globalMaxViewport": 1920,
+  "clampExtension.globalMinViewport": 375,
+  "clampExtension.showComments": true,
+  "folderTemplates.structures": [
+    {
+      "name": "React Component",
+      "omitParentDirectory": true,
+      "structure": [
+        {
+          "fileName": "<FTName>/index.tsx",
+          "template": "ReactComponent"
+        },
+        {
+          "fileName": "<FTName>/styles.css",
+          "template": "CSSFile"
+        }
+      ]
+    }
+  ],
+  "folderTemplates.fileTemplates": {
+    "ReactComponent": [
+      "import './styles.css';",
+      "",
+      "export default function <FTName>() {",
+      "  return (",
+      "    <div className='<FTName>'></div>",
+      "  );",
+      "}"
+    ],
+    "CSSFile": [
+      ".<FTName> {}"
+    ]
+  },
+  "cSpell.words": [
+    "BEHANCE",
+    "DRIBBBLE",
+    "ререндерится"
+  ],
+}

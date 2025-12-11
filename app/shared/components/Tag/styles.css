@@ -1,0 +1,33 @@
+.Tag {
+  display: flex;
+  flex-direction: column;
+  gap: clamp(0.25rem, calc(0.189rem + 0.259vw), 0.5rem);
+
+  /* min: 4px, max: 8px */
+  .Tag-subtitle {
+    font-family: var(--font-family);
+    font-weight: 500;
+    font-size: clamp(0.75rem, calc(0.659rem + 0.388vw), 1.125rem);
+    /* min: 12px, max: 18px */
+    line-height: 100%;
+    text-transform: uppercase;
+    color: #000;
+    opacity: 0.5;
+  }
+
+  .Tag-title {
+    font-family: var(--font-family);
+    font-weight: 400;
+    font-size: clamp(1.25rem, calc(1.068rem + 0.777vw), 2rem);
+    /* min: 20px, max: 32px */
+    line-height: 110%;
+    letter-spacing: -0.04em;
+    color: #000;
+    padding-bottom: clamp(0.063rem, calc(-0.116rem + 0.763vw), 0.25rem);
+    /* min: 1px, max: 4px */
+    /* viewPort: 768-1920 */
+    .Button {
+      padding: 0;
+    }
+  }
+}

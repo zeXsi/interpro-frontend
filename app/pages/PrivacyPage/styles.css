@@ -1,0 +1,48 @@
+.PrivacyPage {
+  width: min(1096px, 100%);
+  margin: 0 auto;
+  margin-top: 96px;
+  .PrivacyPage-title {
+    font-family: var(--font-family);
+    font-weight: 400;
+    font-size: clamp(2rem, calc(1.515rem + 2.071vw), 4rem); /* min: 32px, max: 64px */
+    line-height: 120%;
+    letter-spacing: -0.04em;
+    color: #000;
+    margin-bottom: clamp(1.75rem, calc(1.447rem + 1.294vw), 3rem); /* min: 28px, max: 48px */
+  }
+}
+
+.Block {
+  margin-bottom: clamp(1.75rem, calc(1.447rem + 1.294vw), 3rem);
+  /* min: 28px, max: 48px */
+  .Block_title {
+    font-family: var(--font-family);
+    font-weight: 500;
+    font-size: clamp(1.5rem, calc(1.379rem + 0.518vw), 2rem);
+    /* min: 24px, max: 32px */
+    line-height: 110%;
+    letter-spacing: -0.02em;
+    text-transform: uppercase;
+    color: #0c0c0c;
+    margin-bottom: clamp(0.5rem, calc(0.379rem + 0.518vw), 1rem); /* min: 8px, max: 16px */
+  }
+  .Block_container {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    .Paragraph {
+  .Paragraph-number,
+  .Paragraph-text {
+    font-family: var(--font-family);
+    font-weight: 400;
+    font-size: clamp(1.125rem, calc(1.034rem + 0.388vw), 1.5rem); /* min: 18px, max: 24px */
+    line-height: 136%;
+    letter-spacing: -0.06em;
+    color: #000;
+  }
+}
+
+  }
+}
+
