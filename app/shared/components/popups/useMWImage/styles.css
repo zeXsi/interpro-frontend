@@ -76,7 +76,7 @@
     img {
       width: 100%;
       height: 100%;
-      object-fit: cover;
+      object-fit: contain;
       user-select: none;
       -webkit-user-select: none;
       &.fade-in {
@@ -90,11 +90,11 @@
     }
 
     @media (max-width: 1440px) {
-      height: 62.5vh;
+      /* height: 62.5vh; */
     }
     @media (max-width: 768px) {
       width: 100vw;
-      height: 42.188vh;
+      /* height: 42.188vh; */
     }
   }
 
