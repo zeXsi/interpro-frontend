@@ -53,7 +53,7 @@ export default function ProjectCard(props: ProjectCardProps) {
             onMouseLeave={() => hoveredProject.v = -props.id}
             ref={refButton}
           >
-            {props.title}
+            {props.title.replaceAll("\\u00AD", "\u00AD")}
           </Button>
         </Link>
       </div>
