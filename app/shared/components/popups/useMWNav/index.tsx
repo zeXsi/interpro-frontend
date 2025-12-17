@@ -136,10 +136,14 @@ interface ContactsProps {
   toClosePopup: () => void;
 }
 function Contacts({ toClosePopup }: ContactsProps) {
+  const toClosePopupYM = () => {
+    toClosePopup();
+    ym(99631636,'reachGoal','reach_contact');
+  }
   return (
     <div className="Contacts px">
       <Link to={['/', '#ContactForm']}>
-        <Button variant="link" className="Contacts-title" onClick={toClosePopup}>
+        <Button variant="link" className="Contacts-title" onClick={toClosePopupYM}>
           оставить контакты
         </Button>
       </Link>

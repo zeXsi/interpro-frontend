@@ -53,7 +53,7 @@ function Header() {
             <span className="qntyProjects">{sgProjects.v.length}</span>
           </span>
         </li>
-        <li className="Header_list-li __contacts" onMouseEnter={() => showWithData('contacts')}>
+        <li className="Header_list-li __contacts" onMouseEnter={() => showWithData('contacts')} onClick={() => {ym(99631636,'reachGoal','button_contact')}}>
           связаться
         </li>
       </ul>
