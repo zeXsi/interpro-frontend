@@ -204,7 +204,7 @@ export function ErrorBoundary({ error }: Route.ErrorBoundaryProps) {
     return (
       <div id="root">
         <Header />
-        {/* <AdBanner /> */}
+        <AdBanner />
         <BTNContact />
         <ErrorNotFound />
         <ParallaxFooter
