@@ -177,8 +177,8 @@ export default function App() {
       <div id="root">
         <Header />
         <cookies.Popup />
-        {/* <AdBanner /> */}
-        {/* <form.Popup /> */}
+        <AdBanner />
+        <form.Popup />
         <BTNContact />
         <RouteGuard isValidRoutes={['/', '/privacy']} isInverted={true}>
           <NavigationTracker />

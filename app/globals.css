@@ -18,8 +18,7 @@
   --px: clamp(1rem, calc(0rem + 2.083vw), 2.5rem); /* min: 16px, max: 40px */
   --heightHeader: clamp(3.688rem, calc(2.33rem + 2.827vw), 4.875rem);
   /* min: 59px, max: 78px 768-1440 */
-  /* --adBanner-height: clamp(2.938rem, calc(2.341rem + 2.545vw), 3.563rem); */
-  --adBanner-height: 0;
+  --adBanner-height: clamp(2.938rem, calc(2.341rem + 2.545vw), 3.563rem);
   /* 47px @375px → 57px @768px */
   @media (max-width: 1000px) {
     --px: clamp(0.5rem, calc(0.023rem + 2.036vw), 1rem); /* min: 8px, max: 16px */

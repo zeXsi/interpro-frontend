@@ -89,19 +89,21 @@ interface MWFormPopupContentProps {
 
 export function Form({ onClose, subTitle = 'получите' , title = 'бесплатный дизайн-проект и консультацию', type = 'popup' }: MWFormPopupContentProps) {
   return (
-    <div className='Form'>
-      <ContactForm
-        onEnd={onClose}
-        type={type}
-        subtitle={subTitle}
-        title={title}
-      />
+    <div className='wrap-form'>
+        <div className='Form'>
+        <ContactForm
+          onEnd={onClose}
+          type={type}
+          subtitle={subTitle}
+          title={title}
+        />
 
-      <picture className="MWForm-bg">
-        <source media="(min-width: 1024px)" srcSet={srcDesk} />
-        <source media="(min-width: 768px)" srcSet={srcTable} />
-        <img src={srcMob} alt="background" />
-      </picture>
+        <picture className="MWForm-bg">
+          <source media="(min-width: 1024px)" srcSet={srcDesk} />
+          <source media="(min-width: 768px)" srcSet={srcTable} />
+          <img src={srcMob} alt="background" />
+        </picture>
+      </div>
     </div>
   );
 }

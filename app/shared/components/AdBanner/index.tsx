@@ -23,7 +23,6 @@ export default function AdBanner() {
       onTouchStart={() => (isHover.v = true)}
       onTouchEnd={ () => (isHover.v = false) }
       onClick={() => MWForm.v.toOpenPopup?.()}
-      style={{"display": "none !important"}}
     >
       <div className="AdBanner_text">
         <span className='AdBanner_text-li'>Получить бесплатный</span>

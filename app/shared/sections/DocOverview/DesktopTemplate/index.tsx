@@ -21,7 +21,7 @@ export default function DesktopTemplate({ isNotPage }: DocOverviewProps) {
   return (
     <div className="DesktopTemplate">
       <div className="wrapper">
-        <div classNaProjectPage_container-rightme="DesktopTemplate_left">
+        <div className="DesktopTemplate_left">
           {sgFeedbacks.v.slice(0, !isNotPage ? Infinity : 4).map(({ payload }, index) => {
             return (
               <AnimatedLabel

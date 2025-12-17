@@ -18,16 +18,17 @@ import useBreakpoints from '@qtpy/use-breakpoints';
 
 import ParallaxFooter from 'shared/components/ParallaxFooter';
 
-import srcVideo2 from 'assets/videos/video_2/video.mp4';
-import srcVideo2Mobile from 'assets/videos/video_2/video_mobile.mp4';
 import srcVideo2Cover from 'assets/videos/video_2/cover.jpg';
-import srcVideo2CoverMobile from 'assets/videos/video_2/cover_mobile.jpg';
-
-import srcVideo3 from 'assets/videos/video_3/video.mp4';
-import srcVideo3Mobile from 'assets/videos/video_3/video_mobile.mp4';
 import srcVideo3Cover from 'assets/videos/video_3/cover.jpg';
+import srcVideo2CoverMobile from 'assets/videos/video_2/cover_mobile.jpg';
 import srcVideo3CoverMobile from 'assets/videos/video_3/cover_mobile.jpg';
 import StartPage from 'shared/components/StartPage';
+
+// HLS видео пути
+const srcVideo2 = '/videos/video_2/hls/video.m3u8';
+const srcVideo3 = '/videos/video_3/hls/video.m3u8';
+const srcVideo2Mobile = '/videos/video_2/hls/video_mobile.m3u8';
+const srcVideo3Mobile = '/videos/video_3/hls/video_mobile.m3u8';
 
 export function meta() {
   const title = 'Interpro: главная';
@@ -98,7 +99,7 @@ export default function Home() {
             source={{
               src: configMedia.srcVideo2,
               cover: configMedia.srcVideo2Cover,
-              type: 'video/mp4',
+              type: 'application/x-mpegURL',
             }}
           />
           <TeamBoostSection />
@@ -119,7 +120,7 @@ export default function Home() {
             source={{
               src: configMedia.srcVideo3,
               cover: configMedia.srcVideo3Cover,
-              type: 'video/mp4',
+              type: 'application/x-mpegURL',
             }}
           />
           <DocOverview />

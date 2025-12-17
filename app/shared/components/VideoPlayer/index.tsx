@@ -1,9 +1,10 @@
 import './styles.css';
 import { memo, useEffect, useRef, useState } from 'react';
+import Hls from 'hls.js';
 
 export interface VideoSource<T extends string> {
   src: string;
-  type: 'video/mp4' | 'video/mov' | 'video/webm' | T;
+  type: 'video/mp4' | 'video/mov' | 'video/webm' | 'application/x-mpegURL' | T;
   cover?: string;
 }
 
@@ -33,24 +34,90 @@ const VideoPlayer = ({
   onError,
 }: VideoHeroProps) => {
   const refVideo = useRef<HTMLVideoElement>(null);
+  const hlsRef = useRef<Hls | null>(null);
   const [isVideoReady, setIsVideoReady] = useState(false);
 
   const updateSources = () => {
     const video = refVideo.current;
     if (!video) return;
 
-    while (video.firstChild) {
-      video.removeChild(video.firstChild);
+    // Очистка предыдущего HLS инстанса
+    if (hlsRef.current) {
+      hlsRef.current.destroy();
+      hlsRef.current = null;
     }
 
-    videoSources.forEach((source) => {
-      const sourceElement = document.createElement('source');
-      sourceElement.src = source.src;
-      sourceElement.type = source.type;
-      video.appendChild(sourceElement);
-    });
+    // Проверяем, есть ли HLS источник
+    const hlsSource = videoSources.find(
+      (source) => source.type === 'application/x-mpegURL' || source.src.endsWith('.m3u8')
+    );
 
-    video.load();
+    if (hlsSource) {
+      // Используем HLS.js для воспроизведения
+      if (Hls.isSupported()) {
+        const hls = new Hls({
+          enableWorker: true,
+          lowLatencyMode: false,
+        });
+        hlsRef.current = hls;
+
+        hls.loadSource(hlsSource.src);
+        hls.attachMedia(video);
+
+        hls.on(Hls.Events.MANIFEST_PARSED, () => {
+          setIsVideoReady(true);
+          if (autoPlay) {
+            playVideo();
+          }
+        });
+
+        hls.on(Hls.Events.ERROR, (event, data) => {
+          console.error('HLS ошибка:', data);
+          if (data.fatal) {
+            switch (data.type) {
+              case Hls.ErrorTypes.NETWORK_ERROR:
+                console.error('Фатальная сетевая ошибка');
+                hls.startLoad();
+                break;
+              case Hls.ErrorTypes.MEDIA_ERROR:
+                console.error('Фатальная медиа ошибка');
+                hls.recoverMediaError();
+                break;
+              default:
+                console.error('Невосстановимая ошибка');
+                hls.destroy();
+                break;
+            }
+          }
+          if (onError) {
+            onError(new Error(data.details));
+          }
+        });
+      } else if (video.canPlayType('application/vnd.apple.mpegurl')) {
+        // Нативная поддержка HLS (Safari)
+        video.src = hlsSource.src;
+        video.addEventListener('loadedmetadata', () => {
+          setIsVideoReady(true);
+          if (autoPlay) {
+            playVideo();
+          }
+        });
+      }
+    } else {
+      // Обычные видео форматы (mp4, webm, mov)
+      while (video.firstChild) {
+        video.removeChild(video.firstChild);
+      }
+
+      videoSources.forEach((source) => {
+        const sourceElement = document.createElement('source');
+        sourceElement.src = source.src;
+        sourceElement.type = source.type;
+        video.appendChild(sourceElement);
+      });
+
+      video.load();
+    }
   };
 
   const playVideo = async () => {
@@ -89,10 +156,23 @@ const VideoPlayer = ({
     };
 
     updateSources();
-    video.addEventListener('canplay', handleCanPlay);
+
+    // Добавляем обработчик только для не-HLS видео
+    const hasHlsSource = videoSources.some(
+      (source) => source.type === 'application/x-mpegURL' || source.src.endsWith('.m3u8')
+    );
+
+    if (!hasHlsSource) {
+      video.addEventListener('canplay', handleCanPlay);
+    }
 
     return () => {
       video.removeEventListener('canplay', handleCanPlay);
+      // Очистка HLS при размонтировании
+      if (hlsRef.current) {
+        hlsRef.current.destroy();
+        hlsRef.current = null;
+      }
     };
   }, [onError, videoSources]);
 
