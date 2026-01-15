@@ -130,9 +130,14 @@ export default function ContactForm({
   );
 
   const refSend = useRef<HTMLSpanElement>(null);
-  // test@gmail.com;
+  
   const submit = () => {
-    ym?.(99631636, 'reachGoal', 'request_form');
+    if (type === 'popup') {
+      ym?.(99631636, 'reachGoal', 'request_form');
+    } else {
+      ym?.(99631636, 'reachGoal', 'request_popup');
+    }
+
     form.onSubmit(async (data: any) => {
       refSend.current?.toggleAttribute('disabled', true);
       if (type === 'excursion') {
@@ -236,7 +241,9 @@ export const ConsentCheckbox = React.memo(
 
     return (
       <div
-        className={`ConsentCheckbox ${className} ${value ? 'active' : ''} ${isError ? 'error' : ''}`}
+        className={`ConsentCheckbox ${className} ${value ? 'active' : ''} ${
+          isError ? 'error' : ''
+        }`}
       >
         {/* Скрытый input, управляющий сигналом */}
         <field.Input type="checkbox" isHide />
