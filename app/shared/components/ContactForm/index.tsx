@@ -133,9 +133,9 @@ export default function ContactForm({
   
   const submit = () => {
     if (type === 'popup') {
-      ym?.(99631636, 'reachGoal', 'request_form');
-    } else {
       ym?.(99631636, 'reachGoal', 'request_popup');
+    } else {
+      ym?.(99631636, 'reachGoal', 'request_form');
     }
 
     form.onSubmit(async (data: any) => {

@@ -52,7 +52,7 @@ export default function AboutUsMedia() {
         </Link>
       </div>
       <div className="AboutUsMedia-container">
-        <Link to={import.meta.env.VITE_TELEGRAM_URL_1} typeLink="external">
+        <Link to={import.meta.env.VITE_TELEGRAM_URL_2} typeLink="external">
           <MediaItem
             srcImg={srcImg1}
             title="Telegram—канал"
