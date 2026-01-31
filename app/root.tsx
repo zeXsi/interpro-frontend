@@ -17,6 +17,7 @@ import { getFeedNews, getFeedBlog } from 'api/feed/feed.api';
 import { getFeedbacks } from 'api/feedbacks/feedbacks.api';
 import { getLicenses } from 'api/licenses/license.api';
 import { getServiceCategories, getServices } from 'api/services/services.api';
+import { useLocation } from 'react-router';
 
 import { getSSRStore } from 'shared/utils/_stm';
 import Header from 'shared/components/Header';
@@ -167,6 +168,7 @@ export async function loader(_args: Route.LoaderArgs) {
 }
 
 export default function App() {
+  const location = useLocation();
   const cookies = useCookies();
   const form = useMWForm();
   useEffect(() => {
@@ -175,15 +177,20 @@ export default function App() {
   return (
     <>
       <div id="root">
-        <Header />
-        <cookies.Popup />
-        <AdBanner />
-        <form.Popup />
-        <BTNContact />
-        <RouteGuard isValidRoutes={['/', '/privacy']} isInverted={true}>
-          <NavigationTracker />
-        </RouteGuard>
-        <ParallaxFooter PreElement={Outlet} Element={FooterC} />
+        {location.pathname !== '/presentation' && (
+          <>
+            <Header />
+            <cookies.Popup />
+            <AdBanner />
+            <form.Popup />
+            <BTNContact />
+            <RouteGuard isValidRoutes={['/', '/privacy']} isInverted={true}>
+              <NavigationTracker />
+            </RouteGuard>
+            <ParallaxFooter PreElement={Outlet} Element={FooterC} />
+          </>
+        )}
+        {location.pathname == '/presentation' && <Outlet />}
       </div>
     </>
   );

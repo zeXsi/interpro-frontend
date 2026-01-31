@@ -1,0 +1,88 @@
+.PresentationHeader {
+  position: fixed;
+  top: 16px;
+  left: 0;
+  width: 100%;
+  .PresentationHeader__list {
+    list-style: none;
+    display: grid;
+    grid-template-columns: repeat(6, 1fr);
+    gap: 20px;
+
+    @media (width <= 1024px) {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  .PresentationHeader__item {
+    &:first-of-type {
+      grid-column: span 2 / span 2;
+
+      @media (width <= 1024px) {
+        display: none;
+      }
+    }
+
+    &:last-of-type {
+      gap: 8px;
+
+      @media (width > 1024px) {
+        grid-column: span 2 / span 2;
+        grid-column-start: 5;
+        margin-left: auto;
+      }
+
+      @media (width <= 1024px) {
+        justify-content: space-between;
+      }
+    }
+
+    display: flex;
+    gap: 16px;
+
+    .PresentationHeader__item-box {
+      padding: 20px 16px;
+      border-radius: 100px;
+      backdrop-filter: blur(5px);
+      background: rgba(255, 255, 255, 0.5);
+      font-family: var(--font-family);
+      font-weight: 500;
+      font-size: 18px;
+      line-height: 90%;
+      letter-spacing: -0.04em;
+      color: #282828;
+      display: flex;
+      gap: 8px;
+
+      span {
+        font-weight: 400;
+      }
+    }
+
+    .PresentationHeader__item-button {
+      padding: 20px 12px;
+      border-radius: 100px;
+      font-family: var(--font-family);
+      font-size: 18px;
+      line-height: 90%;
+      letter-spacing: -0.04em;
+      color: #000;
+      cursor: pointer;
+      backdrop-filter: blur(5px);
+      background: rgba(255, 255, 255, 0.5);
+
+      @media (width <= 1024px) {
+        font-size: 16px;
+      }
+
+      &:last-of-type {
+        background: #000;
+
+        a {
+          color: #fff;
+          text-decoration: none;
+        }
+      }
+    }
+  }
+}

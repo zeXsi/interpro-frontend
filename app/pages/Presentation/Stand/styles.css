@@ -1,0 +1,12 @@
+.Stand {
+  display: grid;
+  gap: 24px;
+
+  @media (width <= 1024px) {
+    gap: 16px;
+  }
+  
+  img {
+    height: 100dvh;
+  }
+}
