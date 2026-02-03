@@ -57,18 +57,31 @@ const VideoPlayer = ({
       if (Hls.isSupported()) {
         const hls = new Hls({
           enableWorker: true,
-          lowLatencyMode: false,
+
+          // Быстрее до первого кадра
+          startFragPrefetch: true,      // заранее тянуть стартовый сегмент
+          testBandwidth: true,          // быстрее выбрать качество на старте
+
+          // Меньше буфера = быстрее старт (но менее устойчиво на плохой сети)
+          maxBufferLength: 10,          // сек
+          maxMaxBufferLength: 20,
+          backBufferLength: 0,
+          maxBufferHole: 0.5,
+
+          // Иногда помогает старту на мобильных
+          capLevelToPlayerSize: true,   // не грузить 1080p на маленький блок
+
+          lowLatencyMode: false,       
         });
+
         hlsRef.current = hls;
 
         hls.loadSource(hlsSource.src);
         hls.attachMedia(video);
 
-        hls.on(Hls.Events.MANIFEST_PARSED, () => {
+        hls.on(Hls.Events.MEDIA_ATTACHED, () => {
           setIsVideoReady(true);
-          if (autoPlay) {
-            playVideo();
-          }
+          if (autoPlay) playVideo();
         });
 
         hls.on(Hls.Events.ERROR, (event, data) => {
@@ -136,15 +149,15 @@ const VideoPlayer = ({
     }
   };
 
-  const handleVideoClick = () => {
-    const video = refVideo.current;
-    if (!video) return;
+  // const handleVideoClick = () => {
+  //   const video = refVideo.current;
+  //   if (!video) return;
 
-    if (video.paused || !isVideoReady) {
-      updateSources();
-      playVideo();
-    }
-  };
+  //   if (video.paused || !isVideoReady) {
+  //     updateSources();
+  //     playVideo();
+  //   }
+  // };
 
   useEffect(() => {
     const video = refVideo.current;
@@ -187,11 +200,11 @@ const VideoPlayer = ({
         loop={loop}
         playsInline={playsInline}
         preload={preload}
-        onClick={handleVideoClick}
+        // onClick={handleVideoClick}
       >
-        {videoSources.map((source, index) => (
+        {/* {videoSources.map((source, index) => (
           <source key={index} src={source.src} type={source.type} />
-        ))}
+        ))} */}
         Ваш браузер не поддерживает видео.
       </video>
     </div>
