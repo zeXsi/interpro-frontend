@@ -1,8 +1,8 @@
 import './styles.css';
 
-export default function Description({ data }: any) {
+export default function Description({ data, id }: any) {
   return (
-    <div className="About">
+    <section className="About" id={id}>
       <div className="About__wrapper">
         <p className="About__abovetxt">( задача )</p>
       </div>
@@ -10,7 +10,7 @@ export default function Description({ data }: any) {
         className="About__text_body"
         dangerouslySetInnerHTML={{ __html: data.fields.text_body }}
       ></div>
-    </div>
+    </section>
     // <section className="Description">
     //   <div className="Description__content">
     //     <p className="Description__abovetxt">( задача )</p>

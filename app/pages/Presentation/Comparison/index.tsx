@@ -3,9 +3,9 @@ import { ImgComparisonSlider } from '@img-comparison-slider/react';
 import Comparison1 from 'assets/imgs/Presentation/Comparison1.png';
 import Comparison2 from 'assets/imgs/Presentation/Comparison2.png';
 
-export default function Comparison({ data }: any) {
+export default function Comparison({ data, id }: any) {
   return (
-    <section className="Comparison">
+    <section className="Comparison" id={id}>
       <ImgComparisonSlider>
         <img slot="first" src={data.fields.ba_before?.full} />
         <img slot="second" src={data.fields.ba_after?.full} />

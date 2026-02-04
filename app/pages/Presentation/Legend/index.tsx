@@ -2,56 +2,8 @@ import './styles.css';
 
 import { Swiper, SwiperSlide } from 'swiper/react';
 import { Mousewheel, Pagination, EffectFade } from 'swiper/modules';
-import slide from 'assets/imgs/Presentation/slide.png';
-import stand1 from 'assets/imgs/Presentation/stand1.png';
-import stand2 from 'assets/imgs/Presentation/stand2.png';
-import Comparison1 from 'assets/imgs/Presentation/Comparison1.png';
-import Comparison2 from 'assets/imgs/Presentation/Comparison2.png';
 
-const tabsContent = [
-  {
-    id: 1,
-    title: 'Навес',
-    material: 'сталь',
-    height: '4 метра',
-    image: Comparison1,
-    desc: 'Возвышенным, между утилитарным продуктом и визуальным образом. Уорхол превращал банку супа в произведение искусства. превращал банку супа в произведение искусства.',
-  },
-  {
-    id: 2,
-    title: 'второй этаж',
-    material: 'сталь',
-    height: '4 метра',
-    image: Comparison2,
-    desc: 'Возвышенным, между утилитарным продуктом и визуальным образом. Уорхол превращал банку супа в произведение искусства. превращал банку супа в произведение искусства.',
-  },
-  {
-    id: 3,
-    title: 'экран',
-    material: 'сталь',
-    height: '4 метра',
-    image: slide,
-    desc: 'Возвышенным, между утилитарным продуктом и визуальным образом. Уорхол превращал банку супа в произведение искусства. превращал банку супа в произведение искусства.',
-  },
-  {
-    id: 4,
-    title: 'зона 1',
-    material: 'сталь',
-    height: '4 метра',
-    image: stand1,
-    desc: 'Возвышенным, между утилитарным продуктом и визуальным образом. Уорхол превращал банку супа в произведение искусства. превращал банку супа в произведение искусства.',
-  },
-  {
-    id: 5,
-    title: 'зона 2',
-    material: 'сталь',
-    height: '4 метра',
-    image: stand2,
-    desc: 'Возвышенным, между утилитарным продуктом и визуальным образом. Уорхол превращал банку супа в произведение искусства. превращал банку супа в произведение искусства.',
-  },
-];
-
-export default function Legend({ data }: any) {
+export default function Legend({ data, id }: any) {
   const pagination = {
     clickable: true,
     renderBullet: function (index: number, className: string) {
@@ -62,7 +14,7 @@ export default function Legend({ data }: any) {
   };
 
   return (
-    <section className="Legend">
+    <section className="Legend" id={id}>
       <Swiper
         direction={'vertical'}
         slidesPerView={1}
@@ -99,7 +51,7 @@ export default function Legend({ data }: any) {
           <div className="Legend__content-desc">
             <ul className="Legend__content-list">
               {item.attrs.map((attr: any) => (
-                <li className="Legend__content-item">
+                <li className="Legend__content-item" key={attr.label}>
                   <span>{attr.label}</span>
                   <p>{attr.value}</p>
                 </li>

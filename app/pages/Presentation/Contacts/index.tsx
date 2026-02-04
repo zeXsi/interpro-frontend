@@ -1,10 +1,10 @@
-import Button from 'shared/components/Button';
 import './styles.css';
+import Button from 'shared/components/Button';
 import { Link } from 'react-router';
 
-export default function Contacts({ data }: any) {
+export default function Contacts({ data, id }: any) {
   return (
-    <section className="Contacts">
+    <section className="Contacts" id={id}>
       <div className="Contacts__content">
         <div className="Contacts__col">
           <p>( менеджер )</p>

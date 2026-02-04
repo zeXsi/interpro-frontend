@@ -1,0 +1,42 @@
+.PresentationFooter {
+  position: fixed;
+  bottom: 16px;
+  z-index: 9999;
+
+  @media (width <= 1024px) {
+    display: none;
+  }
+
+  .PresentationFooter__list {
+    display: flex;
+    gap: 16px;
+    justify-content: center;
+    list-style: none;
+    padding: 20px 16px;
+    border-radius: 100px;
+    backdrop-filter: blur(5px);
+    background: rgba(255, 255, 255, 0.5);
+  }
+
+  .PresentationFooter__link {
+    text-decoration: none;
+    font-family: var(--font-family);
+    font-size: 14px;
+    line-height: 90%;
+    letter-spacing: -0.04em;
+    color: #000;
+    opacity: 0.5;
+    transition: 0.3s ease-out;
+    display: flex;
+    gap: 4px;
+    align-items: center;
+
+    &.active {
+      opacity: 1;
+
+      &::before {
+        content: '•';
+      }
+    }
+  }
+}

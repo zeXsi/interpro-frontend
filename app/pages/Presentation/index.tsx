@@ -12,6 +12,7 @@ import Content from './Content';
 import { createPresentationQuery } from 'api/presentation/presentation.api';
 import { useLoaderData } from 'react-router';
 import Video from './Video';
+import PresentationFooter from './Footer';
 
 export async function loader() {
   try {
@@ -35,17 +36,25 @@ export default function Presentation() {
       <main>
         <Cover />
         {presentationResponse.slides.map((item: any) => {
-          if (item.type === 'text') return <Description data={item} key={item.id} />;
-          if (item.type === 'photo_text') return <Idea data={item} key={item.id} />;
-          if (item.type === 'stand_view') return <Stand data={item} key={item.id} />;
-          if (item.type === 'before_after') return <Comparison data={item} key={item.id} />;
-          if (item.type === 'legend') return <Legend data={item} key={item.id} />;
-          if (item.type === 'contacts') return <Contacts data={item} key={item.id} />;
-          if (item.type === 'video') return <Video data={item} key={item.id} />;
+          if (item.type === 'text')
+            return <Description id={item.type + item.id} data={item} key={item.id} />;
+          if (item.type === 'photo_text')
+            return <Idea id={item.type + item.id} data={item} key={item.id} />;
+          if (item.type === 'stand_view')
+            return <Stand id={item.type + item.id} data={item} key={item.id} />;
+          if (item.type === 'before_after')
+            return <Comparison id={item.type + item.id} data={item} key={item.id} />;
+          if (item.type === 'legend')
+            return <Legend id={item.type + item.id} data={item} key={item.id} />;
+          if (item.type === 'contacts')
+            return <Contacts id={item.type + item.id} data={item} key={item.id} />;
+          if (item.type === 'video')
+            return <Video id={item.type + item.id} data={item} key={item.id} />;
         })}
         <Content />
         <Panorama />
       </main>
+      <PresentationFooter />
     </>
   );
 }
