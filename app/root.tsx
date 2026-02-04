@@ -95,7 +95,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
         <script type="text/javascript" dangerouslySetInnerHTML={{ __html: getSSRStore() }} />
 
         {/* Yandex.Metrika counter */}
-        <script type="text/javascript" dangerouslySetInnerHTML={{ __html: yandexMetrikaScript }} />
+        {/* <script type="text/javascript" dangerouslySetInnerHTML={{ __html: yandexMetrikaScript }} /> */}
       </head>
       <body>
         {/* Yandex.Metrika counter */}
