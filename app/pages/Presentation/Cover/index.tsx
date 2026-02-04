@@ -4,18 +4,19 @@ import { useLoaderData } from 'react-router';
 export default function Cover() {
   const presentationResponse = useLoaderData();
 
+  const renderSpans = (arr?: any[]) => arr?.map((item, index) => <span key={index}>{item}</span>);
+
   return (
     <section className="Cover" id="hero">
       <h1 className="Cover__title">{presentationResponse.title}</h1>
       <p className="Cover__txt">
-        {presentationResponse.tax?.year && <span>{presentationResponse.tax.year[0]}</span>}
-        {presentationResponse.tax?.expo && <span>{presentationResponse.tax.expo[0]}</span>}
-        {presentationResponse.tax?.stand_type && (
-          <span>{presentationResponse.tax.stand_type[0]}</span>
-        )}
+        {renderSpans(presentationResponse.tax?.year)}
+        {renderSpans(presentationResponse.tax?.expo)}
+        {renderSpans(presentationResponse.tax?.stand_type)}
+        
         {presentationResponse?.project_size && (
           <span>
-            {presentationResponse?.project_size} м<sup>2</sup>
+            {presentationResponse.project_size} м<sup>2</sup>
           </span>
         )}
       </p>

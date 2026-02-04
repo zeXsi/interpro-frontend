@@ -4,6 +4,8 @@ import { useLoaderData } from 'react-router';
 export default function PresentationHeader() {
   const presentationResponse = useLoaderData();
 
+  const renderSpans = (arr?: any[]) => arr?.map((item, index) => <span key={index}>{item}</span>);
+
   const handlePrint = () => {
     if (typeof window !== 'undefined') {
       window.print();
@@ -15,15 +17,16 @@ export default function PresentationHeader() {
       <nav className="PresentationHeader__nav">
         <ul className="PresentationHeader__list">
           <li className="PresentationHeader__item">
+            {presentationResponse.title && (
+              <div className="PresentationHeader__item-box">
+                INTER PRO x {presentationResponse.title}
+              </div>
+            )}
             <div className="PresentationHeader__item-box">
-              INTER PRO x {presentationResponse.title}
-            </div>
-            <div className="PresentationHeader__item-box">
-              {presentationResponse.tax?.year && <span>{presentationResponse.tax.year[0]}</span>}
-              {presentationResponse.tax?.expo && <span>{presentationResponse.tax.expo[0]}</span>}
-              {presentationResponse.tax?.stand_type && (
-                <span>{presentationResponse.tax.stand_type[0]}</span>
-              )}
+              {renderSpans(presentationResponse.tax?.year)}
+              {renderSpans(presentationResponse.tax?.expo)}
+              {renderSpans(presentationResponse.tax?.stand_type)}
+
               {presentationResponse?.project_size && (
                 <span>
                   {presentationResponse.project_size} м<sup>2</sup>

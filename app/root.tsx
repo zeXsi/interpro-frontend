@@ -174,10 +174,13 @@ export default function App() {
   useEffect(() => {
     lenisManager.init();
   }, []);
+
+  const isPresentation = location.pathname.startsWith('/presentation');
+
   return (
     <>
       <div id="root">
-        {location.pathname !== '/presentation' && (
+        {!isPresentation && (
           <>
             <Header />
             <cookies.Popup />
@@ -190,7 +193,7 @@ export default function App() {
             <ParallaxFooter PreElement={Outlet} Element={FooterC} />
           </>
         )}
-        {location.pathname == '/presentation' && <Outlet />}
+        {isPresentation && <Outlet />}
       </div>
     </>
   );

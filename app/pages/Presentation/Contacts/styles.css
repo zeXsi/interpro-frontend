@@ -68,12 +68,19 @@
         line-height: 90%;
         letter-spacing: -0.04em;
         cursor: pointer;
-        backdrop-filter: blur(5px);
+        backdrop-filter: blur(7px);
         background: #000;
         margin-top: 64px;
+        color: #fff;
+        transition: 0.3s ease-out;
+
+        @media (hover: hover) {
+          &:hover {
+            background: rgba(0, 0, 0, 0.5);
+          }
+        }
 
         a {
-          color: #fff;
           text-decoration: none;
         }
 

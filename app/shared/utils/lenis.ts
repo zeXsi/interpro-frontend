@@ -16,8 +16,14 @@ export class LenisManager {
       duration: 1.1,
       smoothWheel: true,
       wheelMultiplier: 1,
+
+      prevent: ((node: HTMLElement) => {
+        return Boolean(node.closest('[data-lenis-prevent]'));
+      }) as (node: HTMLElement) => boolean,
     });
-    
+
+
+
     this.state.v = this.lenis;
     this.startRaf();
   }

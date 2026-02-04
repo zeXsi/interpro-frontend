@@ -2,15 +2,18 @@ import './styles.css';
 
 export default function Description({ data, id }: any) {
   return (
-    <section className="About" id={id}>
-      <div className="About__wrapper">
-        <p className="About__abovetxt">( задача )</p>
-      </div>
-      <div
-        className="About__text_body"
-        dangerouslySetInnerHTML={{ __html: data.fields.text_body }}
-      ></div>
-    </section>
+    data.fields.text_heading ||
+    data.fields.text_body && (
+      <section className="About" id={id}>
+        <div className="About__wrapper">
+          <p className="About__abovetxt">{data.fields.text_heading}</p>
+        </div>
+        <div
+          className="About__text_body"
+          dangerouslySetInnerHTML={{ __html: data.fields.text_body }}
+        ></div>
+      </section>
+    )
     // <section className="Description">
     //   <div className="Description__content">
     //     <p className="Description__abovetxt">( задача )</p>

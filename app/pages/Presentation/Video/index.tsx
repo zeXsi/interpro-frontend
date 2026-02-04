@@ -19,16 +19,18 @@ function getEmbedSrc({ vid_embed, vid_provider }: any) {
 export default function Video({ data, id }: any) {
   const src = getEmbedSrc(data.fields);
   return (
-    <section className="Video" id={id}>
-      <iframe
-        src={src}
-        // allow="autoplay; fullscreen; picture-in-picture"
-        // webkitAllowFullScreen
-        // mozallowfullscreen
-        allowFullScreen
-        frameBorder="0"
-        title="video"
-      />
-    </section>
+    src && (
+      <section className="Video" id={id} data-lenis-prevent>
+        <iframe
+          src={src}
+          // allow="autoplay; fullscreen; picture-in-picture"
+          // webkitAllowFullScreen
+          // mozallowfullscreen
+          allowFullScreen
+          frameBorder="0"
+          title="video"
+        />
+      </section>
+    )
   );
 }

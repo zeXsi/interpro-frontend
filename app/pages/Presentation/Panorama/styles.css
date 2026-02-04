@@ -1,0 +1,7 @@
+.panorama canvas {
+  cursor: grab;
+}
+
+.panorama canvas:active {
+  cursor: grabbing;
+}

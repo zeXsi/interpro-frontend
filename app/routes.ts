@@ -10,7 +10,7 @@ export default [
   route('/thankyou', './pages/ThankYouPage/index.tsx'),
   route('/faq', './pages/FAQPage/index.tsx'),
   route('/excursion', './pages/Excursion/index.tsx'),
-  route('/presentation', './pages/Presentation/index.tsx'),
+  route('/presentation/:name', './pages/Presentation/index.tsx'),
   route('/*', './pages/ErrorNotFound/index.tsx'),
 
   ...prefix('/blog', [

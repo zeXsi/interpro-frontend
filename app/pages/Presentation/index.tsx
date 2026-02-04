@@ -9,10 +9,10 @@ import Comparison from './Comparison';
 import Legend from './Legend';
 import Panorama from './Panorama';
 import Content from './Content';
-import { createPresentationQuery } from 'api/presentation/presentation.api';
-import { useLoaderData } from 'react-router';
 import Video from './Video';
 import PresentationFooter from './Footer';
+import { createPresentationQuery } from 'api/presentation/presentation.api';
+import { useLoaderData } from 'react-router';
 
 export async function loader() {
   try {
@@ -30,29 +30,29 @@ export default function Presentation() {
   const presentationResponse = useLoaderData();
   console.log(presentationResponse);
 
+  const COMPONENTS: Record<string, React.FC<any>> = {
+    text: Description,
+    photo_text: Idea,
+    stand_view: Stand,
+    before_after: Comparison,
+    legend: Legend,
+    contacts: Contacts,
+    heading: Content,
+    video: Video,
+    photo_360: Panorama,
+  };
+
   return (
     <>
       <PresentationHeader />
       <main>
         <Cover />
         {presentationResponse.slides.map((item: any) => {
-          if (item.type === 'text')
-            return <Description id={item.type + item.id} data={item} key={item.id} />;
-          if (item.type === 'photo_text')
-            return <Idea id={item.type + item.id} data={item} key={item.id} />;
-          if (item.type === 'stand_view')
-            return <Stand id={item.type + item.id} data={item} key={item.id} />;
-          if (item.type === 'before_after')
-            return <Comparison id={item.type + item.id} data={item} key={item.id} />;
-          if (item.type === 'legend')
-            return <Legend id={item.type + item.id} data={item} key={item.id} />;
-          if (item.type === 'contacts')
-            return <Contacts id={item.type + item.id} data={item} key={item.id} />;
-          if (item.type === 'video')
-            return <Video id={item.type + item.id} data={item} key={item.id} />;
+          const Component = COMPONENTS[item.type];
+          if (!Component) return null;
+
+          return <Component key={item.id} id={item.type + item.id} data={item} />;
         })}
-        <Content />
-        <Panorama />
       </main>
       <PresentationFooter />
     </>

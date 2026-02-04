@@ -1,4 +1,6 @@
 .Comparison {
+  cursor: pointer;
+  
   @media (width <= 1024px) {
     padding-top: 124px;
   }

@@ -34,15 +34,7 @@
 
     &:has(.Idea__content-slides:not(.single)) {
       flex-direction: column;
-      padding-top: 157px;
-
-      @media (width <= 1024px) {
-        padding-top: 124px;
-      }
-
-      @media (width <= 540px) {
-        padding-top: 64px;
-      }
+      justify-content: center;
 
       .Idea__content-desc {
         display: grid;
@@ -67,9 +59,10 @@
       align-items: flex-end;
 
       .Idea__content-desc {
-        width: 41%;
         padding-left: 40px;
         padding-bottom: 40px;
+        width: auto;
+        flex-grow: 1;
 
         @media (width <= 1024px) {
           width: 100%;
@@ -114,6 +107,8 @@
 
         img {
           aspect-ratio: 16/9;
+          min-height: 600px;
+          max-height: 600px;
 
           @media (width <= 1024px) {
             aspect-ratio: 1;
@@ -147,15 +142,15 @@
       }
 
       &.triple {
-        grid-template-columns: repeat(6, 1fr) !important;
-        gap: 8px !important;
+        grid-template-columns: repeat(6, 1fr);
+        gap: 20px;
 
         img {
-          grid-column: 2 span !important;
-          aspect-ratio: 1 !important;
+          grid-column: 2 span;
+          aspect-ratio: 1;
 
           @media (width <= 1024px) {
-            aspect-ratio: 3/4 !important;
+            aspect-ratio: 3/4;
           }
         }
       }
