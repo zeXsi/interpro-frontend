@@ -1,0 +1,24 @@
+.Comparison {
+  @media (width <= 1024px) {
+    padding-top: 124px;
+  }
+
+  @media (width <= 540px) {
+    padding-top: 64px;
+  }
+
+  img-comparison-slider {
+    width: 100%;
+    height: 100%;
+    display: block;
+    --divider-width: 4px;
+
+    img {
+      height: 100dvh;
+
+      @media (width <= 1024px) {
+        height: auto;
+      }
+    }
+  }
+}

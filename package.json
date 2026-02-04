@@ -9,6 +9,7 @@
     "typecheck": "react-router typegen && tsc"
   },
   "dependencies": {
+    "@img-comparison-slider/react": "^8.0.2",
     "@pbe/react-yandex-maps": "^1.2.5",
     "@qtpy/route-guard": "^0.0.4",
     "@qtpy/use-breakpoints": "^0.1.21",
@@ -17,6 +18,8 @@
     "@qtpy/use-ref-map": "^0.0.4",
     "@react-router/node": "^7.9.2",
     "@react-router/serve": "^7.9.2",
+    "@react-three/drei": "^10.7.7",
+    "@react-three/fiber": "^9.5.0",
     "axios": "^1.13.2",
     "hls.js": "^1.6.15",
     "isbot": "^5.1.31",
@@ -26,6 +29,7 @@
     "react-dom": "^19.2.0",
     "react-router": "^7.9.2",
     "swiper": "^12.0.3",
+    "three": "^0.182.0",
     "valibot": "^1.2.0"
   },
   "devDependencies": {

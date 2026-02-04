@@ -1,23 +1,27 @@
 import './styles.css';
 
-import slideImg from 'assets/imgs/Presentation/slide.png';
+// import slideImg from 'assets/imgs/Presentation/slide.png';
 import useMWImage from 'shared/components/popups/useMWImage';
+import Text from 'shared/components/Text';
 
-const slides = [slideImg, slideImg];
+// const slides = [slideImg, slideImg];
 
-export default function Idea() {
+export default function Idea({ data }: any) {
   const { Popup, showWithData } = useMWImage();
   const openAllImages = (currentSrc?: string) => {
     if (!currentSrc) return;
-    const index = slides.findIndex((src) => src === currentSrc);
-    showWithData([index >= 0 ? index : 0, slides as any]);
+    const index = data.fields.pt_images.findIndex((src: any) => src.full === currentSrc);
+    const images = data.fields.pt_images.map((item: any) => item.full);
+    showWithData([index >= 0 ? index : 0, images as any]);
   };
+
   return (
-    <section className="Idea">
+    <section className={`Idea ${!data.fields.pt_images.length && !data.fields?.pt_heading && 'empty'}`}>
       <Popup />
       <div className="Idea__content">
         <div className="Idea__content-desc">
-          <p>
+          {data.fields?.pt_heading && <Text>{data.fields.pt_heading}</Text>}
+          {/* <p>
             Что делает обычный продукт предметом искусства? Почему суповая банка становится
             экспонатом музея, а резервуар с газом — культурным символом? Этот проект — отсылка
             к эстетике Энди Уорхола, художника, поставившего знак равенства между повседневным
@@ -25,15 +29,22 @@ export default function Idea() {
             <br />
             Возвышенным, между утилитарным продуктом и визуальным образом. Уорхол превращал банку
             супа в произведение искусства. превращал банку супа в произведение искусства.
-          </p>
+          </p> */}
         </div>
-        <div
-          className={`Idea__content-slides ${['single', 'double', 'triple'][slides.length - 1]}`}
-        >
-          {slides.map((item) => (
-            <img src={item} alt="Идея и концепция" key={item} onClick={() => openAllImages(item)} />
-          ))}
-        </div>
+        {data.fields?.pt_images && (
+          <div
+            className={`Idea__content-slides ${['single', 'double', 'triple'][data.fields.pt_images.length - 1]}`}
+          >
+            {data.fields.pt_images.map((item: any) => (
+              <img
+                src={item.full}
+                alt="Идея и концепция"
+                key={item.id}
+                onClick={() => openAllImages(item.full)}
+              />
+            ))}
+          </div>
+        )}
       </div>
     </section>
   );

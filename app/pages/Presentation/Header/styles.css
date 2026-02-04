@@ -3,6 +3,7 @@
   top: 16px;
   left: 0;
   width: 100%;
+  z-index: 9999;
   .PresentationHeader__list {
     list-style: none;
     display: grid;
@@ -53,9 +54,18 @@
       color: #282828;
       display: flex;
       gap: 8px;
+      align-items: center;
 
       span {
         font-weight: 400;
+        position: relative;
+
+        sup {
+          position: absolute;
+          top: -3px;
+          right: -5px;
+          font-size: 10px;
+        }
       }
     }
 
@@ -70,6 +80,9 @@
       cursor: pointer;
       backdrop-filter: blur(5px);
       background: rgba(255, 255, 255, 0.5);
+      display: flex;
+      align-items: center;
+      gap: 8px;
 
       @media (width <= 1024px) {
         font-size: 16px;

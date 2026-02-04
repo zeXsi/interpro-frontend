@@ -2,7 +2,7 @@ import Button from 'shared/components/Button';
 import './styles.css';
 import { Link } from 'react-router';
 
-export default function Contacts() {
+export default function Contacts({ data }: any) {
   return (
     <section className="Contacts">
       <div className="Contacts__content">
@@ -10,7 +10,7 @@ export default function Contacts() {
           <p>( менеджер )</p>
           <ul className="Contacts__list">
             <li className="Contacts__list-item">
-              <span>Анастасия</span>
+              <span>{data.fields.ct_name}</span>
             </li>
           </ul>
         </div>
@@ -18,12 +18,12 @@ export default function Contacts() {
           <p>( контакты )</p>
           <ul className="Contacts__list">
             <li className="Contacts__list-item">
-              <Link to={import.meta.env.VITE_TELEGRAM_URL_1}>
+              <Link to={data.fields.ct_tg}>
                 <Button className="Contacts__list-btn" variant="link" children="TELEGRAM" />
               </Link>
             </li>
             <li className="Contacts__list-item">
-              <Link to={import.meta.env.VITE_WHATSAPP_URL}>
+              <Link to={data.fields.ct_tg}>
                 <Button className="Contacts__list-btn" variant="link" children="WHATSAPP" />
               </Link>
             </li>

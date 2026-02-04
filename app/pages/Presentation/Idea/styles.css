@@ -4,6 +4,10 @@
   overflow: hidden;
   display: flex;
 
+  &.empty {
+    display: none;
+  }
+
   &:has(.Idea__content-slides:not(.single)) {
     padding-inline: var(--px);
   }
