@@ -12,8 +12,9 @@
       left: 2.5rem;
       display: flex;
       flex-direction: column;
-
+      
       span {
+        margin: 0.125rem 0;
         padding: 16px;
         width: max-content;
         height: auto;
@@ -114,7 +115,7 @@
 
   .Legend__content {
     display: none;
-    padding-top: 8.438rem;
+    padding-top: 4rem;
 
     @media (width <= 1024px) {
       display: block;

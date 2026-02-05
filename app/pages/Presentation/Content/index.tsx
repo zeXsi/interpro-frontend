@@ -9,7 +9,7 @@ export default function Content({ data, id }: any) {
     <section className="Content" id={id}>
       <div className="Content__wrapper">
         {hd_title && <h2 className="Content__title">{hd_title}</h2>}
-        {hd_text && <p className="Content__txt">{hd_text}</p>}
+        {hd_text && <p className="Content__txt" dangerouslySetInnerHTML={{ __html: hd_text }}></p>}
       </div>
     </section>
   );

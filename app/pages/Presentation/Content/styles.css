@@ -7,6 +7,7 @@
   @media (width <= 1024px) {
     height: auto;
     padding-block: 7.75rem;
+    grid-template-columns: 1fr;
   }
 
   @media (width <= 540px) {
@@ -29,6 +30,7 @@
     line-height: 90%;
     letter-spacing: -0.07em;
     text-align: center;
+    text-wrap: balance;
 
     @media (width <= 1024px) {
       font-size: 3rem;
