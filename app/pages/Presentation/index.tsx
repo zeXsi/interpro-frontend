@@ -13,16 +13,27 @@ import Video from './Video';
 import PresentationFooter from './Footer';
 import { createPresentationQuery } from 'api/presentation/presentation.api';
 import { useLoaderData } from 'react-router';
+import type { LoaderFunctionArgs } from 'react-router';
 
-export async function loader() {
+export async function loader({ params }: LoaderFunctionArgs) {
+  const { name } = params;
+
+  if (!name) {
+    throw new Response('Not Found', { status: 404 });
+  }
+
   try {
-    const { sgPresentation, getPresentation } = createPresentationQuery('imperiya-klimata');
-
+    const { getPresentation } = createPresentationQuery(name);
     const presentationResponse = await getPresentation();
+
+    // если API вернуло пусто / не найдено
+    if (!presentationResponse || !presentationResponse.slides?.length) {
+      throw new Response('Not Found', { status: 404 });
+    }
 
     return presentationResponse;
   } catch (error) {
-    return error;
+    throw new Response('Not Found', { status: 404 });
   }
 }
 

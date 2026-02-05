@@ -25,6 +25,7 @@
 
   @media (width <= 1024px) {
     min-height: auto;
+    margin-bottom: 16px;
   }
 
   .Idea__content {
@@ -144,6 +145,10 @@
       &.triple {
         grid-template-columns: repeat(6, 1fr);
         gap: 20px;
+
+        @media (width <= 1024px) {
+          gap: 8px;
+        }
 
         img {
           grid-column: 2 span;

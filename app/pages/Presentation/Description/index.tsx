@@ -1,28 +1,19 @@
 import './styles.css';
 
 export default function Description({ data, id }: any) {
+  const { text_heading, text_body } = data.fields;
+
+  if (!text_heading && !text_body) return null;
+
   return (
-    data.fields.text_heading ||
-    data.fields.text_body && (
-      <section className="About" id={id}>
-        <div className="About__wrapper">
-          <p className="About__abovetxt">{data.fields.text_heading}</p>
-        </div>
-        <div
-          className="About__text_body"
-          dangerouslySetInnerHTML={{ __html: data.fields.text_body }}
-        ></div>
-      </section>
-    )
-    // <section className="Description">
-    //   <div className="Description__content">
-    //     <p className="Description__abovetxt">( задача )</p>
-    //     <div className="Description__txt">
-    //       Что делает обычный продукт предметом искусства? Почему суповая банка становится экспонатом
-    //       музея, а резервуар с газом — культурным символом? Этот проект — отсылка к эстетике Энди
-    //       Уорхола, художника, поставившего знак равенства между повседневным
-    //     </div>
-    //   </div>
-    // </section>
+    <section className="About" id={id}>
+      <div className="About__wrapper">
+        {text_heading && <p className="About__abovetxt">{text_heading}</p>}
+      </div>
+
+      {text_body && (
+        <div className="About__text_body" dangerouslySetInnerHTML={{ __html: text_body }} />
+      )}
+    </section>
   );
 }

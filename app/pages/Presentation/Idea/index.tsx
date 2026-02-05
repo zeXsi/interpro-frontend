@@ -6,31 +6,45 @@ import Text from 'shared/components/Text';
 export default function Idea({ data, id }: any) {
   const { Popup, showWithData } = useMWImage();
 
-  const isEmpty = !data.fields.pt_images.length && !data.fields?.pt_heading;
+  const images = data.fields?.pt_images ?? [];
+  const heading = data.fields?.pt_heading;
+
+  if (!images.length && !heading) return null;
+
+  const layout =
+    images.length === 1
+      ? 'single'
+      : images.length === 2
+        ? 'double'
+        : images.length >= 3
+          ? 'triple'
+          : '';
 
   const openAllImages = (currentSrc?: string) => {
     if (!currentSrc) return;
-    const index = data.fields.pt_images.findIndex((src: any) => src.full === currentSrc);
-    const images = data.fields.pt_images.map((item: any) => item.full);
-    showWithData([index >= 0 ? index : 0, images as any]);
+
+    const index = images.findIndex((src: any) => src.full === currentSrc);
+    showWithData([index >= 0 ? index : 0, images.map((i: any) => i.full)]);
   };
 
   return (
-    <section className={`Idea ${isEmpty ? 'empty' : ''}`} id={id}>
-      <Popup />
+    <section className="Idea" id={id}>
+      {images.length > 0 && <Popup />}
+
       <div className="Idea__content">
-        <div className="Idea__content-desc">
-          {data.fields?.pt_heading && <Text>{data.fields.pt_heading}</Text>}
-        </div>
-        {data.fields?.pt_images && (
-          <div
-            className={`Idea__content-slides ${['single', 'double', 'triple'][data.fields.pt_images.length - 1]}`}
-          >
-            {data.fields.pt_images.map((item: any) => (
+        {heading && (
+          <div className="Idea__content-desc">
+            <Text>{heading}</Text>
+          </div>
+        )}
+
+        {images.length > 0 && (
+          <div className={`Idea__content-slides ${layout}`}>
+            {images.map((item: any) => (
               <img
+                key={item.id}
                 src={item.full}
                 alt="Идея и концепция"
-                key={item.id}
                 onClick={() => openAllImages(item.full)}
               />
             ))}

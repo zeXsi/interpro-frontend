@@ -2,13 +2,17 @@ import './styles.css';
 import { ImgComparisonSlider } from '@img-comparison-slider/react';
 
 export default function Comparison({ data, id }: any) {
+  const before = data.fields?.ba_before?.full;
+  const after = data.fields?.ba_after?.full;
+
+  if (!before || !after) return null;
+
   return (
-    data.fields.ba_before?.full &&
-    data.fields.ba_after?.full && (
-      <section className="Comparison" id={id}>
-        <ImgComparisonSlider>
-          <img slot="first" src={data.fields.ba_before?.full} />
-          <img slot="second" src={data.fields.ba_after?.full} />
+    <section className="Comparison" id={id}>
+      <ImgComparisonSlider>
+        <img slot="first" src={before} alt="До" />
+        <img slot="second" src={after} alt="После" />
+
           <svg
             width="82"
             height="56"
@@ -31,8 +35,7 @@ export default function Comparison({ data, id }: any) {
               </clipPath>
             </defs>
           </svg>
-        </ImgComparisonSlider>
-      </section>
-    )
+      </ImgComparisonSlider>
+    </section>
   );
 }

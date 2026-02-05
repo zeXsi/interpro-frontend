@@ -1,3 +1,7 @@
+.panorama {
+  height: 100dvh;
+}
+
 .panorama canvas {
   cursor: grab;
 }
