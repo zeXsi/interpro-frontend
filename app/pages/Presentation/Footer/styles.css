@@ -47,10 +47,11 @@
 
     &::before {
       content: '';
-      width: 0;
-      height: 0;
+      width: 4px;
+      height: 4px;
       border-radius: 100%;
       background: #000;
+      opacity: 0;
       transform: translateX(calc(100% + 4px));
       transition: 0.3s ease-out;
     }
@@ -65,6 +66,7 @@
       opacity: 1;
 
       &::before {
+        opacity: 1;
         width: 0.25rem;
         height: 0.25rem;
         transform: translateX(0);
