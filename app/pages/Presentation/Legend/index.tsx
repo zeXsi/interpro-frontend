@@ -20,6 +20,7 @@ export default function Legend({ data, id }: any) {
         effect="fade"
         spaceBetween={8}
         pagination={pagination}
+        mousewheel={true}
         modules={[EffectFade, Mousewheel, Pagination]}
         className="Legend__swiper"
       >

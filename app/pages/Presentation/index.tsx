@@ -39,7 +39,6 @@ export async function loader({ params }: LoaderFunctionArgs) {
 
 export default function Presentation() {
   const presentationResponse = useLoaderData();
-  console.log(presentationResponse);
 
   const COMPONENTS: Record<string, React.FC<any>> = {
     text: Description,
