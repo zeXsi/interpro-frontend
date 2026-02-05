@@ -138,6 +138,7 @@
       &.single {
         width: 59%;
         height: 100%;
+        flex-shrink: 0;
 
         @media (width <= 1024px) {
           width: 100%;
