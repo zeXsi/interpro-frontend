@@ -1,0 +1,50 @@
+main.dark {
+  background: #000;
+  color: #fff;
+
+  .Button {
+    &.ghostLink,
+    &.link {
+      &::before {
+        background-color: #fff;
+      }
+    }
+  }
+
+  .Legend__swiper {
+    .Legend__swiper-desc {
+      background: #000;
+    }
+    .swiper-pagination {
+      span {
+        &.swiper-pagination-bullet-active {
+          background: #000;
+          color: #fff;
+        }
+      }
+    }
+
+    .Legend__swiper-txt {
+      color: #fff;
+    }
+  }
+
+  .Contacts__list {
+    .Contacts__list-item {
+      .Contacts__list-button {
+        background: #fff;
+        color: #000;
+
+        @media (hover: hover) {
+          &:hover {
+            background: rgba(255, 255, 255, 0.5);
+          }
+        }
+      }
+    }
+
+    .Contacts__list-btn {
+      color: #fff;
+    }
+  }
+}

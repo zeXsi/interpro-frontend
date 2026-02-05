@@ -55,7 +55,7 @@ export default function Presentation() {
   return (
     <>
       <PresentationHeader />
-      <main>
+      <main className={presentationResponse.theme}>
         <Cover />
         {presentationResponse.slides.map((item: any) => {
           const Component = COMPONENTS[item.type];
