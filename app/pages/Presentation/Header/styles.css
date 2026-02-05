@@ -6,19 +6,13 @@
   z-index: 9999;
   .PresentationHeader__list {
     list-style: none;
-    display: grid;
-    grid-template-columns: repeat(6, 1fr);
+    display: flex;
+    justify-content: space-between;
     gap: 20px;
-
-    @media (width <= 1024px) {
-      grid-template-columns: 1fr;
-    }
   }
 
   .PresentationHeader__item {
     &:first-of-type {
-      grid-column: span 2 / span 2;
-
       @media (width <= 1024px) {
         display: none;
       }
@@ -27,13 +21,8 @@
     &:last-of-type {
       gap: 8px;
 
-      @media (width > 1024px) {
-        grid-column: span 2 / span 2;
-        grid-column-start: 5;
-        margin-left: auto;
-      }
-
       @media (width <= 1024px) {
+        width: 100%;
         justify-content: space-between;
       }
     }
@@ -42,18 +31,18 @@
     gap: 16px;
 
     .PresentationHeader__item-box {
-      padding: 20px 16px;
+      padding: 1.25rem 1rem;
       border-radius: 100px;
       backdrop-filter: blur(7px);
       background: rgba(255, 255, 255, 0.5);
       font-family: var(--font-family);
       font-weight: 500;
-      font-size: 18px;
+      font-size: 1.125rem;
       line-height: 90%;
       letter-spacing: -0.04em;
       color: #282828;
       display: flex;
-      gap: 8px;
+      gap: 0.5rem;
       align-items: center;
 
       span {
@@ -62,9 +51,9 @@
 
         sup {
           position: absolute;
-          top: -3px;
-          right: -5px;
-          font-size: 10px;
+          top: -0.188rem;
+          right: -0.313rem;
+          font-size: 0.625rem;
         }
       }
     }
@@ -73,7 +62,7 @@
       padding: 20px 12px;
       border-radius: 100px;
       font-family: var(--font-family);
-      font-size: 18px;
+      font-size: 1.125rem;
       line-height: 90%;
       letter-spacing: -0.04em;
       color: #000;
@@ -92,7 +81,7 @@
       }
 
       @media (width <= 1024px) {
-        font-size: 16px;
+        font-size: 1rem;
       }
 
       @media (hover: hover) {

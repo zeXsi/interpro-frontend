@@ -27,6 +27,15 @@
 
 html {
   overflow-x: hidden;
+  font-size: 0.833vw;
+
+  @media (max-width: 1024px) {
+    font-size: 2.083vw;
+  }
+
+  @media (max-width: 540px) {
+    font-size: 4.267vw;
+  }
 }
 body {
   overflow-x: clip;
@@ -185,7 +194,7 @@ img {
         }
       }
     }
-    
+
     &:active,
     &:focus-visible {
       .Button,

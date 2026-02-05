@@ -1,38 +1,38 @@
 import { useEffect, useState } from 'react';
 
-export function useActiveSection(threshold = 0.3) {
+export function useActiveSection() {
     const [activeId, setActiveId] = useState<string | null>(null);
 
     useEffect(() => {
-        if (window.innerWidth <= 1024) return;
-
         const sections = document.querySelectorAll<HTMLElement>('section[id]');
+        if (!sections.length) return;
 
-        const observer = new IntersectionObserver(
-            (entries) => {
-                let maxRatio = 0;
-                let currentId: string | null = null;
+        const handleScroll = () => {
+            const triggerPoint = window.innerHeight * 0.1; // 10% от верхнего края экрана
+            let currentId: string | null = null;
 
-                entries.forEach((entry) => {
-                    if (entry.isIntersecting && entry.intersectionRatio > maxRatio) {
-                        maxRatio = entry.intersectionRatio;
-                        currentId = entry.target.id;
-                    }
-                });
+            sections.forEach((section) => {
+                const rect = section.getBoundingClientRect();
+                if (rect.top <= triggerPoint && rect.bottom > triggerPoint) {
+                    currentId = section.id;
+                }
+            });
 
-                if (currentId) setActiveId(currentId);
-            },
-            {
-                threshold,
-                rootMargin: '-20% 0px -40% 0px',
+            if (currentId && currentId !== activeId) {
+                setActiveId(currentId);
             }
-        );
+        };
 
-        sections.forEach((section) => observer.observe(section));
+        window.addEventListener('scroll', handleScroll);
+        window.addEventListener('resize', handleScroll);
 
-        return () => observer.disconnect();
-    }, [threshold]);
+        handleScroll(); // сразу определить активную секцию
+
+        return () => {
+            window.removeEventListener('scroll', handleScroll);
+            window.removeEventListener('resize', handleScroll);
+        };
+    }, [activeId]);
 
     return activeId;
 }
-

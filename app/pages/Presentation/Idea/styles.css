@@ -113,6 +113,8 @@
 
           @media (width <= 1024px) {
             aspect-ratio: 1;
+            min-height: auto;
+            max-height: auto;
           }
 
           &:first-of-type {

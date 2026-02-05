@@ -20,28 +20,29 @@
   .Cover__title {
     font-family: var(--font-family);
     font-weight: 400;
-    font-size: 124px;
+    font-size: 7.75rem;
     line-height: 90%;
     letter-spacing: -0.07em;
 
     @media (width <= 1024px) {
-      font-size: 64px;
+      font-size: 4rem;
     }
 
     @media (width <= 540px) {
-      font-size: 44px;
+      font-size: 2.75rem;
     }
   }
 
   .Cover__txt {
     display: flex;
-    gap: 24px;
+    flex-wrap: wrap;
+    gap: 1.5rem;
     margin-top: 16px;
 
     span {
       font-family: var(--font-family);
       font-weight: 500;
-      font-size: 18px;
+      font-size: 1.125rem;
       line-height: 90%;
       letter-spacing: -0.04em;
       text-transform: uppercase;
@@ -49,17 +50,17 @@
 
       sup {
         position: absolute;
-        top: -3px;
-        right: -6px;
-        font-size: 10px;
+        top: -0.188rem;
+        right: -0.375rem;
+        font-size: 0.625rem;
       }
 
       @media (width <= 1024px) {
-        font-size: 16px;
+        font-size: 1rem;
       }
 
       @media (width <= 540px) {
-        font-size: 14px;
+        font-size: 0.875rem;
       }
     }
   }

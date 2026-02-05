@@ -4,7 +4,8 @@
   z-index: 9999;
 
   @media (width <= 1024px) {
-    display: none;
+    width: 100%;
+    padding-inline: var(--px);
   }
 
   .PresentationFooter__list {
@@ -16,12 +17,24 @@
     border-radius: 100px;
     backdrop-filter: blur(7px);
     background: rgba(255, 255, 255, 0.5);
+
+    @media (width <= 1024px) {
+      justify-content: flex-start;
+      overflow-x: auto;
+      &::-webkit-scrollbar {
+        height: 0;
+      }
+    }
+  }
+
+  .PresentationFooter__item {
+    flex-shrink: 0;
   }
 
   .PresentationFooter__link {
     text-decoration: none;
     font-family: var(--font-family);
-    font-size: 14px;
+    font-size: 0.875rem;
     line-height: 90%;
     letter-spacing: -0.04em;
     color: #000;
@@ -30,6 +43,7 @@
     display: flex;
     gap: 4px;
     align-items: center;
+    cursor: pointer;
 
     @media (hover: hover) {
       &:hover {
@@ -39,6 +53,7 @@
 
     &.active {
       opacity: 1;
+      flex-shrink: 0;
 
       &::before {
         content: '•';

@@ -17,10 +17,12 @@
   @media (width <= 1024px) {
     min-height: auto;
     padding-top: 124px;
+    padding-bottom: 142px;
   }
 
   @media (width <= 540px) {
     padding-top: 64px;
+    padding-bottom: 128px;
   }
 
   .Contacts__col {
@@ -55,7 +57,7 @@
       span {
         font-family: var(--font-family);
         font-weight: 500;
-        font-size: 32px;
+        font-size: 2rem;
         letter-spacing: -0.02em;
         text-transform: uppercase;
       }
@@ -64,7 +66,7 @@
         padding: 20px 12px;
         border-radius: 100px;
         font-family: var(--font-family);
-        font-size: 18px;
+        font-size: 1.125rem;
         line-height: 90%;
         letter-spacing: -0.04em;
         cursor: pointer;
@@ -85,7 +87,7 @@
         }
 
         @media (width <= 1024px) {
-          font-size: 16px;
+          font-size: 1rem;
         }
       }
     }
@@ -93,7 +95,7 @@
     .Contacts__list-btn {
       font-family: var(--font-family);
       font-weight: 500;
-      font-size: 32px;
+      font-size: 2rem;
       letter-spacing: -0.02em;
       text-transform: uppercase;
       color: #000;

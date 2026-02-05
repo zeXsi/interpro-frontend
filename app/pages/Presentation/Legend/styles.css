@@ -22,7 +22,7 @@
         opacity: 1;
         font-family: var(--font-family);
         font-weight: 500;
-        font-size: 18px;
+        font-size: 1.125rem;
         line-height: 90%;
         letter-spacing: -0.04em;
         text-transform: uppercase;
@@ -87,7 +87,7 @@
 
       span {
         font-weight: 500;
-        font-size: 14px;
+        font-size: 0.875rem;
         line-height: 90%;
         letter-spacing: -0.04em;
         text-transform: uppercase;
@@ -96,7 +96,7 @@
 
       p {
         font-weight: 500;
-        font-size: 18px;
+        font-size: 1.125rem;
         line-height: 90%;
         letter-spacing: -0.04em;
         text-transform: uppercase;
@@ -104,7 +104,7 @@
     }
 
     .Legend__swiper-txt {
-      font-size: 18px;
+      font-size: 1.125rem;
       line-height: 136%;
       letter-spacing: -0.04em;
       color: #282828;
@@ -123,7 +123,7 @@
     .Legend__content-title {
       font-family: var(--font-family);
       font-weight: 500;
-      font-size: 32px;
+      font-size: 2rem;
       line-height: 90%;
       letter-spacing: -0.04em;
       text-transform: uppercase;
@@ -172,7 +172,7 @@
 
       span {
         font-weight: 500;
-        font-size: 12px;
+        font-size: 0.75rem;
         line-height: 90%;
         letter-spacing: -0.04em;
         text-transform: uppercase;
@@ -182,7 +182,7 @@
 
       p {
         font-weight: 500;
-        font-size: 14px;
+        font-size: 0.875rem;
         line-height: 90%;
         letter-spacing: -0.04em;
         text-transform: uppercase;
