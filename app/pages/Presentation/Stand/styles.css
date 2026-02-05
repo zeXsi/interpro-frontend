@@ -1,14 +1,14 @@
 .Stand {
   display: grid;
-  gap: 24px;
+  gap: 1.5rem;
 
   @media (width <= 1024px) {
-    gap: 16px;
-    padding-top: 124px;
+    gap: 1rem;
+    padding-top: 7.75rem;
   }
 
   @media (width <= 540px) {
-    padding-top: 64px;
+    padding-top: 4rem;
   }
 
   img {

@@ -6,11 +6,11 @@
 
   @media (width <= 1024px) {
     height: auto;
-    padding-block: 124px;
+    padding-block: 7.75rem;
   }
 
   @media (width <= 540px) {
-    padding-block: 64px;
+    padding-block: 4rem;
   }
 
   .Content__wrapper {
@@ -19,7 +19,7 @@
     text-align: center;
     display: flex;
     flex-direction: column;
-    gap: 32px;
+    gap: 2rem;
   }
 
   .Content__title {

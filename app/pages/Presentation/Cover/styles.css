@@ -4,17 +4,17 @@
   align-items: center;
   justify-content: center;
   flex-direction: column;
-  gap: 16px;
+  gap: 1rem;
 
   @media (width <= 1024px) {
-    padding-top: 134px;
+    padding-top: 8.375rem;
     min-height: auto;
   }
 
   @media (width <= 540px) {
-    padding-top: 144px;
+    padding-top: 8.375rem;
     align-items: flex-start;
-    padding-inline: 8px;
+    padding-inline: 0.5rem;
   }
 
   .Cover__title {
@@ -37,7 +37,6 @@
     display: flex;
     flex-wrap: wrap;
     gap: 1.5rem;
-    margin-top: 16px;
 
     span {
       font-family: var(--font-family);

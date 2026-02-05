@@ -7,7 +7,7 @@
   .Contacts__content {
     display: grid;
     grid-template-columns: repeat(6, 1fr);
-    gap: 20px;
+    gap: 1.25rem;
 
     @media (width <= 1024px) {
       grid-template-columns: repeat(auto-fit, minmax(364px, 1fr));
@@ -16,13 +16,13 @@
 
   @media (width <= 1024px) {
     min-height: auto;
-    padding-top: 124px;
-    padding-bottom: 142px;
+    padding-top: 7.75rem;
+    padding-bottom: 8.875rem;
   }
 
   @media (width <= 540px) {
-    padding-top: 64px;
-    padding-bottom: 128px;
+    padding-top: 4rem;
+    padding-bottom: 8rem;
   }
 
   .Contacts__col {
@@ -49,9 +49,9 @@
 
   .Contacts__list {
     list-style: none;
-    margin-top: 16px;
+    margin-top: 1rem;
     display: grid;
-    gap: 12px;
+    gap: 0.75rem;
 
     .Contacts__list-item {
       span {
@@ -72,7 +72,7 @@
         cursor: pointer;
         backdrop-filter: blur(7px);
         background: #000;
-        margin-top: 64px;
+        margin-top: 4rem;
         color: #fff;
         transition: 0.3s ease-out;
 

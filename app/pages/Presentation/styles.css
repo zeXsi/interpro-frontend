@@ -48,3 +48,10 @@ main.dark {
     }
   }
 }
+
+main {
+  @media (width > 1024px) {
+    display: grid;
+    gap: 1rem;
+  }
+}
