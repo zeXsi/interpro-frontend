@@ -5,7 +5,7 @@ import { OrbitControls, Sphere } from '@react-three/drei';
 import * as THREE from 'three';
 
 function PanoramaSphere({ image }: { image: string }) {
-  const texture = useLoader(THREE.TextureLoader, 'https://norikdavtian.github.io/ThreeJS-360-Panorama/img/spherical_texture.jpg');
+  const texture = useLoader(THREE.TextureLoader, image);
 
   return (
     <Sphere args={[500, 64, 64]} scale={[-1, 1, 1]}>

@@ -23,7 +23,20 @@ export default function PresentationHeader() {
           <li className="PresentationHeader__item">
             {presentationResponse.title && (
               <div className="PresentationHeader__item-box">
-                INTER PRO x {presentationResponse.title}
+                INTER PRO{' '}
+                <svg
+                  width="10"
+                  height="10"
+                  viewBox="0 0 10 10"
+                  fill="none"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <path
+                    d="M2.3623 0.242188L4.92871 4.08301L7.50391 0.242188H8.75195L5.52637 4.90039L8.88379 9.75195H7.65332L4.9375 5.73535L2.23047 9.75195H1L4.35742 4.90039L1.13184 0.242188H2.3623Z"
+                    fill="#282828"
+                  />
+                </svg>
+                {presentationResponse.title}
               </div>
             )}
             <div className="PresentationHeader__item-box">
