@@ -73,7 +73,7 @@ export default function PresentationHeader() {
                 </svg>
               </button>
             </a>
-            <a href={discussLink}>
+            <a href={discussLink} target='_blank'>
               <button className="PresentationHeader__item-button">Обсудить стенд</button>
             </a>
           </li>

@@ -1,5 +1,6 @@
 .panorama {
   height: 100dvh;
+  position: relative;
 }
 
 .panorama canvas {
@@ -8,4 +9,32 @@
 
 .panorama canvas:active {
   cursor: grabbing;
+}
+
+.panorama-label {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 10;
+  background: rgba(0, 0, 0, 0.6);
+  color: white;
+  padding: 1rem;
+  border-radius: 1rem;
+  box-shadow: 0 4px 4px 0 rgba(0, 0, 0, 0.25);
+  background: #ecf89b;
+  font-family: var(--font-family);
+  font-size: 1.125rem;
+  line-height: 90%;
+  letter-spacing: -0.04em;
+  color: #616e07;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  transition: 0.3s ease-out;
+  pointer-events: none;
+}
+
+.panorama.interacted .panorama-label {
+  opacity: 0;
 }

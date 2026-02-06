@@ -1,5 +1,5 @@
 import './styles.css';
-import { Suspense } from 'react';
+import { Suspense, useState } from 'react';
 import { Canvas, useLoader } from '@react-three/fiber';
 import { OrbitControls, Sphere } from '@react-three/drei';
 import * as THREE from 'three';
@@ -16,10 +16,51 @@ function PanoramaSphere({ image }: { image: string }) {
 
 export default function PanoramaViewer({ data, id }: any) {
   const image = data.fields?.p360_image?.full;
+  const [interacted, setInteracted] = useState(false);
+
   if (!image) return null;
 
   return (
-    <section id={id} className="panorama">
+    <section
+      id={id}
+      className={`panorama ${interacted ? 'interacted' : ''}`}
+      onPointerDown={() => setInteracted(true)}
+    >
+      <div className="panorama-label">
+        <svg
+          width="20"
+          height="20"
+          viewBox="0 0 20 20"
+          fill="none"
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <g clip-path="url(#clip0_5158_62273)">
+            <path
+              d="M10.0013 18.3346C14.6037 18.3346 18.3346 14.6037 18.3346 10.0013C18.3346 5.39893 14.6037 1.66797 10.0013 1.66797C5.39893 1.66797 1.66797 5.39893 1.66797 10.0013C1.66797 14.6037 5.39893 18.3346 10.0013 18.3346Z"
+              stroke="#616E07"
+              strokeWidth="1.5"
+              strokeLinecap="round"
+            />
+            <path
+              d="M1.66797 10C5.9888 14.0225 13.7213 13.6567 18.3346 10.2967"
+              stroke="#616E07"
+              strokeWidth="1.5"
+            />
+            <path
+              d="M9.61679 1.66797C5.82679 5.41797 5.40596 14.168 9.99762 18.3346"
+              stroke="#616E07"
+              strokeWidth="1.5"
+            />
+          </g>
+          <defs>
+            <clipPath id="clip0_5158_62273">
+              <rect width="20" height="20" fill="white" />
+            </clipPath>
+          </defs>
+        </svg>{' '}
+        360° панорама
+      </div>
+
       <Canvas camera={{ fov: 75, position: [0, 0, 0.1] }}>
         <Suspense fallback={null}>
           <PanoramaSphere image={image} />

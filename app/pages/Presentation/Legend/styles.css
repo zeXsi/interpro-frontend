@@ -27,7 +27,7 @@
         line-height: 90%;
         letter-spacing: -0.04em;
         text-transform: uppercase;
-        backdrop-filter: blur(7px);
+        backdrop-filter: blur(50px);
         background: rgba(255, 255, 255, 0.2);
         transition: 0.3s ease-out;
 
@@ -73,6 +73,7 @@
       line-height: 90%;
       letter-spacing: -0.04em;
       text-transform: uppercase;
+      color: #000;
     }
 
     .Legend__swiper-list {
@@ -92,6 +93,7 @@
         line-height: 90%;
         letter-spacing: -0.04em;
         text-transform: uppercase;
+        color: #000;
         opacity: 0.5;
       }
 
@@ -101,6 +103,7 @@
         line-height: 90%;
         letter-spacing: -0.04em;
         text-transform: uppercase;
+        color: #000;
       }
     }
 

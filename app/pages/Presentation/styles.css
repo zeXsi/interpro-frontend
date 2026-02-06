@@ -1,6 +1,76 @@
+html:has(main.light, main.dark) {
+  font-size: 0.833vw;
+
+  @media (max-width: 1024px) {
+    font-size: 2.083vw;
+  }
+
+  @media (max-width: 540px) {
+    font-size: 4.267vw;
+  }
+}
+
+html:has(main.dark) {
+  .PresentationHeader {
+    & .PresentationHeader__item {
+      .PresentationHeader__item-box {
+        background: rgb(156, 156, 156, 0.1);
+        color: #fff;
+
+        svg path {
+          fill: #fff;
+        }
+      }
+      & > a {
+        .PresentationHeader__item-button {
+          background: rgb(156, 156, 156, 0.1);
+          color: #fff;
+
+          svg {
+            path {
+              fill: #fff;
+            }
+          }
+        }
+        &:last-of-type {
+          .PresentationHeader__item-button {
+            color: #000;
+            background: #fff;
+          }
+        }
+      }
+    }
+  }
+
+  .PresentationFooter {
+    .PresentationFooter__list {
+      background: rgb(156, 156, 156, 0.1);
+      backdrop-filter: blur(50px);
+    }
+
+    .PresentationFooter__link {
+      color: #fff;
+
+      &::before {
+        background: #fff;
+      }
+    }
+  }
+}
+
 main.dark {
-  background: #000;
+  background: #202020;
   color: #fff;
+
+  .Idea {
+    & .Idea__content {
+      & .Idea__content-desc {
+        p {
+          color: #fff;
+        }
+      }
+    }
+  }
 
   .Button {
     &.ghostLink,
@@ -8,24 +78,6 @@ main.dark {
       &::before {
         background-color: #fff;
       }
-    }
-  }
-
-  .Legend__swiper {
-    .Legend__swiper-desc {
-      background: #000;
-    }
-    .swiper-pagination {
-      span {
-        &.swiper-pagination-bullet-active {
-          background: #000;
-          color: #fff;
-        }
-      }
-    }
-
-    .Legend__swiper-txt {
-      color: #fff;
     }
   }
 
@@ -49,7 +101,8 @@ main.dark {
   }
 }
 
-main {
+main.light,
+main.dark {
   @media (width > 1024px) {
     display: grid;
     gap: 1rem;

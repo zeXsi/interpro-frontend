@@ -55,7 +55,7 @@ export default function Contacts({ data, id }: any) {
               </a>
             </li>
             <li className="Contacts__list-item">
-              <a href={discussLink}>
+              <a href={discussLink} target="_blank">
                 <button className="Contacts__list-button">Обсудить стенд</button>
               </a>
             </li>
