@@ -21,6 +21,11 @@
     display: flex;
     flex-direction: column;
     gap: 2rem;
+
+    @media (width <= 1024px) {
+      grid-column: auto;
+      grid-column-start: auto;
+    }
   }
 
   .Content__title {

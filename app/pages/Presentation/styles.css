@@ -58,6 +58,10 @@ html:has(main.dark) {
   }
 }
 
+main {
+  width: 100%;
+}
+
 main.dark {
   background: #202020;
   color: #fff;

@@ -1,7 +1,17 @@
 .Legend {
+  --count-slides: 1; /* Задаётся в коде */
+  height: calc(100vh * var(--count-slides));
+  position: relative;
+
+  @media (width <= 1024px) {
+      height: fit-content;
+    }
+
   .Legend__swiper {
     width: 100%;
     height: 100dvh;
+    position: sticky;
+    top: 0;
 
     @media (width <= 1024px) {
       display: none;
@@ -12,13 +22,13 @@
       left: 2.5rem;
       display: flex;
       flex-direction: column;
-      
+
       span {
         margin: 0.125rem 0;
-        padding: 16px;
+        padding: 1.125rem;
         width: max-content;
         height: auto;
-        border-radius: 100px;
+        border-radius: 1rem;
         color: #fff;
         opacity: 1;
         font-family: var(--font-family);
@@ -28,7 +38,8 @@
         letter-spacing: -0.04em;
         text-transform: uppercase;
         backdrop-filter: blur(50px);
-        background: rgba(255, 255, 255, 0.2);
+        backdrop-filter: blur(50px);
+        background: rgba(37, 37, 37, 0.55);
         transition: 0.3s ease-out;
 
         @media (hover: hover) {
@@ -135,14 +146,14 @@
     }
 
     .Legend__content-image {
-      margin-top: 16px;
+      margin-top: 1rem;
       aspect-ratio: 16/9;
     }
 
     .Legend__content-desc {
       margin-block: 1rem;
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(275px, 1fr));
+      grid-template-columns: repeat(auto-fit, minmax(17.1875rem, 1fr));
       gap: 1.25rem;
       padding-inline: var(--px);
       align-items: flex-start;
