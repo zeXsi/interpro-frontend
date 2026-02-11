@@ -27,8 +27,48 @@ export async function loader({ params, request }: LoaderFunctionArgs) {
 
     await page.goto(target, { waitUntil: 'domcontentloaded', timeout: 60000 });
     await page.waitForSelector('main', { timeout: 15000 });
-    await page.waitForTimeout(1200);
     await page.emulateMedia({ media: 'print' });
+
+    // Trigger lazy loaders by walking through the page once.
+    await page.evaluate(async () => {
+      const scrollHeight = document.documentElement.scrollHeight;
+      const viewportHeight = window.innerHeight || 1080;
+      const step = Math.max(Math.floor(viewportHeight * 0.9), 1);
+
+      for (let y = 0; y < scrollHeight; y += step) {
+        window.scrollTo(0, y);
+        await new Promise((resolve) => setTimeout(resolve, 40));
+      }
+
+      window.scrollTo(0, 0);
+    });
+
+    // Wait until images are loaded (or timeout) to avoid blank slides in PDF.
+    await page.evaluate(async (timeoutMs: number) => {
+      const images = Array.from(document.images);
+
+      images.forEach((img) => {
+        img.setAttribute('loading', 'eager');
+        img.setAttribute('decoding', 'sync');
+      });
+
+      const waitForImage = (img: HTMLImageElement) =>
+        new Promise<void>((resolve) => {
+          if (img.complete && img.naturalWidth > 0) {
+            resolve();
+            return;
+          }
+
+          const done = () => resolve();
+          img.addEventListener('load', done, { once: true });
+          img.addEventListener('error', done, { once: true });
+        });
+
+      await Promise.race([
+        Promise.all(images.map(waitForImage)).then(() => undefined),
+        new Promise<void>((resolve) => setTimeout(resolve, timeoutMs)),
+      ]);
+    }, 10000);
 
     const pdf = await page.pdf({
       width: '1920px',
