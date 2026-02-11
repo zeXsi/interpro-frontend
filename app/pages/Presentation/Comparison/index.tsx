@@ -1,11 +1,27 @@
 import './styles.css';
 import { ImgComparisonSlider } from '@img-comparison-slider/react';
+import { useLocation } from 'react-router';
 
 export default function Comparison({ data, id }: any) {
+  const location = useLocation();
   const before = data.fields?.ba_before?.full;
   const after = data.fields?.ba_after?.full;
+  const isPdfExport = new URLSearchParams(location.search).get('export') === 'pdf';
 
   if (!before || !after) return null;
+
+  if (isPdfExport) {
+    return (
+      <>
+        <section className="Comparison Comparison--printSlide" id={id}>
+          <img src={before} alt="До" />
+        </section>
+        <section className="Comparison Comparison--printSlide">
+          <img src={after} alt="После" />
+        </section>
+      </>
+    );
+  }
 
   return (
     <section className="Comparison" id={id}>

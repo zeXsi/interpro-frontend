@@ -10,7 +10,17 @@
     gap: 1.25rem;
 
     @media (width <= 1024px) {
-      grid-template-columns: repeat(auto-fit, minmax(364px, 1fr));
+      grid-template-columns: 1fr 1fr;
+      gap: 4rem 0.5rem;
+    }
+
+    @media (width <= 540px) {
+      grid-template-columns: 1fr;
+      gap: 2.75rem;
+
+      .Contacts__col:last-child {
+        margin-top: 1.25rem;
+      }
     }
   }
 

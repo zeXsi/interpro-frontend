@@ -69,6 +69,12 @@ export default function Video({ data, id }: any) {
           frameBorder="0"
           title="video"
         />
+        <p className="Video__print-link">
+          Ссылка на видео:{' '}
+          <a href={src} target="_blank" rel="noreferrer">
+            {src}
+          </a>
+        </p>
       </section>
     )
   );

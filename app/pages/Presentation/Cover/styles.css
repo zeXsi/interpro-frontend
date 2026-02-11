@@ -4,15 +4,16 @@
   align-items: center;
   justify-content: center;
   flex-direction: column;
-  gap: 1rem;
+  gap: 1.5rem;
 
   @media (width <= 1024px) {
     padding-top: 8.375rem;
     min-height: auto;
+    gap: 1rem;
   }
 
   @media (width <= 540px) {
-    padding-top: 8.375rem;
+    padding-top: 7.125rem;
     align-items: flex-start;
     padding-inline: 0.5rem;
   }
@@ -37,6 +38,10 @@
     display: flex;
     flex-wrap: wrap;
     gap: 1.5rem;
+
+    @media (width <= 540px) {
+      gap: 1rem;
+    }
 
     span {
       font-family: var(--font-family);
@@ -63,5 +68,26 @@
         font-size: 0.875rem;
       }
     }
+  }
+}
+
+@media print {
+  .Cover {
+    min-height: 210mm;
+    height: 210mm;
+    padding: 0;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .Cover .Cover__title {
+    text-align: center;
+    font-size: 6rem;
+    line-height: 0.92;
+  }
+
+  .Cover .Cover__txt {
+    justify-content: center;
+    gap: 1rem;
   }
 }

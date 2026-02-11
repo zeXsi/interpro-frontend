@@ -4,8 +4,8 @@
   position: relative;
 
   @media (width <= 1024px) {
-      height: fit-content;
-    }
+    height: fit-content;
+  }
 
   .Legend__swiper {
     width: 100%;
@@ -37,7 +37,6 @@
         line-height: 90%;
         letter-spacing: -0.04em;
         text-transform: uppercase;
-        backdrop-filter: blur(50px);
         backdrop-filter: blur(50px);
         background: rgba(37, 37, 37, 0.55);
         transition: 0.3s ease-out;
@@ -208,6 +207,24 @@
       font-family: var(--font-family);
       line-height: 136%;
       letter-spacing: -0.04em;
+    }
+  }
+}
+
+@media print {
+  .Legend {
+    .Legend__swiper {
+      position: relative;
+
+      .Legend__swiper-slide {
+        height: 100vh;
+      }
+
+      .swiper-pagination {
+        span {
+          backdrop-filter: none;
+        }
+      }
     }
   }
 }

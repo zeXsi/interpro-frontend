@@ -1,6 +1,10 @@
 .Video {
   height: 100dvh;
 
+  .Video__print-link {
+    display: none;
+  }
+
   @media (width <= 1024px) {
     height: auto;
     margin-top: 5rem;
@@ -11,5 +15,29 @@
     height: 100%;
     display: block;
     aspect-ratio: 4/3;
+  }
+
+  @media print {
+    height: 210mm;
+    display: grid;
+    place-items: center;
+    padding: 20mm;
+
+    iframe {
+      display: none;
+    }
+
+    .Video__print-link {
+      display: block;
+      font-family: var(--font-family);
+      font-size: 14pt;
+      line-height: 1.4;
+
+      a {
+        color: inherit;
+        text-decoration: underline;
+        word-break: break-word;
+      }
+    }
   }
 }

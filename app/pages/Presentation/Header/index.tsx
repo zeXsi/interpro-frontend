@@ -1,8 +1,9 @@
 import './styles.css';
-import { useLoaderData } from 'react-router';
+import { useLoaderData, useParams } from 'react-router';
 
 export default function PresentationHeader() {
   const presentationResponse = useLoaderData();
+  const { name } = useParams();
 
   const contact = presentationResponse.slides.find((item: any) => item.type == 'contacts');
   const discussLink =
@@ -10,11 +11,7 @@ export default function PresentationHeader() {
 
   const renderSpans = (arr?: any[]) => arr?.map((item, index) => <span key={index}>{item}</span>);
 
-  const handlePrint = () => {
-    if (typeof window !== 'undefined') {
-      window.print();
-    }
-  };
+  const pdfHref = name ? `/presentation/${name}/pdf` : '#';
 
   return (
     <header className="PresentationHeader px">
@@ -52,7 +49,7 @@ export default function PresentationHeader() {
             </div>
           </li>
           <li className="PresentationHeader__item">
-            <a onClick={handlePrint}>
+            <a href={pdfHref} target="_blank" rel="noopener noreferrer">
               <button className="PresentationHeader__item-button">
                 Cкачать .pdf{' '}
                 <svg
@@ -73,7 +70,7 @@ export default function PresentationHeader() {
                 </svg>
               </button>
             </a>
-            <a href={discussLink} target='_blank'>
+            <a href={discussLink} target="_blank" rel="noopener noreferrer">
               <button className="PresentationHeader__item-button">Обсудить стенд</button>
             </a>
           </li>

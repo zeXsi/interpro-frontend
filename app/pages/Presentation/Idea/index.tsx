@@ -7,7 +7,7 @@ export default function Idea({ data, id }: any) {
   const { Popup, showWithData } = useMWImage();
 
   const images = data.fields?.pt_images ?? [];
-  const heading = data.fields?.pt_heading;
+  const heading = data.fields?.pt_heading?.trim();
 
   if (!images.length && !heading) return null;
 
@@ -31,7 +31,7 @@ export default function Idea({ data, id }: any) {
     <section className="Idea" id={id}>
       {images.length > 0 && <Popup />}
 
-      <div className="Idea__content">
+      <div className={`Idea__content ${layout} ${heading !== "" ? 'heading' : 'no-heading'} ${images.length === 0 ? 'no-img' : ''}`}>
         {heading && (
           <div className="Idea__content-desc">
             <Text>{heading}</Text>
