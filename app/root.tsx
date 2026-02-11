@@ -138,7 +138,7 @@ export function meta({}: Route.MetaArgs) {
 export const links: Route.LinksFunction = () => [
   { rel: 'me', href: import.meta.env.VITE_TELEGRAM_URL_1 },
   { rel: 'me', href: import.meta.env.VITE_TELEGRAM_URL_2 },
-  { rel: 'me', href: import.meta.env.VITE_TELEGRAM_URL_3 },
+  // { rel: 'me', href: import.meta.env.VITE_TELEGRAM_URL_3 },
   { rel: 'me', href: import.meta.env.VITE_WHATSAPP_URL },
   { rel: 'me', href: import.meta.env.VITE_INSTAGRAM_URL },
   { rel: 'me', href: import.meta.env.VITE_YOUTUBE_URL },
