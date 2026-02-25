@@ -14,6 +14,31 @@ import PresentationFooter from './Footer';
 import { createPresentationQuery } from 'api/presentation/presentation.api';
 import { useLoaderData } from 'react-router';
 import type { LoaderFunctionArgs } from 'react-router';
+import type { Presentation as PresentationType } from 'api/presentation/presentation.types';
+
+export function meta({ data }: { data: PresentationType }) {
+  const tags = [
+    ...(data?.tax?.year ?? []),
+    ...(data?.tax?.expo ?? []),
+    ...(data?.tax?.stand_type ?? []),
+    ...(data?.project_size ? [`${data.project_size}м²`] : []),
+  ].join(' ');
+
+  const title = data?.title
+    ? `Interpro x ${data.title}${tags ? ` / ${tags}` : ''}`
+    : 'Interpro';
+
+  const description = 'Дизайн-проект';
+
+  return [
+    { title },
+    { name: 'description', content: description },
+    { property: 'og:title', content: title },
+    { property: 'og:description', content: description },
+    { property: 'og:type', content: 'website' },
+    { property: 'og:site_name', content: 'Interpro' },
+  ];
+}
 
 export async function loader({ params }: LoaderFunctionArgs) {
   const { name } = params;
