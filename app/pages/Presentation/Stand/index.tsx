@@ -1,13 +1,15 @@
 import './styles.css';
 
 export default function Stand({ data, id }: any) {
-  const image = data.fields?.sv_image;
+  const images = data.fields?.sv_images;
 
-  if (!image?.full) return null;
+  if (images?.length === 0) return null;
 
   return (
     <section className="Stand" id={id}>
-      <img src={image.full} alt="Изображение проекта: детали стенда" />
+      {images.map((item) => (
+        <img src={item.full} alt="Изображение проекта: детали стенда" />
+      ))}
     </section>
   );
 }

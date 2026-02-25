@@ -5,7 +5,11 @@
 
   @media (width <= 1024px) {
     width: 100%;
-    padding-inline: var(--px);
+    padding-inline: 1rem;
+  }
+
+  @media (width <= 576px) {
+    padding-inline: 0.5rem;
   }
 
   .PresentationFooter__list {

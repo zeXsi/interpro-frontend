@@ -1,5 +1,5 @@
 .Contacts {
-  padding-inline: var(--px);
+  padding-inline: 1.25rem;
   min-height: 100dvh;
   display: grid;
   align-items: center;
@@ -26,12 +26,12 @@
 
   @media (width <= 1024px) {
     min-height: auto;
-    padding-top: 7.75rem;
+    padding: 0 1rem;
     padding-bottom: 8.875rem;
   }
 
   @media (width <= 540px) {
-    padding-top: 4rem;
+    padding: 0 0.5rem;
     padding-bottom: 8rem;
   }
 

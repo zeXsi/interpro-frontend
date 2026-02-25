@@ -5,6 +5,13 @@
 
   @media (width <= 1024px) {
     height: fit-content;
+    gap: 7.75rem;
+    display: flex;
+    flex-direction: column;
+  }
+
+  @media (width <= 576px) {
+    gap: 4rem;
   }
 
   .Legend__swiper {
@@ -22,6 +29,7 @@
       left: 2.5rem;
       display: flex;
       flex-direction: column;
+      width: fit-content;
 
       span {
         margin: 0.125rem 0;
@@ -61,7 +69,7 @@
       align-items: center;
       gap: 1.25rem;
       z-index: 1;
-      padding-inline: var(--px);
+      padding-inline: 2.5rem;
     }
 
     .Legend__swiper-image {
@@ -84,11 +92,11 @@
       letter-spacing: -0.04em;
       text-transform: uppercase;
       color: #000;
+      margin-bottom: 2.75rem;
     }
 
     .Legend__swiper-list {
       list-style: none;
-      margin-top: 2.75rem;
       display: grid;
       gap: 1.5rem;
     }
@@ -128,10 +136,11 @@
 
   .Legend__content {
     display: none;
-    padding-top: 4rem;
+    gap: 1rem;
 
     @media (width <= 1024px) {
-      display: block;
+      display: flex;
+      flex-direction: column;
     }
 
     .Legend__content-title {
@@ -141,21 +150,28 @@
       line-height: 90%;
       letter-spacing: -0.04em;
       text-transform: uppercase;
-      padding-inline: var(--px);
+      padding-inline: 1rem;
+
+      @media (width <= 576px) {
+        font-size: 1.5rem;
+        padding-inline: 0.5rem;
+      }
     }
 
     .Legend__content-image {
-      margin-top: 1rem;
       aspect-ratio: 16/9;
     }
 
     .Legend__content-desc {
-      margin-block: 1rem;
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(17.1875rem, 1fr));
       gap: 1.25rem;
-      padding-inline: var(--px);
+      padding-inline: 1rem;
       align-items: flex-start;
+
+      @media (width <= 576px) {
+        padding-inline: 0.5rem;
+      }
     }
 
     .Legend__content-list {

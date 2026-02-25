@@ -118,6 +118,11 @@ main.dark {
       color: #fff;
     }
   }
+
+  .About .About__wrapper .About__text_body,
+  .Legend .Legend__content .Legend__content-item span {
+    color: #fff;
+  }
 }
 
 @media print {

@@ -57,20 +57,22 @@ export default function Legend({ data, id }: any) {
             >
               <img src={item.full} alt={item.title} className="Legend__swiper-image" />
 
-              <div className="Legend__swiper-desc">
-                <h3 className="Legend__swiper-title">{item.title}</h3>
+              {item.attrs.legend > 0 && (
+                <div className="Legend__swiper-desc">
+                  {item.title && (<h3 className="Legend__swiper-title">{item.title}</h3>)}
 
-                <ul className="Legend__swiper-list">
-                  {item.attrs.map((attr: any) => (
-                    <li key={attr.label} className="Legend__swiper-item">
-                      <span>{attr.label}</span>
-                      <p>{attr.value}</p>
-                    </li>
-                  ))}
-                </ul>
+                  <ul className="Legend__swiper-list">
+                    {item.attrs.map((attr: any) => (
+                      <li key={attr.label} className="Legend__swiper-item">
+                        <span>{attr.label}</span>
+                        <p>{attr.value}</p>
+                      </li>
+                    ))}
+                  </ul>
 
-                <p className="Legend__swiper-txt" dangerouslySetInnerHTML={{ __html: item.text }} />
-              </div>
+                  <p className="Legend__swiper-txt" dangerouslySetInnerHTML={{ __html: item.text }} />
+                </div>
+              )}
 
               <div className="swiper-pagination swiper-pagination-clickable swiper-pagination-bullets swiper-pagination-vertical">
                 {items.map((paginationItem: any, index2: number) => (
@@ -125,20 +127,22 @@ export default function Legend({ data, id }: any) {
           >
             <img src={item.full} alt={item.title} className="Legend__swiper-image" />
 
-            <div className="Legend__swiper-desc">
-              <h3 className="Legend__swiper-title">{item.title}</h3>
+            {item.attrs.length > 0 && (
+              <div className="Legend__swiper-desc">
+                {item.title && (<h3 className="Legend__swiper-title">{item.title}</h3>)}
 
-              <ul className="Legend__swiper-list">
-                {item.attrs.map((attr: any) => (
-                  <li key={attr.label} className="Legend__swiper-item">
-                    <span>{attr.label}</span>
-                    <p>{attr.value}</p>
-                  </li>
-                ))}
-              </ul>
+                <ul className="Legend__swiper-list">
+                  {item.attrs.map((attr: any) => (
+                    <li key={attr.label} className="Legend__swiper-item">
+                      <span>{attr.label}</span>
+                      <p>{attr.value}</p>
+                    </li>
+                  ))}
+                </ul>
 
-              <p className="Legend__swiper-txt" dangerouslySetInnerHTML={{ __html: item.text }} />
-            </div>
+                <p className="Legend__swiper-txt" dangerouslySetInnerHTML={{ __html: item.text }} />
+              </div>
+            )}
           </SwiperSlide>
         ))}
 
@@ -147,21 +151,23 @@ export default function Legend({ data, id }: any) {
 
       {items.map((item: any, index: number) => (
         <div className="Legend__content" key={`legend-content-${index}-${item.id ?? 'no-id'}`}>
-          <h2 className="Legend__content-title">{item.title}</h2>
+          {item.title && (<h2 className="Legend__content-title">{item.title}</h2>)}
           <img src={item.full} alt={item.title} className="Legend__content-image" />
 
-          <div className="Legend__content-desc">
-            <ul className="Legend__content-list">
-              {item.attrs.map((attr: any) => (
-                <li key={attr.label} className="Legend__content-item">
-                  <span>{attr.label}</span>
-                  <p>{attr.value}</p>
-                </li>
-              ))}
-            </ul>
+          {item.attrs.length > 0 && (
+            <div className="Legend__content-desc">
+              <ul className="Legend__content-list">
+                {item.attrs.map((attr: any) => (
+                  <li key={attr.label} className="Legend__content-item">
+                    <span>{attr.label}</span>
+                    <p>{attr.value}</p>
+                  </li>
+                ))}
+              </ul>
 
-            <p className="Legend__content-txt" dangerouslySetInnerHTML={{ __html: item.text }} />
-          </div>
+              <p className="Legend__content-txt" dangerouslySetInnerHTML={{ __html: item.text }} />
+            </div>
+          )}
         </div>
       ))}
     </section>
