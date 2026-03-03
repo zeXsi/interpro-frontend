@@ -5,34 +5,39 @@ import AnimatedLabel from 'shared/components/AnimatedLabel';
 import UserInfo from '../UserInfo';
 import Button from 'shared/components/Button';
 import Link from 'shared/components/Link';
-import { DocOverviewProps } from '..';
+import { DocOverviewProps, ReviewItem } from '..';
 import IsNot from 'shared/components/IsNot';
 import { sgFeedbacks } from 'api/feedbacks/feedbacks.api';
 
-export default function DesktopTemplate({ isNotPage }: DocOverviewProps) {
+function feedbacksToItems(isNotPage?: boolean): ReviewItem[] {
+  return sgFeedbacks.v.slice(0, !isNotPage ? Infinity : 4).map(({ payload }) => ({
+    company: payload.company,
+    text: payload.text,
+    pdfUrl: payload.pdf,
+    personName: payload.person?.name,
+    personPosition: payload.person?.position,
+  }));
+}
+
+export default function DesktopTemplate({ isNotPage, items }: DocOverviewProps) {
   const [activeClient, setActiveClient] = useState<number>(0);
 
-  const handleClick = (clientKey: number) => {
-    setActiveClient(clientKey);
-  };
-
-  const userData = sgFeedbacks.v[activeClient];
+  const list = items ?? feedbacksToItems(isNotPage);
+  const active = list[activeClient];
 
   return (
     <div className="DesktopTemplate">
       <div className="wrapper">
         <div className="DesktopTemplate_left">
-          {sgFeedbacks.v.slice(0, !isNotPage ? Infinity : 4).map(({ payload }, index) => {
-            return (
-              <AnimatedLabel
-                key={index}
-                isActive={index === activeClient}
-                title={payload?.company}
-                onClick={() => handleClick(index)}
-              />
-            );
-          })}
-        
+          {list.map((item, index) => (
+            <AnimatedLabel
+              key={index}
+              isActive={index === activeClient}
+              title={item.company}
+              onClick={() => setActiveClient(index)}
+            />
+          ))}
+
           <IsNot value={isNotPage}>
             <Link to="/about-us/feedbacks">
               <Button className="btn-allFeedbacks" variant="ghostLink" children="Все отзывы" />
@@ -40,14 +45,14 @@ export default function DesktopTemplate({ isNotPage }: DocOverviewProps) {
           </IsNot>
           <br />
         </div>
-        {!!userData?.payload && (
+        {active && (
           <div className="wrapUserInfo">
             <UserInfo
-              docName={`${userData.payload.company}`}
-              docLink={userData.payload.pdf}
-              userName={userData.payload?.person?.name}
-              userStatus={userData.payload?.person?.position}
-              docDescription={userData.payload.text}
+              docName={active.company}
+              docLink={active.pdfUrl}
+              userName={active.personName ?? ''}
+              userStatus={active.personPosition ?? ''}
+              docDescription={active.text}
             />
           </div>
         )}

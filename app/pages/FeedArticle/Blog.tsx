@@ -8,6 +8,5 @@ export function meta({ loaderData }: Route.MetaArgs) {
   return _meta(loaderData);
 }
 export default function BlogArticle({ loaderData }: Route.ComponentProps) {
-  console.log(23);
   return <FeedArticle data={loaderData} />;
 }

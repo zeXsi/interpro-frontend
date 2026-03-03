@@ -188,7 +188,7 @@ export default function FeedPage({ data }: { data: Props }) {
           {feed?.articles.map(({ payload, slug }, index) => (
             <Article
               key={index}
-              srcImg={payload.cover.url}
+              srcImg={payload.cover?.url ?? ''}
               date={formatDateToRussian(payload.date)}
               title={payload.title}
               desc={payload.subtitle}

@@ -3,20 +3,28 @@ import DesktopTemplate from './DesktopTemplate';
 import TableTemplate from './TableTemplate';
 import Subtitle from 'shared/components/Subtitle';
 
-export interface DocOverviewProps { 
-  isNotPage?: boolean
+export interface ReviewItem {
+  company: string;
+  text: string;
+  pdfUrl: string;
+  personName?: string;
+  personPosition?: string;
 }
-function DocOverview({ isNotPage = true }: DocOverviewProps) {
 
+export interface DocOverviewProps {
+  isNotPage?: boolean;
+  items?: ReviewItem[];
+  subtitle?: string;
+}
+
+function DocOverview({ isNotPage = true, items, subtitle = '( Что говорят клиенты )' }: DocOverviewProps) {
   return (
     <div className="DocOverview px" id="DocOverview">
-      <Subtitle>( Что говорят клиенты )</Subtitle>
-      <DesktopTemplate {...{isNotPage}}/>
-      <TableTemplate {...{isNotPage}}/>
+      <Subtitle>{subtitle}</Subtitle>
+      <DesktopTemplate isNotPage={isNotPage} items={items} />
+      <TableTemplate isNotPage={isNotPage} items={items} />
     </div>
   );
 }
 
-export default DocOverview
-
-
+export default DocOverview;

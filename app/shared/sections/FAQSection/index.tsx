@@ -7,12 +7,24 @@ import Link from 'shared/components/Link';
 import { useSignalValue } from 'shared/utils/_stm/react/react';
 import { sgFaqs } from 'api/faq/faq.api';
 
+export interface FAQItem {
+  question: string;
+  answer: string;
+}
 
 interface Props {
   qntyPreview?: number;
+  items?: FAQItem[];
 }
-export default function FAQSection({ qntyPreview = Infinity }: Props) {
-  useSignalValue(sgFaqs)
+
+export default function FAQSection({ qntyPreview = Infinity, items }: Props) {
+  useSignalValue(sgFaqs);
+
+  const list: FAQItem[] = items
+    ?? sgFaqs.v.slice(0, qntyPreview).map(({ payload }) => ({
+      question: payload.question,
+      answer: payload.answer,
+    }));
 
   return (
     <div className="FAQSection px" id="FAQSection">
@@ -30,21 +42,21 @@ export default function FAQSection({ qntyPreview = Infinity }: Props) {
       </div>
       <div className="FAQSection_right">
         <div className="FAQSection_right-items">
-          { sgFaqs.v.slice(0, qntyPreview).map(({ payload }, index) => (
-            <Accordion key={ index }>
+          {list.map((item, index) => (
+            <Accordion key={index}>
               <Accordion.Header>
-                <span className="Accordion_header-title">{ payload.question }</span>
+                <span className="Accordion_header-title">{item.question}</span>
                 <CrossIcon className="Accordion_header-icon" />
               </Accordion.Header>
               <Accordion.Content>
-                <p className="Accordion_content-description">{ payload.answer }</p>
+                <p className="Accordion_content-description">{item.answer}</p>
               </Accordion.Content>
             </Accordion>
-          )) }
+          ))}
         </div>
         {
           //prettier-ignore
-          qntyPreview !== Infinity && (
+          !items && qntyPreview !== Infinity && (
             <Link to="/faq">
               <Button.Arrow direction='right' className='FAQSection_right-btn' >
                 Все вопросы
@@ -52,7 +64,7 @@ export default function FAQSection({ qntyPreview = Infinity }: Props) {
             </Link>
         )}
       </div>
-     
+
     </div>
   );
 }

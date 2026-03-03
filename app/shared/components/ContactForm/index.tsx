@@ -30,6 +30,11 @@ type GlobValues = {
   nameCompany: string;
 } & PubValues;
 
+type MiniValues = {
+  username: string;
+  phone: string;
+};
+
 type PopupValues = {
   email: string;
 } & PubValues;
@@ -82,6 +87,32 @@ const globalConf: FormConfig<GlobValues> = {
   },
 };
 
+const miniConf: FormConfig<MiniValues> = {
+  username: {
+    initialValue: '',
+    validate: (value) => /^[a-zA-Zа-яА-Я]+$/.test(value),
+    title: 'Ваше имя',
+    errorMessage: 'Некорректные символы',
+  },
+  phone: {
+    initialValue: '',
+    validate: (value) => /^\d+$/.test(value),
+    title: 'Номер телефона',
+    errorMessage: 'Поле должно содержать только цифры.',
+  },
+  consent: {
+    initialValue: false,
+    validate: (value) => value === true,
+    title: 'Согласие',
+    errorMessage: 'Для отправки формы необходимо подтвердить согласие',
+  },
+  ad: {
+    initialValue: false,
+    validate: () => true,
+    optional: true,
+  },
+};
+
 const popupConf: FormConfig<PopupValues> = {
   ...publicConf,
   email: {
@@ -113,7 +144,7 @@ interface PropsContactForm {
   title?: React.ReactNode;
   subtitle?: string;
   onEnd?: () => void;
-  type?: 'popup' | 'normal' | 'excursion';
+  type?: 'popup' | 'normal' | 'excursion' | 'mini-normal';
 }
 
 export default function ContactForm({
@@ -126,11 +157,17 @@ export default function ContactForm({
   const { goTo } = useNavigate();
 
   const form = useForm(
-    type === 'popup' ? popupConf : type === 'excursion' ? excursionConf : (globalConf as any)
+    type === 'popup'
+      ? popupConf
+      : type === 'excursion'
+        ? excursionConf
+        : type === 'mini-normal'
+          ? miniConf
+          : (globalConf as any)
   );
 
   const refSend = useRef<HTMLSpanElement>(null);
-  
+
   const submit = () => {
     if (type === 'popup') {
       ym?.(99631636, 'reachGoal', 'request_popup');
@@ -156,6 +193,13 @@ export default function ContactForm({
           email: data.email,
           consent: data.ad,
         });
+      } else if (type === 'mini-normal') {
+        await sendLead({
+          name: data.username,
+          phone: data.phone,
+          company: '',
+          consent: data.ad,
+        });
       } else {
         await sendLead({
           name: data.username,
@@ -179,7 +223,7 @@ export default function ContactForm({
   };
 
   return (
-    <div className={`ContactForm ${className}`} id="ContactForm">
+    <div className={`ContactForm ${className} ${type}`} id="ContactForm">
       <Subtitle>( {!subtitle ? 'ЕСТЬ ИДЕИ?' : subtitle} )</Subtitle>
       <h2 className="ContactForm-title">
         <Activity mode={title ? 'visible' : 'hidden'}>{title}</Activity>

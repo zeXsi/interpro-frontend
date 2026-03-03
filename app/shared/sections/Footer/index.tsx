@@ -5,6 +5,8 @@ import Button from 'shared/components/Button';
 import LogoIcon from 'assets/icons/logo.svg?react';
 import { useNavigate } from 'shared/components/NavigationTracker';
 
+const date = new Date();
+
 export default function Footer() {
   const { goTo } = useNavigate();
 
@@ -90,7 +92,7 @@ export default function Footer() {
             <span onClick={() => goTo('/')}>
               <LogoIcon className="Footer_bottom-logo" />
             </span>{' '}
-            <span>© 2017 — 2025 интерпроект</span>
+            <span>© 2017 — {date.getFullYear()} интерпроект</span>
           </div>
           <div className="Footer_bottom-wrapper">
             <Button size="sm" variant="ghostLink" onClick={() => goTo('/mapping')}>

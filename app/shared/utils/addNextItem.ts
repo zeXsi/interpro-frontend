@@ -10,24 +10,27 @@ type Obj = {
 type Item = {
   nextItem?: Omit<Obj, 'payload'>,
 }
+function buildNextItem(nextObj: Obj) {
+  return {
+    slug: nextObj.slug,
+    id: nextObj.id,
+    title: getTitle(nextObj.payload),
+    ...(nextObj.payload?.category?.slug && {
+      categorySlug: nextObj.payload.category.slug,
+    }),
+  };
+}
+
 export function addNextItem<T extends Item[]>(items: T): T {
   return items.map((item, index) => {
     if (index < items.length - 1) {
-      const nextItem = items[index + 1] as any as Obj;
-      item.nextItem = {
-        slug: nextItem.slug,
-        id: nextItem.id,
-        title: getTitle(nextItem.payload),
-      };
+      const nextObj = items[index + 1] as any as Obj;
+      item.nextItem = buildNextItem(nextObj);
       return item;
     }
 
-    const firstProject = items[0] as any as Obj;
-    item.nextItem = {
-      slug: firstProject.slug,
-      id: firstProject.id,
-      title: getTitle(firstProject.payload),
-    };
+    const firstObj = items[0] as any as Obj;
+    item.nextItem = buildNextItem(firstObj);
     return item;
   }) as any;
 }

@@ -92,7 +92,11 @@ export function Layout({ children }: { children: React.ReactNode }) {
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: seoScheme(data.projects) }}
         />
-        <script type="text/javascript" dangerouslySetInnerHTML={{ __html: getSSRStore() }} />
+        <script
+          type="text/javascript"
+          dangerouslySetInnerHTML={{ __html: getSSRStore() }}
+          suppressHydrationWarning
+        />
 
         {/* Yandex.Metrika counter */}
         {/* <script type="text/javascript" dangerouslySetInnerHTML={{ __html: yandexMetrikaScript }} /> */}

@@ -8,10 +8,20 @@ import { useState } from 'react';
 import Button from 'shared/components/Button';
 import Link from 'shared/components/Link';
 import IsNot from 'shared/components/IsNot';
-import { DocOverviewProps } from '..';
+import { DocOverviewProps, ReviewItem } from '..';
 import { sgFeedbacks } from 'api/feedbacks/feedbacks.api';
 
-export default function TableTemplate({ isNotPage }: DocOverviewProps) {
+function feedbacksToItems(): ReviewItem[] {
+  return sgFeedbacks.v.map(({ payload }) => ({
+    company: payload.company,
+    text: payload.text,
+    pdfUrl: payload.pdf,
+    personName: payload.person?.name,
+    personPosition: payload.person?.position,
+  }));
+}
+
+export default function TableTemplate({ isNotPage, items }: DocOverviewProps) {
   const { getRef } = useRefMap<RefAnimatedLabel>();
 
   const [activated, setActive] = useState(-1);
@@ -21,9 +31,11 @@ export default function TableTemplate({ isNotPage }: DocOverviewProps) {
     getRef(`feedback_${index}`).current?.setIsActive?.(v);
   };
 
+  const list = items ?? feedbacksToItems();
+
   return (
     <div className="TableTemplate">
-      {sgFeedbacks.v.map(({ payload }, index) => {
+      {list.map((item, index) => {
         const isActive = activated === index;
         return (
           <Accordion isActive={isActive} key={index} onClick={(v) => handleActive(v, index)}>
@@ -32,22 +44,22 @@ export default function TableTemplate({ isNotPage }: DocOverviewProps) {
                 isActive={isActive}
                 isFull={true}
                 ref={getRef(`feedback_${index}`)}
-                title={payload.company}
+                title={item.company}
               />
             </Accordion.Header>
             <Accordion.Content>
               <UserInfo
-                docName={payload.company}
-                docLink={payload.pdf}
-                userName={payload.person.name}
-                userStatus={payload.person.position}
-                docDescription={payload.text}
+                docName={item.company}
+                docLink={item.pdfUrl}
+                userName={item.personName ?? ''}
+                userStatus={item.personPosition ?? ''}
+                docDescription={item.text}
               />
             </Accordion.Content>
           </Accordion>
         );
       })}
-      <IsNot value={isNotPage}>
+      <IsNot value={isNotPage && !items}>
         <Link to="/about-us/feedbacks">
           <Button className="btn-allFeedbacks" variant="ghostLink" children="Все отзывы" />
         </Link>

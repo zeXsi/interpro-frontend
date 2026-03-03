@@ -18,16 +18,17 @@
     span {
       cursor: pointer;
       transition: opacity 0.3s ease-out;
+      opacity: .3;
       &.active {
-        opacity: 0.3;
-        &:hover {
-          opacity: 0.2;
-        }
+        pointer-events: none;
+        opacity: 1;
+        /* &:hover {
+          opacity: 0.5;
+        } */
       }
       &:not(&.active) {
-        opacity: 1;
         &:hover {
-          opacity: 0.5;
+          opacity: 0.2;
         }
       }
     }

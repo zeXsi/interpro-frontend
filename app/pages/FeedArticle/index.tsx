@@ -153,7 +153,7 @@ export default function FeedArticle({ data }: { data: ArticleData }) {
               {articles.map(({ payload, slug: itemSlug }, index) => (
                 <Article
                   key={index}
-                  srcImg={payload.cover.url}
+                  srcImg={payload.cover?.url ?? ''}
                   date={formatDateToRussian(payload.date)}
                   title={payload.title}
                   desc={payload.subtitle}

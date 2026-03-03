@@ -1,6 +1,7 @@
 import { NextItem } from '../api.types';
 
 export interface Service {
+  nextItem?: import('../api.types').NextItem;
   id: number;
   date: string; // ISO string
   date_gmt: string; // ISO string
@@ -39,6 +40,30 @@ export interface Service {
       count: number;
       tags: string[];
     };
+    accordion?: Array<{ title: string; content: string }>;
+    content_blocks?: Array<{ title?: string; content?: string }>;
+    price?: string;
+    projects?: Array<{
+      id: number;
+      slug: string;
+      name: string;
+      full_image?: { url: string } | null;
+    }>;
+    reviews?: Array<{
+      title: string;
+      content_plain?: string;
+      content: string;
+      pdf?: { url: string } | null;
+    }>;
+    faq?: Array<{ question: string; answer: string }>;
+    news?: Array<{
+      id: number;
+      slug: string;
+      title: string;
+      name: string;
+      permalink: string;
+      full_image?: { url: string } | null;
+    }>;
   };
   _links: {
     self: Array<{
@@ -104,6 +129,31 @@ export interface ServiceCategory {
       slug: string;
       title: string;
     }[];
+    title?: string;
+    accordion?: Array<{ title: string; content: string }>;
+    content_blocks?: Array<{ title?: string; content?: string }>;
+    price?: string;
+    projects?: Array<{
+      id: number;
+      slug: string;
+      name: string;
+      full_image?: { url: string } | null;
+    }>;
+    reviews?: Array<{
+      title: string;
+      content_plain?: string;
+      content: string;
+      pdf?: { url: string } | null;
+    }>;
+    faq?: Array<{ question: string; answer: string }>;
+    news?: Array<{
+      id: number;
+      slug: string;
+      title: string;
+      name: string;
+      permalink: string;
+      full_image?: { url: string } | null;
+    }>;
   };
   _links: {
     self: Array<{
