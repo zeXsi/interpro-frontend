@@ -4,14 +4,16 @@ export interface LeadData {
   name: string;
   phone: string;
   company?: string;
-  consent: boolean
+  consent: boolean;
+  extraInfo?: string;
 }
 
 export interface LeadDataPopup {
   name: string;
   phone: string;
   email: string;
-  consent: boolean
+  consent: boolean;
+  extraInfo?: string;
 }
 
 export interface LeadDataExcursion {
@@ -20,7 +22,8 @@ export interface LeadDataExcursion {
   email: string;
   company: string;
   post: string;
-  consent: boolean
+  consent: boolean;
+  extraInfo?: string;
 }
 
 export interface LeadResponse {

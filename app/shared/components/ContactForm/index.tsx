@@ -145,6 +145,8 @@ interface PropsContactForm {
   subtitle?: string;
   onEnd?: () => void;
   type?: 'popup' | 'normal' | 'excursion' | 'mini-normal';
+  /** Название услуги для type="mini-normal" → extraInfo = "Услуга {serviceName}" */
+  serviceName?: string;
 }
 
 export default function ContactForm({
@@ -153,6 +155,7 @@ export default function ContactForm({
   subtitle,
   title,
   onEnd,
+  serviceName,
 }: PropsContactForm) {
   const { goTo } = useNavigate();
 
@@ -178,6 +181,17 @@ export default function ContactForm({
 
     form.onSubmit(async (data: any) => {
       refSend.current?.toggleAttribute('disabled', true);
+      const extraInfoByType =
+        type === 'excursion'
+          ? 'Заявка на экскурсию'
+          : type === 'popup'
+            ? 'Заказать дизайн-проект'
+            : type === 'mini-normal'
+              ? serviceName
+                ? `Услуга ${serviceName}`
+                : undefined
+              : 'Основная заявка';
+
       if (type === 'excursion') {
         await sendExcursion({
           name: data.username,
@@ -186,6 +200,7 @@ export default function ContactForm({
           company: data.nameCompany ?? '',
           post: data.namePost ?? '',
           consent: data.ad,
+          extraInfo: extraInfoByType,
         });
       } else if (type === 'popup') {
         await sendLeadPopup({
@@ -193,6 +208,7 @@ export default function ContactForm({
           phone: data.phone ?? '',
           email: data.email,
           consent: data.ad,
+          extraInfo: extraInfoByType,
         });
       } else if (type === 'mini-normal') {
         await sendLead({
@@ -200,6 +216,7 @@ export default function ContactForm({
           phone: data.phone,
           company: '',
           consent: data.ad,
+          extraInfo: extraInfoByType,
         });
       } else {
         await sendLead({
@@ -207,6 +224,7 @@ export default function ContactForm({
           phone: data.phone,
           company: data.nameCompany,
           consent: data.ad,
+          extraInfo: extraInfoByType,
         });
       }
 

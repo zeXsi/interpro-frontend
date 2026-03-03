@@ -148,7 +148,7 @@ export default function ServiceCategoryPage({ loaderData: data, params }: Route.
         })}
 
         <div ref={contactFormRef} className="wrap-ContactForm">
-          <ContactForm type="mini-normal" title="Заказать звонок" subtitle="" />
+          <ContactForm type="mini-normal" title="Заказать звонок" subtitle="" serviceName={data?.payload?.name} />
         </div>
 
         {data?.nextItem?.slug && data.nextItem.slug !== data?.slug && (

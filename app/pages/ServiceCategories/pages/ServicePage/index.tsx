@@ -134,7 +134,7 @@ export default function ServicePage({ loaderData: data, params }: Route.Componen
         })}
 
         <div ref={contactFormRef} className="wrap-ContactForm">
-          <ContactForm type="mini-normal" title="Заказать звонок" subtitle="" />
+          <ContactForm type="mini-normal" title="Заказать звонок" subtitle="" serviceName={data?.payload?.title} />
         </div>
 
         {data?.nextItem?.slug && data.nextItem.slug !== data?.slug && (
