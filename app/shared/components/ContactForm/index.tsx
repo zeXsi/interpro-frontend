@@ -169,6 +169,7 @@ export default function ContactForm({
   const refSend = useRef<HTMLSpanElement>(null);
 
   const submit = () => {
+    const ym = typeof window !== 'undefined' ? (window as any).ym : undefined;
     if (type === 'popup') {
       ym?.(99631636, 'reachGoal', 'request_popup');
     } else {

@@ -138,7 +138,7 @@ interface ContactsProps {
 function Contacts({ toClosePopup }: ContactsProps) {
   const toClosePopupYM = () => {
     toClosePopup();
-    ym(99631636,'reachGoal','reach_contact');
+    (window as any).ym?.(99631636,'reachGoal','reach_contact');
   }
   return (
     <div className="Contacts px">
