@@ -13,6 +13,11 @@
     gap: 16px;
     user-select: none;
     cursor: pointer;
+    align-items: center;
+    
+    .Accordion_header-title {
+      height: fit-content;
+    }
   }
 
   .Accordion_content {

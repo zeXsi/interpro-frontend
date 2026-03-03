@@ -67,7 +67,7 @@ export default function ServiceCategoryPage({ loaderData: data, params }: Route.
     <div className="InteractiveExhibit">
       <div className="wrap-first-wrap px">
         <div className="wrap-first-title">
-          <TitlePage title={data?.payload.title ?? ''} />
+          <TitlePage title={data?.payload.name!} />
           {data?.payload.description || (data?.payload.accordion?.length ?? 0) > 0 ? (
             <div className="wrap-desc">
               {data?.payload.description && (
