@@ -33,7 +33,7 @@ const srcVideo3Mobile = srcVideo3;
 export function meta() {
   const title = 'Interpro: главная';
   const description =
-    'Проектируем и строим выставочные стенды любого масштаба — от лаконичных решений до сложных архитектурных объектов';
+    'Выставочные стенды под ключ в Москве | Заказать стенд для выставки в компании Interpro';
 
   return [
     { title },
