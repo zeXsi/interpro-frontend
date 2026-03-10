@@ -56,7 +56,7 @@ export default function Contacts() {
                 ['telegram', import.meta.env.VITE_TELEGRAM_URL_1, 'external'],
                 ['Whatsapp', import.meta.env.VITE_WHATSAPP_URL, 'external'],
                 ['+7 (499) 390 03-75', import.meta.env.VITE_PHONE, 'external'],
-                ['info@interpro.pro', import.meta.env.VITE_EMAIL, 'external'],
+                [import.meta.env.VITE_EMAIL_NAME, import.meta.env.VITE_EMAIL, 'external'],
               ]}
             />
             <InfoList

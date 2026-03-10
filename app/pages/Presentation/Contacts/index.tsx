@@ -50,7 +50,7 @@ export default function Contacts({ data, id }: any) {
                 <Button
                   className="Contacts__list-btn"
                   variant="link"
-                  children="info@interpro.pro"
+                  children={import.meta.env.VITE_EMAIL_NAME}
                 />
               </a>
             </li>

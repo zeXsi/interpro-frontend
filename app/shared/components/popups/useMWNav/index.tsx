@@ -165,7 +165,7 @@ function Contacts({ toClosePopup }: ContactsProps) {
         </Link>
         <Link to={import.meta.env.VITE_EMAIL} typeLink="external">
           <Button variant="link" underline="left-right" className="Contacts-items add-line-height">
-            info@interpro.pro
+            {import.meta.env.VITE_EMAIL_NAME}
           </Button>
         </Link>
       </div>

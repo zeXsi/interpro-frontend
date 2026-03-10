@@ -208,10 +208,13 @@ export default function ContactForm({
 
   const submit = () => {
     const ym = typeof window !== 'undefined' ? (window as any).ym : undefined;
+    const _tmr = typeof window !== 'undefined' ? window._tmr : undefined;
     if (type === 'popup') {
       ym?.(99631636, 'reachGoal', 'request_popup');
+      _tmr?.push({ type: 'reachGoal', id: 3746602, goal: 'reach_goal_popup' });
     } else {
       ym?.(99631636, 'reachGoal', 'request_form');
+      _tmr?.push({ type: 'reachGoal', id: 3746602, goal: 'reach_goal_final' });
     }
 
     form.onSubmit(async (data: any) => {

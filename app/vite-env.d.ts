@@ -15,6 +15,7 @@ interface Window {
     faqs: State['faqs'];
     feedbacks: State['feedbacks'];
   };
+  _tmr?: Array<Record<string, string | number>>;
 }
 
-function ym(counterId: number, goalName: string, type?:string): void;
+function ym(counterId: number, goalName: string, type?: string): void;
