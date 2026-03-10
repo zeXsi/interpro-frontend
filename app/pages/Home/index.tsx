@@ -21,14 +21,14 @@ import ParallaxFooter from 'shared/components/ParallaxFooter';
 import srcVideo2Cover from 'assets/videos/video_2/cover.jpg';
 import srcVideo3Cover from 'assets/videos/video_3/cover.jpg';
 import srcVideo2CoverMobile from 'assets/videos/video_2/cover_mobile.jpg';
-import srcVideo3CoverMobile from 'assets/videos/video_3/cover_mobile.jpg';
 import StartPage from 'shared/components/StartPage';
 
 // HLS видео пути
 const srcVideo2 = '/videos/video_2/hls/video.m3u8';
 const srcVideo3 = '/videos/video_3/hls/video.m3u8';
 const srcVideo2Mobile = '/videos/video_2/hls/video_mobile.m3u8';
-const srcVideo3Mobile = '/videos/video_3/hls/video_mobile.m3u8';
+// video_3: мобилка использует те же видео и обложку что десктоп
+const srcVideo3Mobile = srcVideo3;
 
 export function meta() {
   const title = 'Interpro: главная';
@@ -73,7 +73,7 @@ export default function Home() {
         srcVideo2: srcVideo2Mobile,
         srcVideo3: srcVideo3Mobile,
         srcVideo2Cover: srcVideo2CoverMobile,
-        srcVideo3Cover: srcVideo3CoverMobile,
+        srcVideo3Cover: srcVideo3Cover, // video_3: та же обложка что десктоп
         aspectRatio: '375/940',
       },
     },
