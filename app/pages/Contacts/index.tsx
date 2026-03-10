@@ -83,6 +83,7 @@ export default function Contacts() {
                 ['pinterest', import.meta.env.VITE_PINTEREST_URL, 'external'],
                 ['behance', import.meta.env.VITE_BEHANCE_URL, 'external'],
               ]}
+              subtitle={<span className='mob-no-br'>*Meta признана экстремистской <br /> организацией на территории РФ</span>}
             />
             <InfoList
               className="__group-4"
