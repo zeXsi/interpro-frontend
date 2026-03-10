@@ -26,7 +26,7 @@ export default function ServiceCategories({}) {
   return (
     <StartPage>
       <div className="ServiceCategories px">
-        <TitlePage title="услуги" />
+        <TitlePage title="Услуги" />
         <ServicesDesc title="подход">
           Проектируем, строим, поддерживаем выставочные стенды, которые работают на бренд
         </ServicesDesc>

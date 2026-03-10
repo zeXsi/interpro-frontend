@@ -1,4 +1,4 @@
-import './styles.css'
+import './styles.css';
 
 interface ArticleProps {
   date: string;
@@ -8,12 +8,14 @@ interface ArticleProps {
   onClick?: () => void;
 }
 
-export default function Article({ date, onClick,  srcImg, title, desc }: ArticleProps) {
+export default function Article({ date, onClick, srcImg, title, desc }: ArticleProps) {
   return (
-    <div className="Article" onClick={onClick} >
-      <div className="Article-img">
-        <img src={srcImg} />
-      </div>
+    <div className="Article" onClick={onClick}>
+      {srcImg && (
+        <div className="Article-img">
+          <img src={srcImg} />
+        </div>
+      )}
       <div className="Article_info">
         <span className="Article_info-date">{date}</span>
         <div className="Article_info-title">{title}</div>

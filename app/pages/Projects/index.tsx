@@ -151,7 +151,7 @@ export default function ProjectsPage() {
                     title={payload.title}
                     description={payload.about}
                     image={payload.cover}
-                    year={payload.meta.year.name}
+                    year={payload.meta.year?.name ?? ''}
                     typeStand={toFormatNames(payload.meta.type_tax)}
                     nameExhibition={toFormatNames(payload.meta.exhibition)}
                     link={link}

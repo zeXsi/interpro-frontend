@@ -1,0 +1,57 @@
+import './styles.css';
+import { ImgComparisonSlider } from '@img-comparison-slider/react';
+import { useLocation } from 'react-router';
+
+export default function Comparison({ data, id }: any) {
+  const location = useLocation();
+  const before = data.fields?.ba_before?.full;
+  const after = data.fields?.ba_after?.full;
+  const isPdfExport = new URLSearchParams(location.search).get('export') === 'pdf';
+
+  if (!before || !after) return null;
+
+  if (isPdfExport) {
+    return (
+      <>
+        <section className="Comparison Comparison--printSlide" id={id}>
+          <img src={before} alt="До" />
+        </section>
+        <section className="Comparison Comparison--printSlide">
+          <img src={after} alt="После" />
+        </section>
+      </>
+    );
+  }
+
+  return (
+    <section className="Comparison" id={id}>
+      <ImgComparisonSlider>
+        <img slot="first" src={before} alt="До" />
+        <img slot="second" src={after} alt="После" />
+
+          <svg
+            width="82"
+            height="56"
+            viewBox="0 0 82 56"
+            fill="none"
+            xmlns="http://www.w3.org/2000/svg"
+            // slot="handle"
+            {...({ slot: 'handle' } as unknown as React.SVGProps<SVGSVGElement>)}
+          >
+            <g data-figma-bg-blur-radius="50">
+              <rect width="82" height="56" rx="28" fill="white" />
+              <path
+                d="M36.7123 22.2955C36.6193 22.2019 36.5088 22.1276 36.387 22.0768C36.2652 22.0261 36.1346 22 36.0026 22C35.8707 22 35.7401 22.0261 35.6183 22.0768C35.4965 22.1276 35.3859 22.2019 35.293 22.2955L30.2956 27.2907C30.202 27.3836 30.1276 27.4941 30.0769 27.6158C30.0261 27.7375 30 27.8681 30 28C30 28.1319 30.0261 28.2625 30.0769 28.3842C30.1276 28.5059 30.202 28.6164 30.2956 28.7093L35.293 33.7045C35.3859 33.7981 35.4965 33.8724 35.6183 33.9232C35.7401 33.9739 35.8707 34 36.0026 34C36.1346 34 36.2652 33.9739 36.387 33.9232C36.5088 33.8724 36.6193 33.7981 36.7123 33.7045C36.8059 33.6116 36.8803 33.5011 36.931 33.3794C36.9818 33.2576 37.0079 33.1271 37.0079 32.9952C37.0079 32.8633 36.9818 32.7327 36.931 32.611C36.8803 32.4892 36.8059 32.3787 36.7123 32.2859L32.4145 28L36.7123 23.7141C36.8059 23.6213 36.8803 23.5108 36.931 23.389C36.9818 23.2673 37.0079 23.1367 37.0079 23.0048C37.0079 22.8729 36.9818 22.7424 36.931 22.6206C36.8803 22.4989 36.8059 22.3884 36.7123 22.2955ZM51.7044 27.2907L46.707 22.2955C46.6138 22.2024 46.5032 22.1285 46.3814 22.0781C46.2597 22.0277 46.1292 22.0017 45.9974 22.0017C45.7312 22.0017 45.4759 22.1074 45.2877 22.2955C45.1946 22.3887 45.1206 22.4992 45.0702 22.6209C45.0198 22.7427 44.9938 22.8731 44.9938 23.0048C44.9938 23.2709 45.0995 23.526 45.2877 23.7141L49.5855 28L45.2877 32.2859C45.1941 32.3787 45.1197 32.4892 45.069 32.611C45.0182 32.7327 44.9921 32.8633 44.9921 32.9952C44.9921 33.1271 45.0182 33.2576 45.069 33.3794C45.1197 33.5011 45.1941 33.6116 45.2877 33.7045C45.3807 33.7981 45.4912 33.8724 45.613 33.9232C45.7348 33.9739 45.8654 34 45.9974 34C46.1293 34 46.2599 33.9739 46.3817 33.9232C46.5035 33.8724 46.6141 33.7981 46.707 33.7045L51.7044 28.7093C51.798 28.6164 51.8724 28.5059 51.9231 28.3842C51.9739 28.2625 52 28.1319 52 28C52 27.8681 51.9739 27.7375 51.9231 27.6158C51.8724 27.4941 51.798 27.3836 51.7044 27.2907Z"
+                fill="black"
+              />
+            </g>
+            <defs>
+              <clipPath id="bgblur_0_4799_64579_clip_path" transform="translate(50 50)">
+                <rect width="82" height="56" rx="28" />
+              </clipPath>
+            </defs>
+          </svg>
+      </ImgComparisonSlider>
+    </section>
+  );
+}

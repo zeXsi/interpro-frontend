@@ -5,6 +5,8 @@ import Button from 'shared/components/Button';
 import LogoIcon from 'assets/icons/logo.svg?react';
 import { useNavigate } from 'shared/components/NavigationTracker';
 
+const date = new Date();
+
 export default function Footer() {
   const { goTo } = useNavigate();
 
@@ -34,12 +36,13 @@ export default function Footer() {
           items={[
             ['telegram-канал', import.meta.env.VITE_TELEGRAM_URL_2, 'external'],
             // ['telegram-live', import.meta.env.VITE_TELEGRAM_URL_3, 'external'],
-            ['instagram', import.meta.env.VITE_INSTAGRAM_URL, 'external'],
+            ['instagram*', import.meta.env.VITE_INSTAGRAM_URL, 'external'],
             ['youtube', import.meta.env.VITE_YOUTUBE_URL, 'external'],
             ['vk', import.meta.env.VITE_VK_URL, 'external'],
             ['pinterest', import.meta.env.VITE_PINTEREST_URL, 'external'],
             ['behance', import.meta.env.VITE_BEHANCE_URL, 'external'],
           ]}
+          subtitle={<span className='mob-no-br'>*Meta признана экстремистской <br /> организацией на территории РФ</span>}
         />
         {/* <InfoList
             title="услуги:"
@@ -70,7 +73,7 @@ export default function Footer() {
             ['telegram', import.meta.env.VITE_TELEGRAM_URL_1, 'external'],
             ['Whatsapp', import.meta.env.VITE_WHATSAPP_URL, 'external'],
             ['+7 (499) 390 03-75', import.meta.env.VITE_PHONE, 'external'],
-            ['info@interpro.pro', import.meta.env.VITE_EMAIL, 'external'],
+            [import.meta.env.VITE_EMAIL_NAME, import.meta.env.VITE_EMAIL, 'external'],
           ]}
         />
         <InfoList
@@ -90,7 +93,7 @@ export default function Footer() {
             <span onClick={() => goTo('/')}>
               <LogoIcon className="Footer_bottom-logo" />
             </span>{' '}
-            <span>© 2017 — 2025 интерпроект</span>
+            <span>© 2017 — {date.getFullYear()} интерпроект</span>
           </div>
           <div className="Footer_bottom-wrapper">
             <Button size="sm" variant="ghostLink" onClick={() => goTo('/mapping')}>

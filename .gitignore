@@ -1,7 +1,9 @@
 .DS_Store
+.vscode
 # .env
 /node_modules/
 
 # React Router
 /.react-router/
 /build/
+/public/sitemap.xml

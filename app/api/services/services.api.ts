@@ -29,6 +29,10 @@ export const getServiceCategoriesById = (params: Param) => qServiceCategoryById.
 const qServices = createQuery<Service[]>({
   endpoint: '/service',
   initial: [],
+  middleware: (data) => {
+    addNextItem(data as any);
+    return data;
+  },
 });
 
 export const sgServices = qServices.sg;

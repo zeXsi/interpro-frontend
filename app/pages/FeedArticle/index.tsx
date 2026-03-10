@@ -153,7 +153,7 @@ export default function FeedArticle({ data }: { data: ArticleData }) {
               {articles.map(({ payload, slug: itemSlug }, index) => (
                 <Article
                   key={index}
-                  srcImg={payload.cover.url}
+                  srcImg={payload.cover?.url ?? ''}
                   date={formatDateToRussian(payload.date)}
                   title={payload.title}
                   desc={payload.subtitle}
@@ -269,7 +269,7 @@ function Networks() {
         </Link>
         <Link to={import.meta.env.VITE_INSTAGRAM_URL} typeLink="external">
           <Button className="addPadd" variant="outline">
-            Instagram
+            Instagram*
           </Button>
         </Link>
         <Link to={import.meta.env.VITE_VK_URL} typeLink="external">

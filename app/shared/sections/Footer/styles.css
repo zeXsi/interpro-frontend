@@ -62,7 +62,7 @@
     gap: inherit;
     .InfoList-container {
       overflow: hidden;
-      gap: clamp(0.5rem, calc(0.379rem + 0.518vw), 1rem); /* min: 8px, max: 16px */
+      gap: 8px;
     }
 
     &.__requisites {
@@ -200,6 +200,11 @@
   .Footer {
     .Footer-title {
       grid-column: 1 / 4;
+    }
+    .InfoList {
+      .InfoList-container {
+        gap: clamp(0.5rem, calc(-0.071rem + 1.19vw), 1rem); /* min: 16px, max: 8px */
+      }
     }
   }
 }

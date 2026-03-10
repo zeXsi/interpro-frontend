@@ -26,7 +26,7 @@ export async function clientLoader({ params }: Route.LoaderArgs) {
   const project = await getProjectsById({ id: params.slug });
 
   if (!project) {
-    throw new Response("Not found", { status: 404 });
+    throw new Response('Not found', { status: 404 });
   }
 
   return project;
@@ -46,7 +46,6 @@ export function meta({ data }: Route.MetaArgs) {
     { property: 'og:description', content: description },
   ];
 }
-
 
 export default function ProjectPage({ loaderData: data, params }: Route.ComponentProps) {
   const { setCrumbs } = useNavigate();
@@ -87,7 +86,7 @@ export default function ProjectPage({ loaderData: data, params }: Route.Componen
         <h1 className="ProjectPage_title px">{data?.payload?.title}</h1>
 
         <TagsDesktop
-          year={data?.payload?.meta?.year.name}
+          year={data?.payload?.meta?.year?.name ?? ''}
           typeStand={toFormatNames(data?.payload?.meta?.type_tax)}
           exhibition={toFormatNames(data?.payload?.meta?.exhibition)}
           desc={data?.payload?.about ?? ''}
@@ -396,38 +395,63 @@ function SwiperScheme({
               </SwiperSlide>
             );
           })}
-          <button onClick={() => handlePrev()} className="SwiperScheme_swiper-prev mx">
-            <ArrowIcon />
-          </button>
-          <button onClick={() => handleNext()} className="SwiperScheme_swiper-next mx">
-            <ArrowIcon />
-          </button>
-          <div className="SwiperScheme_swiper-pagination">
-            {imgs.map((_, index) => {
-              const clIsActive = currIndex === index ? 'active' : '';
-              return <span key={index} className={clIsActive}></span>;
-            })}
-          </div>
+          {imgs.length > 1 && (
+            <>
+              <button onClick={() => handlePrev()} className="SwiperScheme_swiper-prev mx">
+                <ArrowIcon />
+              </button>
+              <button onClick={() => handleNext()} className="SwiperScheme_swiper-next mx">
+                <ArrowIcon />
+              </button>
+              <div className="SwiperScheme_swiper-pagination">
+                {imgs.map((_, index) => {
+                  const clIsActive = currIndex === index ? 'active' : '';
+                  return <span key={index} className={clIsActive}></span>;
+                })}
+              </div>
+            </>
+          )}
         </Swiper>
       </div>
     )
   );
 }
 
+function toEmbedUrl(url: string): string {
+  try {
+    // Rutube: /video/ID -> /play/embed/ID
+    const rutube = url.match(/rutube\.ru\/video\/([\w-]+)/i);
+    if (rutube) return `https://rutube.ru/play/embed/${rutube[1]}/`;
+
+    // YouTube: watch?v=ID или youtu.be/ID -> embed
+    const ytWatch = url.match(/youtube\.com\/watch\?v=([\w-]+)/i);
+    if (ytWatch) return `https://www.youtube.com/embed/${ytWatch[1]}`;
+    const ytShort = url.match(/youtu\.be\/([\w-]+)/i);
+    if (ytShort) return `https://www.youtube.com/embed/${ytShort[1]}`;
+
+    // Vimeo: vimeo.com/ID -> player.vimeo.com/video/ID
+    const vimeo = url.match(/vimeo\.com\/(\d+)/i);
+    if (vimeo) return `https://player.vimeo.com/video/${vimeo[1]}`;
+
+    return url;
+  } catch {
+    return url;
+  }
+}
+
 interface VideoPlayerProps {
   url?: string;
 }
 const VideoPlayer = ({ url }: VideoPlayerProps) => {
+  const embedSrc = url ? toEmbedUrl(url) : '';
   return (
-    !!url && (
+    !!embedSrc && (
       <div className="VideoPlayer">
         <iframe
           className="VideoPlayer-iframe"
-          src={url}
+          src={embedSrc}
           frameBorder="0"
           allow="clipboard-write; autoplay"
-          // webkitAllowFullScreen
-          // mozallowfullscreen
           allowFullScreen
         />
       </div>

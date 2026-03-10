@@ -17,6 +17,7 @@ import { getFeedNews, getFeedBlog } from 'api/feed/feed.api';
 import { getFeedbacks } from 'api/feedbacks/feedbacks.api';
 import { getLicenses } from 'api/licenses/license.api';
 import { getServiceCategories, getServices } from 'api/services/services.api';
+import { useLocation } from 'react-router';
 
 import { getSSRStore } from 'shared/utils/_stm';
 import Header from 'shared/components/Header';
@@ -64,6 +65,18 @@ const yandexMetrikaScript = `
   });
 `;
 
+const mailRuTopScript = `
+  var _tmr = window._tmr || (window._tmr = []);
+  _tmr.push({id: "3746602", type: "pageView", start: (new Date()).getTime()});
+  (function (d, w, id) {
+    if (d.getElementById(id)) return;
+    var ts = d.createElement("script"); ts.type = "text/javascript"; ts.async = true; ts.id = id;
+    ts.src = "https://top-fwz1.mail.ru/js/code.js";
+    var f = function () {var s = d.getElementsByTagName("script")[0]; s.parentNode.insertBefore(ts, s);};
+    if (w.opera == "[object Opera]") { d.addEventListener("DOMContentLoaded", f, false); } else { f(); }
+  })(document, window, "tmr-code");
+`;
+
 export function Layout({ children }: { children: React.ReactNode }) {
   const data = useLoaderData();
   return (
@@ -91,10 +104,20 @@ export function Layout({ children }: { children: React.ReactNode }) {
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: seoScheme(data.projects) }}
         />
-        <script type="text/javascript" dangerouslySetInnerHTML={{ __html: getSSRStore() }} />
+        <script
+          type="text/javascript"
+          dangerouslySetInnerHTML={{ __html: getSSRStore() }}
+          suppressHydrationWarning
+        />
 
         {/* Yandex.Metrika counter */}
-        <script type="text/javascript" dangerouslySetInnerHTML={{ __html: yandexMetrikaScript }} />
+        {/* <script type="text/javascript" dangerouslySetInnerHTML={{ __html: yandexMetrikaScript }} /> */}
+
+        {/* Top.Mail.Ru counter */}
+        <script
+          type="text/javascript"
+          dangerouslySetInnerHTML={{ __html: mailRuTopScript }}
+        />
       </head>
       <body>
         {/* Yandex.Metrika counter */}
@@ -105,6 +128,11 @@ export function Layout({ children }: { children: React.ReactNode }) {
               src="https://mc.yandex.ru/watch/99631636"
               style={{ position: 'absolute', left: '-9999px' }}
               alt=""
+            />
+            <img
+              src="https://top-fwz1.mail.ru/counter?id=3746602;js=na"
+              style={{ position: 'absolute', left: '-9999px' }}
+              alt="Top.Mail.Ru"
             />
           </div>
         </noscript>
@@ -130,7 +158,7 @@ export function meta({}: Route.MetaArgs) {
     { property: 'og:title', content: 'Interpro — Связаться' },
     {
       property: 'og:description',
-      content: 'Мы находимся в Telegram, Instagram, YouTube, VK и других соцсетях.',
+      content: 'Мы находимся в Telegram, Instagram*, YouTube, VK и других соцсетях.',
     },
   ];
 }
@@ -167,23 +195,32 @@ export async function loader(_args: Route.LoaderArgs) {
 }
 
 export default function App() {
+  const location = useLocation();
   const cookies = useCookies();
   const form = useMWForm();
   useEffect(() => {
     lenisManager.init();
   }, []);
+
+  const isPresentation = location.pathname.startsWith('/presentation');
+
   return (
     <>
       <div id="root">
-        <Header />
-        <cookies.Popup />
-        <AdBanner />
-        <form.Popup />
-        <BTNContact />
-        <RouteGuard isValidRoutes={['/', '/privacy']} isInverted={true}>
-          <NavigationTracker />
-        </RouteGuard>
-        <ParallaxFooter PreElement={Outlet} Element={FooterC} />
+        {!isPresentation && (
+          <>
+            <Header />
+            <cookies.Popup />
+            <AdBanner />
+            <form.Popup />
+            <BTNContact />
+            <RouteGuard isValidRoutes={['/', '/privacy']} isInverted={true}>
+              <NavigationTracker />
+            </RouteGuard>
+            <ParallaxFooter PreElement={Outlet} Element={FooterC} />
+          </>
+        )}
+        {isPresentation && <Outlet />}
       </div>
     </>
   );

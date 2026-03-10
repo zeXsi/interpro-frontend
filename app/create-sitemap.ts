@@ -91,13 +91,10 @@ ${allUrls
 </urlset>`;
 
   const sitemapPath = resolveSitemapPath();
-  console.log(sitemapPath)
   // 💥 Создаём папку, если не существует
   fs.mkdirSync(path.dirname(sitemapPath), { recursive: true });
 
   fs.writeFileSync(sitemapPath, xml);
-
-  console.log("[Sitemap] Updated:", sitemapPath);
 }
 
 export async function startSitemapScheduler() {
@@ -105,8 +102,6 @@ export async function startSitemapScheduler() {
   if (schedulerStarted) return;
 
   schedulerStarted = true;
-
-  console.log("[Sitemap] Scheduler started");
 
   await buildSitemap();
   setInterval(buildSitemap, 4 * 60 * 60 * 1000);

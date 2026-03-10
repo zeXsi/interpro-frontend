@@ -5,5 +5,5 @@ interface Props {
   className?: string;
 }
 export default function TitlePage({ title, className = '' }: Props) {
-  return <h1 className={`TitlePage ${className}`}>{title}</h1>;
+  return title && (<h1 className={`TitlePage ${className}`}>{title}</h1>);
 }

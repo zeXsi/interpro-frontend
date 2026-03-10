@@ -1,6 +1,6 @@
 import usePopup from '@qtpy/use-popup';
 import './styles.css';
-import { Activity, useImperativeHandle, useRef, useState } from 'react';
+import { Activity, useImperativeHandle, useRef, useState, useEffect } from 'react';
 import SVGCross from 'assets/icons/close-popup.svg?react';
 import { Swiper, SwiperSlide } from 'swiper/react';
 import { Swiper as TSwiper } from 'swiper';
@@ -65,6 +65,35 @@ export default function useMWImage() {
           }, 50);
         },
       }));
+
+      useEffect(() => {
+        const handleKeyDown = (e: KeyboardEvent) => {
+          if (!photos.length) return;
+
+          switch (e.key) {
+            case 'ArrowLeft':
+              e.preventDefault();
+              handlePrev();
+              break;
+
+            case 'ArrowRight':
+              e.preventDefault();
+              handleNext();
+              break;
+
+            case 'Escape':
+              e.preventDefault();
+              props.toClosePopup();
+              break;
+          }
+        };
+
+        window.addEventListener('keydown', handleKeyDown);
+
+        return () => {
+          window.removeEventListener('keydown', handleKeyDown);
+        };
+      }, [photos.length, currIndex]);
 
       return (
         <Popup className="MWImage" isOnCloseBG={false}>

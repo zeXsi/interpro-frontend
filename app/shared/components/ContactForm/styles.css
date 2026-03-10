@@ -38,6 +38,112 @@
       width: var(--size);
     }
   }
+
+  &.mini-normal {
+    .Subtitle {
+      display: none;
+    }
+
+    display: flex;
+    flex-direction: column;
+    gap: 44px;
+
+    .ContactForm-title {
+      font-family: var(--font-family);
+      font-weight: 400;
+      font-size: clamp(2rem, calc(1.333rem + 1.389vw), 3rem); /* min: 32px, max: 48px */
+      line-height: 110%;
+      letter-spacing: -0.04em;
+      color: #000;
+      margin: 0;
+    }
+
+    .ContactForm_inner {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: clamp(0.5rem, calc(0rem + 1.042vw), 1.25rem); /* min: 8px, max: 20px */
+
+      .ContactForm-form {
+        grid-column: 1 / 2;
+        margin: 0;
+      }
+
+      .ContactForm_footer {
+        grid-column: 3 / 4;
+
+        .ButtonArrow {
+          gap: 8px;
+          margin-bottom: 16px;
+
+          .Button {
+            font-family: var(--font-family);
+            font-weight: 500;
+            font-size: 24px;
+            line-height: 120%;
+            letter-spacing: -0.04em;
+            text-align: center;
+            color: #000;
+          }
+
+          svg {
+            margin-top: 0 !important;
+            width: 32px;
+            height: 32px;
+          }
+        }
+
+        .ConsentCheckbox {
+          .wrapper {
+            gap: 8px;
+
+            .ConsentCheckbox_checkbox {
+              width: 24px;
+              height: 24px;
+              min-width: unset;
+              min-height: unset;
+              flex-shrink: 0;
+            }
+          }
+        }
+
+        .ConsentCheckbox-text {
+          font-family: var(--font-family);
+          font-weight: 500;
+          font-size: 14px;
+          line-height: 136%;
+          letter-spacing: -0.02em;
+          color: #000;
+        }
+      }
+    }
+
+    @media (max-width: 1366px) {
+      .ContactForm_inner {
+        grid-template-columns: 1fr 1fr;
+
+        .ContactForm-form {
+          width: 66%;
+        }
+
+        .ContactForm_footer {
+          grid-column: 2 / -1;
+        }
+      }
+    }
+
+    @media (max-width: 768px) {
+      .ContactForm_inner {
+        .ContactForm-form {
+          grid-column: 1 / -1;
+          width: 100%;
+        }
+
+        .ContactForm_footer {
+          grid-column: 1 / -1;
+        }
+      }
+    }
+  }
 }
 
 .ConsentCheckbox {

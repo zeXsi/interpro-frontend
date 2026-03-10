@@ -56,7 +56,7 @@ export default function Contacts() {
                 ['telegram', import.meta.env.VITE_TELEGRAM_URL_1, 'external'],
                 ['Whatsapp', import.meta.env.VITE_WHATSAPP_URL, 'external'],
                 ['+7 (499) 390 03-75', import.meta.env.VITE_PHONE, 'external'],
-                ['info@interpro.pro', import.meta.env.VITE_EMAIL, 'external'],
+                [import.meta.env.VITE_EMAIL_NAME, import.meta.env.VITE_EMAIL, 'external'],
               ]}
             />
             <InfoList
@@ -77,12 +77,13 @@ export default function Contacts() {
               items={[
                 ['telegram-канал', import.meta.env.VITE_TELEGRAM_URL_2, 'external'],
                 // ['telegram-live', import.meta.env.VITE_TELEGRAM_URL_3, 'external'],
-                ['instagram', import.meta.env.VITE_INSTAGRAM_URL, 'external'],
+                ['instagram*', import.meta.env.VITE_INSTAGRAM_URL, 'external'],
                 ['youtube', import.meta.env.VITE_YOUTUBE_URL, 'external'],
                 ['vk', import.meta.env.VITE_VK_URL, 'external'],
                 ['pinterest', import.meta.env.VITE_PINTEREST_URL, 'external'],
                 ['behance', import.meta.env.VITE_BEHANCE_URL, 'external'],
               ]}
+              subtitle={<span className='mob-no-br'>*Meta признана экстремистской <br /> организацией на территории РФ</span>}
             />
             <InfoList
               className="__group-4"

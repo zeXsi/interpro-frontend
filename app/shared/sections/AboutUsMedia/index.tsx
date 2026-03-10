@@ -32,7 +32,7 @@ export default function AboutUsMedia() {
         </Link>
         <Link to={import.meta.env.VITE_INSTAGRAM_URL} typeLink="external">
           <Button className="addPadd" variant="outline">
-            Instagram
+            Instagram*
           </Button>
         </Link>
         <Link to={import.meta.env.VITE_VK_URL} typeLink="external">

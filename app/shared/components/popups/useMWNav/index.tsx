@@ -138,7 +138,7 @@ interface ContactsProps {
 function Contacts({ toClosePopup }: ContactsProps) {
   const toClosePopupYM = () => {
     toClosePopup();
-    ym(99631636,'reachGoal','reach_contact');
+    (window as any).ym?.(99631636,'reachGoal','reach_contact');
   }
   return (
     <div className="Contacts px">
@@ -165,7 +165,7 @@ function Contacts({ toClosePopup }: ContactsProps) {
         </Link>
         <Link to={import.meta.env.VITE_EMAIL} typeLink="external">
           <Button variant="link" underline="left-right" className="Contacts-items add-line-height">
-            info@interpro.pro
+            {import.meta.env.VITE_EMAIL_NAME}
           </Button>
         </Link>
       </div>
