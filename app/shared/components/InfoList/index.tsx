@@ -7,6 +7,7 @@ interface Props {
   items: Array<
     [title: string | string[], link?: string | string[], typeLink?: 'external' | 'internal']
   >;
+  subtitle?: React.ReactNode;
   className?: string;
   variant?: 'paragraph' | 'link' | 'custom';
   mode?: 'text' | 'button' | 'text_underline';
@@ -17,6 +18,7 @@ interface Props {
 export default function InfoList({
   title,
   items,
+  subtitle = "",
   variant = 'link',
   mode = 'button',
   className = '',
@@ -87,6 +89,9 @@ export default function InfoList({
       <div className="InfoList-container">
         {items.map(([label, src, typeLink], index) =>
           renderItem(label, index, src, typeLink)
+        )}
+        {subtitle && (
+          <p className='subtitle'>{subtitle}</p>
         )}
       </div>
     </div>

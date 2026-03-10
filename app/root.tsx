@@ -158,7 +158,7 @@ export function meta({}: Route.MetaArgs) {
     { property: 'og:title', content: 'Interpro — Связаться' },
     {
       property: 'og:description',
-      content: 'Мы находимся в Telegram, Instagram, YouTube, VK и других соцсетях.',
+      content: 'Мы находимся в Telegram, Instagram*, YouTube, VK и других соцсетях.',
     },
   ];
 }

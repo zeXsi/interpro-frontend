@@ -77,12 +77,13 @@ export default function Contacts() {
               items={[
                 ['telegram-канал', import.meta.env.VITE_TELEGRAM_URL_2, 'external'],
                 ['telegram-live', import.meta.env.VITE_TELEGRAM_URL_3, 'external'],
-                ['instagram', import.meta.env.VITE_INSTAGRAM_URL, 'external'],
+                ['instagram*', import.meta.env.VITE_INSTAGRAM_URL, 'external'],
                 ['youtube', import.meta.env.VITE_YOUTUBE_URL, 'external'],
                 ['vk', import.meta.env.VITE_VK_URL, 'external'],
                 ['pinterest', import.meta.env.VITE_PINTEREST_URL, 'external'],
                 ['behance', import.meta.env.VITE_BEHANCE_URL, 'external'],
               ]}
+              subtitle={<span className='mob-no-br'>*Meta признана экстремистской <br /> организацией на территории РФ</span>}
             />
             <InfoList
               className="__group-4"
