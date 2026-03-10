@@ -1,11 +1,13 @@
 #!/bin/bash
-# Конвертация video-3.mp4 в HLS (desktop + mobile) без аудио + создание обложек
+# Конвертация video_3.mov в HLS (desktop + mobile) без аудио + создание обложек
 # Требуется: ffmpeg (apt install ffmpeg / brew install ffmpeg)
 
 set -e
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 PROJECT_ROOT="$(dirname "$SCRIPT_DIR")"
-SRC_VIDEO="$PROJECT_ROOT/app/assets/videos/video_3/video-3.mp4"
+# Поддержка video_3.mov или video-3.mp4
+SRC_VIDEO="$PROJECT_ROOT/app/assets/videos/video_3/video_3.mov"
+[[ -f "$SRC_VIDEO" ]] || SRC_VIDEO="$PROJECT_ROOT/app/assets/videos/video_3/video-3.mp4"
 HLS_DIR="$PROJECT_ROOT/public/videos/video_3/hls"
 ASSETS_DIR="$PROJECT_ROOT/app/assets/videos/video_3"
 
@@ -28,7 +30,7 @@ ffmpeg -y -i "$SRC_VIDEO" \
 echo "2. Конвертация в HLS (mobile 375px, без аудио)..."
 ffmpeg -y -i "$SRC_VIDEO" \
   -an \
-  -vf "scale=375:-2" \
+  -vf "scale=376:-2" \
   -c:v libx264 \
   -preset medium \
   -crf 23 \
@@ -51,7 +53,7 @@ echo "4. Создание cover_mobile.jpg..."
 ffmpeg -y -i "$SRC_VIDEO" \
   -ss 00:00:01 \
   -vframes 1 \
-  -vf "scale=375:-2" \
+  -vf "scale=376:-2" \
   -q:v 2 \
   "$ASSETS_DIR/cover_mobile.jpg"
 

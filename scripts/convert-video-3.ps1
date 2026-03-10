@@ -1,15 +1,14 @@
-# Конвертация video-3.mp4 в HLS (desktop + mobile) без аудио + создание обложек
+# Конвертация video_3.mov в HLS (desktop + mobile) без аудио + создание обложек
 # Требуется: ffmpeg (установить: winget install ffmpeg  или choco install ffmpeg)
 
 $ErrorActionPreference = "Stop"
 $projectRoot = Split-Path -Parent (Split-Path -Parent $PSScriptRoot)
-$srcVideo = Join-Path $projectRoot "app\assets\videos\video_3\video-3.mp4"
+$srcVideo = Join-Path $projectRoot "app\assets\videos\video_3\video_3.mov"
+if (-not (Test-Path $srcVideo)) { $srcVideo = Join-Path $projectRoot "app\assets\videos\video_3\video-3.mp4" }
 $hlsDir = Join-Path $projectRoot "public\videos\video_3\hls"
 $assetsDir = Join-Path $projectRoot "app\assets\videos\video_3"
 
-if (-not (Test-Path $srcVideo)) {
-    Write-Error "Исходное видео не найдено: $srcVideo"
-}
+if (-not (Test-Path $srcVideo)) { Write-Error "Исходное видео не найдено (ожидается video_3.mov или video-3.mp4)" }
 
 # Создаём директории
 New-Item -ItemType Directory -Force -Path $hlsDir | Out-Null
@@ -33,7 +32,7 @@ Write-Host "2. Конвертация в HLS (mobile 375px, без аудио)..
 Push-Location $hlsDir
 ffmpeg -y -i $srcVideo `
     -an `
-    -vf "scale=375:-2" `
+    -vf "scale=376:-2" `
     -c:v libx264 `
     -preset medium `
     -crf 23 `
@@ -60,7 +59,7 @@ Write-Host "4. Создание cover_mobile.jpg..."
 ffmpeg -y -i $srcVideo `
     -ss 00:00:01 `
     -vframes 1 `
-    -vf "scale=375:-2" `
+    -vf "scale=376:-2" `
     -q:v 2 `
     $coverMobilePath
 if ($LASTEXITCODE -ne 0) { throw "Ошибка создания cover_mobile" }
