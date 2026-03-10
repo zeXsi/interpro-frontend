@@ -19,6 +19,41 @@ function vld<T>(schema: any) {
 
 const emailSchema = pipe(string(), email());
 
+// Маска телефона: +7 (XXX) XXX-XX-XX
+function normalizePhoneDigits(str: string): string {
+  let digits = str.replace(/\D/g, '');
+  if (digits.startsWith('8')) digits = '7' + digits.slice(1);
+  else if (digits.startsWith('9') && digits.length <= 10) digits = '7' + digits;
+  else if (digits.length && !digits.startsWith('7')) digits = '7' + digits;
+  return digits.slice(0, 11);
+}
+
+function formatPhoneDisplay(digits: string): string {
+  if (!digits) return '';
+  const rest = digits.startsWith('7') ? digits.slice(1) : digits;
+  if (rest.length <= 3) return `+7 (${rest}`;
+  if (rest.length <= 6) return `+7 (${rest.slice(0, 3)}) ${rest.slice(3)}`;
+  if (rest.length <= 8) return `+7 (${rest.slice(0, 3)}) ${rest.slice(3, 6)}-${rest.slice(6)}`;
+  return `+7 (${rest.slice(0, 3)}) ${rest.slice(3, 6)}-${rest.slice(6, 8)}-${rest.slice(8, 10)}`;
+}
+
+// Индекс цифры для удаления: перед курсором (Backspace) или после (Delete)
+function getDigitIndexToRemove(formatted: string, cursorPos: number, forBackspace: boolean): number {
+  let digitIndex = -1;
+  for (let i = 0; i < formatted.length; i++) {
+    if (/\d/.test(formatted[i])) {
+      digitIndex++;
+      if (forBackspace && i >= cursorPos) return digitIndex > 0 ? digitIndex - 1 : -1;
+      if (!forBackspace && i >= cursorPos) return digitIndex;
+    }
+  }
+  return forBackspace ? digitIndex : -1;
+}
+
+// Валидация российского номера: 11 цифр, начинается с 7
+const isValidRuPhone = (value: string) => /^7\d{10}$/.test(String(value ?? '').replace(/\D/g, ''));
+const phoneErrorMessage = 'Введите полный номер в формате +7 (XXX) XXX-XX-XX';
+
 type PubValues = {
   username: string;
   phone: string;
@@ -58,9 +93,9 @@ const publicConf: FormConfig<PubValues> = {
   },
   phone: {
     initialValue: '',
-    validate: (value) => /^\d+$/.test(value),
+    validate: (value) => isValidRuPhone(value),
     title: 'Номер телефона',
-    errorMessage: 'Поле должно содержать только цифры.',
+    errorMessage: phoneErrorMessage,
   },
   consent: {
     initialValue: false,
@@ -96,9 +131,9 @@ const miniConf: FormConfig<MiniValues> = {
   },
   phone: {
     initialValue: '',
-    validate: (value) => /^\d+$/.test(value),
+    validate: (value) => isValidRuPhone(value),
     title: 'Номер телефона',
-    errorMessage: 'Поле должно содержать только цифры.',
+    errorMessage: phoneErrorMessage,
   },
   consent: {
     initialValue: false,
@@ -244,16 +279,16 @@ export default function ContactForm({
   return (
     <div className={`ContactForm ${className} ${type}`} id="ContactForm">
       <Subtitle>( {!subtitle ? 'ЕСТЬ ИДЕИ?' : subtitle} )</Subtitle>
-      <h2 className="ContactForm-title">
+      <div className="ContactForm-title">
         <Activity mode={title ? 'visible' : 'hidden'}>{title}</Activity>
         <Activity mode={!title ? 'visible' : 'hidden'}>
           Давайте обсудим <br className="first" /> ваш проект
         </Activity>
-      </h2>
+      </div>
       <div className="ContactForm_inner">
         <div className="ContactForm-form">
           <Input form={form} name="username" />
-          <Input form={form} name="phone" />
+          <PhoneInput form={form} />
           {(type === 'popup' || type === 'excursion') && <Input form={form} name="email" />}
           {(type === 'normal' || type === 'excursion') && <Input form={form} name="nameCompany" />}
           {type === 'excursion' && <Input form={form} name="namePost" />}
@@ -369,6 +404,82 @@ const Input = React.memo(({ name, form }: InputProps) => {
         />
       </div>
       <p className="Input-message">{field.sg.errorMessage.v}</p>
+    </div>
+  );
+});
+
+interface PhoneInputProps {
+  form: Form<any>;
+}
+
+const PhoneInput = React.memo(({ form }: PhoneInputProps) => {
+  const name = 'phone' as const;
+  const field = form.useField(name);
+  const digits = useSignalValue(field.sg.value) ?? '';
+  const _id = useId();
+  const id = `input-phone-${_id}`;
+  const ref = useRef<HTMLDivElement>(null);
+  const isTyped = useRef(false);
+
+  useWatch(() => {
+    const val = field.sg.value.v;
+    const isSubmitted = form.isSubmitted.v;
+    if (!ref.current) return;
+    const isValid = form.validateField(name);
+    if (isTyped.current) {
+      ref.current?.classList.toggle('error', !!isSubmitted && !isValid);
+    } else isTyped.current = true;
+    ref.current?.classList.toggle('noEmpty', !!val);
+  });
+
+  const formatted = formatPhoneDisplay(String(digits));
+  const errorMessage = useSignalValue(field.sg.errorMessage) ?? '';
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const newDigits = normalizePhoneDigits(e.target.value);
+    field.sg.value.v = newDigits;
+  };
+
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    const input = e.currentTarget;
+    const cursorPos = input.selectionStart ?? 0;
+    const charToDelete =
+      e.key === 'Backspace'
+        ? formatted[cursorPos - 1]
+        : e.key === 'Delete'
+          ? formatted[cursorPos]
+          : null;
+
+    if (charToDelete && !/\d/.test(charToDelete)) {
+      e.preventDefault();
+      const idx = getDigitIndexToRemove(formatted, cursorPos, e.key === 'Backspace');
+      if (idx >= 0) {
+        const arr = String(digits).split('');
+        arr.splice(idx, 1);
+        field.sg.value.v = arr.join('');
+      }
+    }
+  };
+
+  return (
+    <div className="Input" ref={ref}>
+      <div className="Input_wrapper">
+        <label htmlFor={id} className="Input-label">
+          {field.sg.title.v || ''}
+        </label>
+        <input
+          id={id}
+          type="tel"
+          inputMode="tel"
+          autoComplete="tel"
+          className="Input-self"
+          value={formatted}
+          onChange={handleChange}
+          onKeyDown={handleKeyDown}
+          aria-label={field.sg.title.v || 'Номер телефона'}
+        />
+      </div>
+      <p className="Input-message">{errorMessage}</p>
     </div>
   );
 });
