@@ -36,14 +36,18 @@ function Template({ title, tags, link }: TemplateProps) {
   return (
     <div className="Template px">
       <div className="Template_wrapper">
-        <div className="Template-title">{title}</div>
-        <div className="Template_tags">
-          {tags.map((tag, index) => (
-            <Button key={index} variant="outline">
-              {tag}
-            </Button>
-          ))}
-        </div>
+        <noindex>
+          <div className="Template-title" data-nosnippet>
+            {title}
+          </div>
+          <div className="Template_tags" data-nosnippet>
+            {tags.map((tag, index) => (
+              <Button key={index} variant="outline">
+                {tag}
+              </Button>
+            ))}
+          </div>
+        </noindex>
       </div>
       <div className="Template_footer">
         <Link to={link}>

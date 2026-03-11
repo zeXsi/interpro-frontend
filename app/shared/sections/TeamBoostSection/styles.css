@@ -81,9 +81,9 @@
 
       margin-right: 50px;
 
-      /* Ограничение до 6 строк с многоточием */
+      /* Ограничение до 3 строк с многоточием */
       display: -webkit-box;
-      -webkit-line-clamp: 6;
+      -webkit-line-clamp: 3;
       -webkit-box-orient: vertical;
       overflow: hidden;
     }
