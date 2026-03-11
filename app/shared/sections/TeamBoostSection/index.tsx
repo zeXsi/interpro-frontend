@@ -35,8 +35,8 @@ interface TemplateProps {
 function Template({ title, tags, link }: TemplateProps) {
   return (
     <div className="Template px">
-      <div className="Template_wrapper">
-        <noindex>
+      <div className="">
+        <noindex className="Template_wrapper">
           <div className="Template-title" data-nosnippet>
             {title}
           </div>
