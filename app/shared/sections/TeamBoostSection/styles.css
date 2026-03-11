@@ -80,6 +80,12 @@
       color: #000;
 
       margin-right: 50px;
+
+      /* Ограничение до 6 строк с многоточием */
+      display: -webkit-box;
+      -webkit-line-clamp: 6;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
     }
 
     .Template_tags {
