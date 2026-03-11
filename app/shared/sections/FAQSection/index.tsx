@@ -49,7 +49,10 @@ export default function FAQSection({ qntyPreview = Infinity, items }: Props) {
                 <CrossIcon className="Accordion_header-icon" />
               </Accordion.Header>
               <Accordion.Content>
-                <p className="Accordion_content-description">{item.answer}</p>
+                <p
+                  className="Accordion_content-description"
+                  dangerouslySetInnerHTML={{ __html: item.answer }}
+                />
               </Accordion.Content>
             </Accordion>
           ))}
