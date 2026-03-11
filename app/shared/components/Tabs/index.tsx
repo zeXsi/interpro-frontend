@@ -61,6 +61,10 @@ export default function Tabs({ children, startTrigger, className = '' }: PropsTa
           resistanceRatio={0}
           freeMode={true}
           grabCursor={true}
+          simulateTouch={true}
+          allowTouchMove={true}
+          preventClicks={false}
+          preventClicksPropagation={false}
           onSwiper={(swiper) => {
             swiperRef.current = swiper;
           } }
