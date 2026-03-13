@@ -2,9 +2,12 @@ import './styles.css';
 
 import useMWImage from 'shared/components/popups/useMWImage';
 import Text from 'shared/components/Text';
+import PresentationImage from '../PresentationImage';
+import useIsPdfExport from '../useIsPdfExport';
 
 export default function Idea({ data, id }: any) {
   const { Popup, showWithData } = useMWImage();
+  const isPdfExport = useIsPdfExport();
 
   const images = data.fields?.pt_images ?? [];
   const heading = data.fields?.pt_heading?.trim();
@@ -29,9 +32,13 @@ export default function Idea({ data, id }: any) {
 
   return (
     <section className="Idea" id={id}>
-      {images.length > 0 && <Popup />}
+      {images.length > 0 && !isPdfExport && <Popup />}
 
-      <div className={`Idea__content ${layout} ${heading !== "" ? 'heading' : 'no-heading'} ${images.length === 0 ? 'no-img' : ''}`}>
+      <div
+        className={`Idea__content ${layout} ${heading !== '' ? 'heading' : 'no-heading'} ${
+          images.length === 0 ? 'no-img' : ''
+        }`}
+      >
         {heading && (
           <div className="Idea__content-desc">
             <Text>{heading}</Text>
@@ -41,11 +48,11 @@ export default function Idea({ data, id }: any) {
         {images.length > 0 && (
           <div className={`Idea__content-slides ${layout}`}>
             {images.map((item: any) => (
-              <img
+              <PresentationImage
                 key={item.id}
                 src={item.full}
                 alt="Идея и концепция"
-                onClick={() => openAllImages(item.full)}
+                onClick={isPdfExport ? undefined : () => openAllImages(item.full)}
               />
             ))}
           </div>

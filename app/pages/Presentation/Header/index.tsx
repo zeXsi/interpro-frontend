@@ -6,8 +6,9 @@ export default function PresentationHeader() {
   const { name } = useParams();
 
   const contact = presentationResponse.slides.find((item: any) => item.type == 'contacts');
+  const contactFields = contact?.fields;
   const discussLink =
-    contact.fields.ct_tg || contact.fields.ct_wa || `mailto:${import.meta.env.VITE_EMAIL}`;
+    contactFields?.ct_tg || contactFields?.ct_wa || `mailto:${import.meta.env.VITE_EMAIL}`;
 
   const renderSpans = (arr?: any[]) => arr?.map((item, index) => <span key={index}>{item}</span>);
 

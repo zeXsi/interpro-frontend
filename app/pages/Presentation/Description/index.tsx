@@ -1,7 +1,7 @@
 import './styles.css';
 
 export default function Description({ data, id }: any) {
-  const { text_heading, text_body } = data.fields;
+  const { text_heading, text_body } = data.fields ?? {};
 
   if (!text_heading && !text_body) return null;
 

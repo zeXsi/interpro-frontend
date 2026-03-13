@@ -1,22 +1,78 @@
+import type { Browser } from 'playwright';
 import type { LoaderFunctionArgs } from 'react-router';
 import { chromium } from 'playwright';
+import {
+  fetchPresentation,
+  getCachedPdf,
+  getPresentationFingerprint,
+  PDF_RENDER_VERSION,
+  primePresentation,
+  setCachedPdf,
+} from './presentation.server';
+
+let browserPromise: Promise<Browser> | null = null;
+
+async function getBrowser() {
+  if (!browserPromise) {
+    browserPromise = chromium.launch({ headless: true });
+    browserPromise
+      .then((browser) => {
+        browser.on('disconnected', () => {
+          browserPromise = null;
+        });
+      })
+      .catch(() => {
+        browserPromise = null;
+      });
+  }
+
+  return browserPromise;
+}
 
 export async function loader({ params, request }: LoaderFunctionArgs) {
   const { name } = params;
   if (!name) throw new Response('Not Found', { status: 404 });
 
+  const presentation = await fetchPresentation(name);
+  if (!presentation) {
+    throw new Response('Not Found', { status: 404 });
+  }
+
+  const fingerprint = getPresentationFingerprint(presentation);
+  const cacheKey = `${PDF_RENDER_VERSION}:${name}:${fingerprint}`;
+  const cachedPdf = getCachedPdf(cacheKey);
+
+  if (cachedPdf) {
+    return new Response(new Uint8Array(cachedPdf), {
+      headers: {
+        'Content-Type': 'application/pdf',
+        'Content-Disposition': `attachment; filename="presentation-${name}.pdf"`,
+        'Cache-Control': 'private, max-age=3600',
+        ETag: `"${fingerprint}"`,
+      },
+    });
+  }
+
   const url = new URL(request.url);
   const origin = `${url.protocol}//${url.host}`;
-  const target = `${origin}/presentation/${name}?export=pdf`;
+  const token = primePresentation(presentation);
+  const target = `${origin}/presentation/${name}/print?export=pdf&token=${encodeURIComponent(
+    token
+  )}`;
 
-  const browser = await chromium.launch({ headless: true });
+  const browser = await getBrowser();
+  const context = await browser.newContext({
+    viewport: { width: 1920, height: 1080 },
+    screen: { width: 1920, height: 1080 },
+    deviceScaleFactor: 1,
+    colorScheme: presentation.theme === 'dark' ? 'dark' : 'light',
+    reducedMotion: 'reduce',
+    serviceWorkers: 'block',
+  });
+
   try {
-    const page = await browser.newPage({
-      viewport: { width: 1920, height: 1080 },
-      deviceScaleFactor: 1,
-    });
+    const page = await context.newPage();
 
-    // HLS/video requests keep network busy and make networkidle unreliable for PDF export.
     await page.route('**/*', (route) => {
       const resourceType = route.request().resourceType();
       if (resourceType === 'media') {
@@ -29,43 +85,34 @@ export async function loader({ params, request }: LoaderFunctionArgs) {
     await page.waitForSelector('main', { timeout: 15000 });
     await page.emulateMedia({ media: 'print' });
 
-    // Trigger lazy loaders by walking through the page once.
-    await page.evaluate(async () => {
-      const scrollHeight = document.documentElement.scrollHeight;
-      const viewportHeight = window.innerHeight || 1080;
-      const step = Math.max(Math.floor(viewportHeight * 0.9), 1);
-
-      for (let y = 0; y < scrollHeight; y += step) {
-        window.scrollTo(0, y);
-        await new Promise((resolve) => setTimeout(resolve, 40));
-      }
-
-      window.scrollTo(0, 0);
-    });
-
-    // Wait until images are loaded (or timeout) to avoid blank slides in PDF.
     await page.evaluate(async (timeoutMs: number) => {
-      const images = Array.from(document.images);
+      const imageUrls = Array.from(document.querySelectorAll('img'))
+        .map((img) => img.currentSrc || img.getAttribute('src'))
+        .filter((src): src is string => Boolean(src));
 
-      images.forEach((img) => {
-        img.setAttribute('loading', 'eager');
-        img.setAttribute('decoding', 'sync');
-      });
+      const uniqueImageUrls = Array.from(new Set(imageUrls));
 
-      const waitForImage = (img: HTMLImageElement) =>
+      const waitForImage = (src: string) =>
         new Promise<void>((resolve) => {
-          if (img.complete && img.naturalWidth > 0) {
-            resolve();
-            return;
-          }
+          const img = new Image();
+          img.decoding = 'sync';
+          img.loading = 'eager';
 
           const done = () => resolve();
           img.addEventListener('load', done, { once: true });
           img.addEventListener('error', done, { once: true });
+          img.src = src;
+
+          if (img.complete) {
+            resolve();
+          }
         });
 
       await Promise.race([
-        Promise.all(images.map(waitForImage)).then(() => undefined),
+        Promise.all([
+          document.fonts?.ready ?? Promise.resolve(),
+          ...uniqueImageUrls.map(waitForImage),
+        ]).then(() => undefined),
         new Promise<void>((resolve) => setTimeout(resolve, timeoutMs)),
       ]);
     }, 10000);
@@ -78,14 +125,18 @@ export async function loader({ params, request }: LoaderFunctionArgs) {
       preferCSSPageSize: true,
     });
 
-    return new Response(new Uint8Array(pdf), {
+    const pdfBytes = new Uint8Array(pdf);
+    setCachedPdf(cacheKey, pdfBytes);
+
+    return new Response(new Uint8Array(pdfBytes), {
       headers: {
         'Content-Type': 'application/pdf',
         'Content-Disposition': `attachment; filename="presentation-${name}.pdf"`,
-        'Cache-Control': 'no-store',
+        'Cache-Control': 'private, max-age=3600',
+        ETag: `"${fingerprint}"`,
       },
     });
   } finally {
-    await browser.close();
+    await context.close();
   }
 }

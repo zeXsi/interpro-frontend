@@ -16,6 +16,9 @@ export const config = {
 export const instance = axios.create({
   timeout: 3000,
   baseURL: import.meta.env.VITE_BASE_URL,
+  // In local/SSR Node runtime axios picks up HTTP(S)_PROXY from env.
+  // Our WordPress API should be requested directly, otherwise the proxy returns 400.
+  proxy: false,
   ...config,
 });
 

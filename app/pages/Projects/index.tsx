@@ -23,6 +23,7 @@ import toFormatNames from 'shared/utils/toFormatNames';
 
 import Link from 'shared/components/Link';
 import { signal } from 'shared/utils/_stm';
+import { useSignalValue } from 'shared/utils/_stm/react/react';
 import { toFilterData, toggleFilter, UserFilter } from 'store/stGlobal';
 import { sgProjects } from 'api/projects/projects.api';
 
@@ -58,6 +59,9 @@ export function meta() {
   ];
 }
 export default function ProjectsPage() {
+  useSignalValue(sgProjects);
+  useSignalValue(sgFilters);
+
   const [switchMode, setSwitchMode] = useState<ViewMode>('grid');
   const refContainer = useRef<HTMLDivElement>(null);
   const refImg = useRef<HTMLDivElement>(null);
@@ -108,7 +112,9 @@ export default function ProjectsPage() {
     {}
   );
 
-  useEffect(() => toggleFilter.toClear, []);
+  useEffect(() => {
+    toggleFilter.toClear();
+  }, []);
 
   const onClick: FilterProps['onClick'] = (tagName, id, isClearAll) => {
     if (isClearAll) return toggleFilter.toClear();

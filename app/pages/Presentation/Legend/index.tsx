@@ -4,6 +4,7 @@ import { Swiper, SwiperSlide } from 'swiper/react';
 import { Pagination, EffectFade } from 'swiper/modules';
 import type { Swiper as SwiperType } from 'swiper';
 import { useLocation } from 'react-router';
+import PresentationImage from '../PresentationImage';
 
 export default function Legend({ data, id }: any) {
   const items = data.fields?.leg_items ?? [];
@@ -39,7 +40,7 @@ export default function Legend({ data, id }: any) {
     window.addEventListener('scroll', handleScroll, { passive: true });
     handleScroll();
     return () => window.removeEventListener('scroll', handleScroll);
-  }, [items.length, swiperReady]);
+  }, [isPdfExport, items.length, swiperReady]);
 
   if (isPdfExport) {
     return (
@@ -55,11 +56,15 @@ export default function Legend({ data, id }: any) {
               key={`print-slide-${index}-${item.id ?? 'no-id'}`}
               className="Legend__swiper-slide"
             >
-              <img src={item.full} alt={item.title} className="Legend__swiper-image" />
+              <PresentationImage
+                src={item.full}
+                alt={item.title}
+                className="Legend__swiper-image"
+              />
 
               {item.attrs.legend > 0 && (
                 <div className="Legend__swiper-desc">
-                  {item.title && (<h3 className="Legend__swiper-title">{item.title}</h3>)}
+                  {item.title && <h3 className="Legend__swiper-title">{item.title}</h3>}
 
                   <ul className="Legend__swiper-list">
                     {item.attrs.map((attr: any) => (
@@ -78,7 +83,9 @@ export default function Legend({ data, id }: any) {
                 {items.map((paginationItem: any, index2: number) => (
                   <span
                     key={`print-bullet-${index2}-${paginationItem.id ?? 'no-id'}`}
-                    className={`swiper-pagination-bullet ${index === index2 ? 'swiper-pagination-bullet-active' : ''}`}
+                    className={`swiper-pagination-bullet ${
+                      index === index2 ? 'swiper-pagination-bullet-active' : ''
+                    }`}
                   >
                     {items[index2]?.title ?? ''}
                   </span>
@@ -125,11 +132,15 @@ export default function Legend({ data, id }: any) {
             key={`swiper-slide-${index}-${item.id ?? 'no-id'}`}
             className="Legend__swiper-slide"
           >
-            <img src={item.full} alt={item.title} className="Legend__swiper-image" />
+            <PresentationImage
+              src={item.full}
+              alt={item.title}
+              className="Legend__swiper-image"
+            />
 
             {item.attrs.length > 0 && (
               <div className="Legend__swiper-desc">
-                {item.title && (<h3 className="Legend__swiper-title">{item.title}</h3>)}
+                {item.title && <h3 className="Legend__swiper-title">{item.title}</h3>}
 
                 <ul className="Legend__swiper-list">
                   {item.attrs.map((attr: any) => (
@@ -151,8 +162,12 @@ export default function Legend({ data, id }: any) {
 
       {items.map((item: any, index: number) => (
         <div className="Legend__content" key={`legend-content-${index}-${item.id ?? 'no-id'}`}>
-          {item.title && (<h2 className="Legend__content-title">{item.title}</h2>)}
-          <img src={item.full} alt={item.title} className="Legend__content-image" />
+          {item.title && <h2 className="Legend__content-title">{item.title}</h2>}
+          <PresentationImage
+            src={item.full}
+            alt={item.title}
+            className="Legend__content-image"
+          />
 
           {item.attrs.length > 0 && (
             <div className="Legend__content-desc">

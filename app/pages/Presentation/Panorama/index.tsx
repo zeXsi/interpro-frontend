@@ -3,6 +3,8 @@ import { Suspense, useState } from 'react';
 import { Canvas, useLoader } from '@react-three/fiber';
 import { OrbitControls, Sphere } from '@react-three/drei';
 import * as THREE from 'three';
+import PresentationImage from '../PresentationImage';
+import useIsPdfExport from '../useIsPdfExport';
 
 function PanoramaSphere({ image }: { image: string }) {
   const texture = useLoader(THREE.TextureLoader, image);
@@ -17,8 +19,17 @@ function PanoramaSphere({ image }: { image: string }) {
 export default function PanoramaViewer({ data, id }: any) {
   const image = data.fields?.p360_image?.full;
   const [interacted, setInteracted] = useState(false);
+  const isPdfExport = useIsPdfExport();
 
   if (!image) return null;
+
+  if (isPdfExport) {
+    return (
+      <section id={id} className="panorama">
+        <PresentationImage src={image} alt="360 panorama" />
+      </section>
+    );
+  }
 
   return (
     <section
