@@ -79,24 +79,40 @@
     <priority>0.2</priority>
   </url>
   <url>
+<<<<<<< HEAD
     <loc>https://interpro.pro/projects/imperia-klimata</loc>
     <lastmod>2025-12-16T23:05:08.791Z</lastmod>
+=======
+    <loc>https://interpro.pro/projects/test-proekt</loc>
+    <lastmod>2026-03-13T12:47:54.895Z</lastmod>
+>>>>>>> origin/dev
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
   </url>
   <url>
+<<<<<<< HEAD
     <loc>https://interpro.pro/projects/futuruss</loc>
     <lastmod>2025-12-16T23:05:08.791Z</lastmod>
+=======
+    <loc>https://interpro.pro/projects/test-proekt-2</loc>
+    <lastmod>2026-03-13T12:47:54.895Z</lastmod>
+>>>>>>> origin/dev
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
   </url>
   <url>
+<<<<<<< HEAD
     <loc>https://interpro.pro/projects/novatek</loc>
     <lastmod>2025-12-16T23:05:08.791Z</lastmod>
+=======
+    <loc>https://interpro.pro/services/dvuhetaznye-stendy</loc>
+    <lastmod>2026-03-13T12:47:54.895Z</lastmod>
+>>>>>>> origin/dev
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
   </url>
   <url>
+<<<<<<< HEAD
     <loc>https://interpro.pro/projects/jac-motors</loc>
     <lastmod>2025-12-16T23:05:08.791Z</lastmod>
     <changefreq>weekly</changefreq>
@@ -333,16 +349,26 @@
   <url>
     <loc>https://interpro.pro/services/proektirovanie-i-stroitelstvo/ekskluzivnye-vystavocnye-stendy</loc>
     <lastmod>2025-12-16T23:05:08.791Z</lastmod>
+=======
+    <loc>https://interpro.pro/services/dvuhetaznye-stendy/usluga-2</loc>
+    <lastmod>2026-03-13T12:47:54.895Z</lastmod>
+>>>>>>> origin/dev
     <changefreq>weekly</changefreq>
     <priority>0.5</priority>
   </url>
   <url>
+<<<<<<< HEAD
     <loc>https://interpro.pro/services/proektirovanie-i-stroitelstvo/vystavocnye-stendy-s-podvesom</loc>
     <lastmod>2025-12-16T23:05:08.791Z</lastmod>
+=======
+    <loc>https://interpro.pro/services/dvuhetaznye-stendy/interaktivnye-vystavocnye-stendy</loc>
+    <lastmod>2026-03-13T12:47:54.895Z</lastmod>
+>>>>>>> origin/dev
     <changefreq>weekly</changefreq>
     <priority>0.5</priority>
   </url>
   <url>
+<<<<<<< HEAD
     <loc>https://interpro.pro/services/proektirovanie-i-stroitelstvo/dvuhetaznye-stendy</loc>
     <lastmod>2025-12-16T23:05:08.791Z</lastmod>
     <changefreq>weekly</changefreq>
@@ -465,24 +491,43 @@
   <url>
     <loc>https://interpro.pro/news/dental-ekspo-g-moskva-22-25-sentabra-2025</loc>
     <lastmod>2025-12-16T23:05:08.791Z</lastmod>
+=======
+    <loc>https://interpro.pro/news/test-novost</loc>
+    <lastmod>2026-03-13T12:47:54.895Z</lastmod>
+>>>>>>> origin/dev
     <changefreq>daily</changefreq>
     <priority>0.5</priority>
   </url>
   <url>
+<<<<<<< HEAD
     <loc>https://interpro.pro/news/13-a-mezdunarodnaa-armarka-sovremennogo-iskusstva-cosmoscow-projdet-v-timirazev-centre-s-11-po-14-sentabra</loc>
     <lastmod>2025-12-16T23:05:08.791Z</lastmod>
+=======
+    <loc>https://interpro.pro/news/test-stat-a-2</loc>
+    <lastmod>2026-03-13T12:47:54.895Z</lastmod>
+>>>>>>> origin/dev
     <changefreq>daily</changefreq>
     <priority>0.5</priority>
   </url>
   <url>
+<<<<<<< HEAD
     <loc>https://interpro.pro/blog/vidy-vystavocnyh-stendov-najdite-ideal-noe-resenie-dla-vasego-biznesa</loc>
     <lastmod>2025-12-16T23:05:08.791Z</lastmod>
+=======
+    <loc>https://interpro.pro/news/test-stat-a</loc>
+    <lastmod>2026-03-13T12:47:54.895Z</lastmod>
+>>>>>>> origin/dev
     <changefreq>daily</changefreq>
     <priority>0.5</priority>
   </url>
   <url>
+<<<<<<< HEAD
     <loc>https://interpro.pro/blog/kak-cerez-dizajn-stenda-rasskazat-o-filosofii-kompanii-delimsa-kejsom-nask</loc>
     <lastmod>2025-12-16T23:05:08.791Z</lastmod>
+=======
+    <loc>https://interpro.pro/blog/test-3</loc>
+    <lastmod>2026-03-13T12:47:54.895Z</lastmod>
+>>>>>>> origin/dev
     <changefreq>daily</changefreq>
     <priority>0.5</priority>
   </url>

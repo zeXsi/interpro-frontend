@@ -7,3 +7,5 @@
 /.react-router/
 /build/
 /public/sitemap.xml
+
+public/sitemap.xml

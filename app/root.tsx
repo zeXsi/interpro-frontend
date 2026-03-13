@@ -79,6 +79,13 @@ const mailRuTopScript = `
 
 export function Layout({ children }: { children: React.ReactNode }) {
   const data = useLoaderData();
+  const location = useLocation();
+  const isPresentationRoute = location.pathname.startsWith('/presentation');
+  const isPresentationPrint =
+    isPresentationRoute &&
+    (location.pathname.endsWith('/print') ||
+      new URLSearchParams(location.search).get('export') === 'pdf');
+
   return (
     <html lang="en">
       <head>
@@ -100,45 +107,53 @@ export function Layout({ children }: { children: React.ReactNode }) {
           media="(prefers-color-scheme: dark)"
         />
 
-        <script
-          type="application/ld+json"
-          dangerouslySetInnerHTML={{ __html: seoScheme(data.projects) }}
-        />
-        <script
-          type="text/javascript"
-          dangerouslySetInnerHTML={{ __html: getSSRStore() }}
-          suppressHydrationWarning
-        />
+        {!isPresentationRoute && (
+          <script
+            type="application/ld+json"
+            dangerouslySetInnerHTML={{ __html: seoScheme(data.projects) }}
+          />
+        )}
+        {!isPresentationPrint && (
+          <script
+            type="text/javascript"
+            dangerouslySetInnerHTML={{ __html: getSSRStore() }}
+            suppressHydrationWarning
+          />
+        )}
 
         {/* Yandex.Metrika counter */}
         <script type="text/javascript" dangerouslySetInnerHTML={{ __html: yandexMetrikaScript }} /> 
 
         {/* Top.Mail.Ru counter */}
-        <script
-          type="text/javascript"
-          dangerouslySetInnerHTML={{ __html: mailRuTopScript }}
-        />
+        {!isPresentationPrint && (
+          <script
+            type="text/javascript"
+            dangerouslySetInnerHTML={{ __html: mailRuTopScript }}
+          />
+        )}
       </head>
       <body>
         {/* Yandex.Metrika counter */}
 
-        <noscript>
-          <div>
-            <img
-              src="https://mc.yandex.ru/watch/99631636"
-              style={{ position: 'absolute', left: '-9999px' }}
-              alt=""
-            />
-            <img
-              src="https://top-fwz1.mail.ru/counter?id=3746602;js=na"
-              style={{ position: 'absolute', left: '-9999px' }}
-              alt="Top.Mail.Ru"
-            />
-          </div>
-        </noscript>
+        {!isPresentationPrint && (
+          <noscript>
+            <div>
+              <img
+                src="https://mc.yandex.ru/watch/99631636"
+                style={{ position: 'absolute', left: '-9999px' }}
+                alt=""
+              />
+              <img
+                src="https://top-fwz1.mail.ru/counter?id=3746602;js=na"
+                style={{ position: 'absolute', left: '-9999px' }}
+                alt="Top.Mail.Ru"
+              />
+            </div>
+          </noscript>
+        )}
         {children}
-        <ScrollRestoration />
-        <Scripts />
+        {!isPresentationPrint && <ScrollRestoration />}
+        {!isPresentationPrint && <Scripts />}
       </body>
     </html>
   );
@@ -177,7 +192,16 @@ export const links: Route.LinksFunction = () => [
   { rel: 'me', href: import.meta.env.VITE_EMAIL },
 ];
 
-export async function loader(_args: Route.LoaderArgs) {
+export async function loader(args: Route.LoaderArgs) {
+  const url = new URL(args.request.url);
+  const isPresentationRoute = url.pathname.startsWith('/presentation');
+
+  if (isPresentationRoute) {
+    return {
+      projects: [],
+    };
+  }
+
   const [projects] = await Promise.all([
     getProjects(),
     getServiceCategories(),

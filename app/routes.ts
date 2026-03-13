@@ -11,8 +11,9 @@ export default [
   route('/faq', './pages/FAQPage/index.tsx'),
   route('/excursion', './pages/Excursion/index.tsx'),
   route('/presentation/:name', './pages/Presentation/index.tsx'),
-  route('/*', './pages/ErrorNotFound/index.tsx'),
+  route('/presentation/:name/print', './pages/Presentation/print.tsx'),
   route('/presentation/:name/pdf', './pages/Presentation/pdf.ts'),
+  route('/*', './pages/ErrorNotFound/index.tsx'),
 
   ...prefix('/blog', [
     index('./pages/FeedPage/Blog.tsx'),

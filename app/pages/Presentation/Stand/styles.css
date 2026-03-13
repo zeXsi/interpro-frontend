@@ -16,4 +16,8 @@
       aspect-ratio: 16/9;
     }
   }
+
+  @media print {
+    gap: 0;
+  }
 }

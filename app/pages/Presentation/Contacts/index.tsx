@@ -15,23 +15,23 @@ export default function Contacts({ data, id }: any) {
           <p>( менеджер )</p>
           <ul className="Contacts__list">
             <li className="Contacts__list-item">
-              <span>{data.fields.ct_name}</span>
+              <span>{fields.ct_name}</span>
             </li>
           </ul>
         </div>
         <div className="Contacts__col">
           <p>( контакты )</p>
           <ul className="Contacts__list">
-            {data.fields.ct_tg && (
+            {fields.ct_tg && (
               <li className="Contacts__list-item">
-                <a href={data.fields.ct_tg}>
+                <a href={fields.ct_tg}>
                   <Button className="Contacts__list-btn" variant="link" children="TELEGRAM" />
                 </a>
               </li>
             )}
-            {data.fields.ct_wa && (
+            {fields.ct_wa && (
               <li className="Contacts__list-item">
-                <a href={data.fields.ct_wa}>
+                <a href={fields.ct_wa}>
                   <Button className="Contacts__list-btn" variant="link" children="WHATSAPP" />
                 </a>
               </li>

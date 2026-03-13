@@ -1,7 +1,9 @@
 import './styles.css';
 import { useEffect, useRef } from 'react';
 
-function getEmbedSrc({ vid_embed, vid_provider }: any) {
+function getEmbedSrc(fields?: any) {
+  const { vid_embed, vid_provider } = fields ?? {};
+
   switch (vid_provider) {
     case 'youtube':
       return `${vid_embed}`;
@@ -17,8 +19,16 @@ function getEmbedSrc({ vid_embed, vid_provider }: any) {
   }
 }
 
+function getPublicVideoUrl(fields?: any) {
+  const { vid_url, vid_embed } = fields ?? {};
+
+  return vid_url || vid_embed || '';
+}
+
 export default function Video({ data, id }: any) {
-  const src = getEmbedSrc(data.fields);
+  const fields = data.fields;
+  const src = getEmbedSrc(fields);
+  const publicUrl = getPublicVideoUrl(fields);
   const containerRef = useRef<HTMLElement>(null);
 
   useEffect(() => {
@@ -26,11 +36,8 @@ export default function Video({ data, id }: any) {
     if (!container) return;
 
     const handleWheel = (e: WheelEvent) => {
-      // Останавливаем propagation внутрь iframe, чтобы событие не ушло туда
       e.stopPropagation();
-      
-      // Диспатчим новое событие на window, чтобы Lenis мог его перехватить
-      // Это позволяет Lenis обработать событие естественным образом
+
       const syntheticEvent = new WheelEvent('wheel', {
         deltaX: e.deltaX,
         deltaY: e.deltaY,
@@ -41,38 +48,30 @@ export default function Video({ data, id }: any) {
         clientX: e.clientX,
         clientY: e.clientY,
       });
-      
-      // Предотвращаем стандартное поведение исходного события
+
       e.preventDefault();
-      
-      // Диспатчим на window, где Lenis слушает события
       window.dispatchEvent(syntheticEvent);
     };
 
-    // Используем capture phase, чтобы перехватить событие до того, как оно дойдёт до iframe
     container.addEventListener('wheel', handleWheel, { passive: false, capture: true });
 
     return () => {
-      container.removeEventListener('wheel', handleWheel, { capture: true } as EventListenerOptions);
+      container.removeEventListener(
+        'wheel',
+        handleWheel,
+        { capture: true } as EventListenerOptions
+      );
     };
   }, []);
 
   return (
     src && (
       <section ref={containerRef} className="Video" id={id}>
-        <iframe
-          src={src}
-          // allow="autoplay; fullscreen; picture-in-picture"
-          // webkitAllowFullScreen
-          // mozallowfullscreen
-          allowFullScreen
-          frameBorder="0"
-          title="video"
-        />
+        <iframe src={src} allowFullScreen frameBorder="0" title="video" />
         <p className="Video__print-link">
           Ссылка на видео:{' '}
-          <a href={src} target="_blank" rel="noreferrer">
-            {src}
+          <a href={publicUrl} target="_blank" rel="noreferrer">
+            {publicUrl}
           </a>
         </p>
       </section>
