@@ -15,6 +15,7 @@ Disallow: *utm=
 Disallow: *openstat=  
 Disallow: /tag/
 Disallow: /readme.html
+Disallow: /presentation/
 Disallow: *?replytocom
 Disallow: *?utm_source=*
 Disallow: *?yadclid=*
@@ -58,6 +59,7 @@ Disallow: */embed
 Disallow: /xmlrpc.php
 Disallow: /tag/
 Disallow: /readme.html
+Disallow: /presentation/
 Disallow: *?replytocom
 Disallow: *?utm_source=*
 Disallow: *?yadclid=*
@@ -104,6 +106,7 @@ Disallow: *utm=
 Disallow: *openstat=
 Disallow: /tag/
 Disallow: /readme.html
+Disallow: /presentation/
 Disallow: *?replytocom
 Disallow: *?utm_source=*
 Disallow: *?yadclid=*
