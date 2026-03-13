@@ -14,7 +14,7 @@
   .Footer-title {
     font-family: var(--font-family);
     font-weight: 500;
-    font-size: clamp(4rem, calc(2.667rem + 2.778vw), 6rem);
+    font-size: clamp(4rem, calc(2.667rem + 2.778vw), 5.5rem);
     /* min: 64px, max: 96px */
 
     width: 724px;
