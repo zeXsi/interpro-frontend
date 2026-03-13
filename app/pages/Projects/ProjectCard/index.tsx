@@ -8,6 +8,7 @@ import { useRef } from 'react';
 import Text from 'shared/components/Text';
 import Link from 'shared/components/Link';
 import { useWatch } from 'shared/utils/_stm/react/react';
+import { decodeUnicodeEscapes } from 'shared/utils/decodeUnicodeEscapes';
 
 export interface ProjectCardProps {
   title: string;
@@ -53,7 +54,7 @@ export default function ProjectCard(props: ProjectCardProps) {
             onMouseLeave={() => hoveredProject.v = -props.id}
             ref={refButton}
           >
-            {props.title.replaceAll("\\u00AD", "\u00AD")}
+            {decodeUnicodeEscapes(props.title)}
           </Button>
         </Link>
       </div>
