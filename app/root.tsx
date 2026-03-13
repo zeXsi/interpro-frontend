@@ -111,7 +111,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
         />
 
         {/* Yandex.Metrika counter */}
-        {/* <script type="text/javascript" dangerouslySetInnerHTML={{ __html: yandexMetrikaScript }} /> */}
+        <script type="text/javascript" dangerouslySetInnerHTML={{ __html: yandexMetrikaScript }} /> 
 
         {/* Top.Mail.Ru counter */}
         <script
