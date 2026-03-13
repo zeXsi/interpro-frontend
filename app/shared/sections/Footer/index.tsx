@@ -14,7 +14,7 @@ export default function Footer() {
     <>
       <div className="Footer px">
         <div className="Footer-title">
-          Возьмём на <br /> себя — от идеи <br /> до стройки
+          Возьмём на <br /> себя — от идеи <br /> до реализации
         </div>
 
         {/* <div className="Footer_header-right"> */}
