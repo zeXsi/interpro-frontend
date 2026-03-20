@@ -8,7 +8,7 @@
     --divider-width: 4px;
 
     img {
-      height: 100vh;
+      height: fit-content;
 
       @media (width <= 1024px) {
         height: auto;
