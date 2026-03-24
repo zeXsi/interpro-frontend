@@ -285,7 +285,7 @@ export default function ContactForm({
       <div className="ContactForm-title">
         <Activity mode={title ? 'visible' : 'hidden'}>{title}</Activity>
         <Activity mode={!title ? 'visible' : 'hidden'}>
-          Давайте обсудим <br className="first" /> ваш проект
+          Давайте обсудим ваш проект
         </Activity>
       </div>
       <div className="ContactForm_inner">
@@ -369,6 +369,14 @@ interface InputProps {
   form: Form<any>;
 }
 
+const InputMessage = React.memo(({ field, form }: { field: ReturnType<Form<any>['useField']>; form: Form<any> }) => {
+  const value = useSignalValue(field.sg.value);
+  const errorMessage = useSignalValue(field.sg.errorMessage) ?? '';
+  const isSubmitted = useSignalValue(form.isSubmitted);
+
+  return <p className="Input-message">{(!!value || !!isSubmitted) && errorMessage ? errorMessage : ''}</p>;
+});
+
 const Input = React.memo(({ name, form }: InputProps) => {
   const field = form.useField(name);
   const refInput = useRef<HTMLInputElement>(null);
@@ -406,7 +414,7 @@ const Input = React.memo(({ name, form }: InputProps) => {
           autoComplete="off"
         />
       </div>
-      <p className="Input-message">{field.sg.errorMessage.v}</p>
+      <InputMessage field={field} form={form} />
     </div>
   );
 });
@@ -419,6 +427,7 @@ const PhoneInput = React.memo(({ form }: PhoneInputProps) => {
   const name = 'phone' as const;
   const field = form.useField(name);
   const digits = useSignalValue(field.sg.value) ?? '';
+  const isSubmitted = useSignalValue(form.isSubmitted);
   const _id = useId();
   const id = `input-phone-${_id}`;
   const ref = useRef<HTMLDivElement>(null);
@@ -426,12 +435,15 @@ const PhoneInput = React.memo(({ form }: PhoneInputProps) => {
 
   useWatch(() => {
     const val = field.sg.value.v;
-    const isSubmitted = form.isSubmitted.v;
+    const submitted = form.isSubmitted.v;
     if (!ref.current) return;
-    const isValid = form.validateField(name);
+    const isValid = submitted ? form.validateField(name) : true;
     if (isTyped.current) {
-      ref.current?.classList.toggle('error', !!isSubmitted && !isValid);
+      ref.current?.classList.toggle('error', !!submitted && !isValid);
     } else isTyped.current = true;
+    if (!submitted) {
+      field.sg.errorMessage.v = '';
+    }
     ref.current?.classList.toggle('noEmpty', !!val);
   });
 
@@ -482,7 +494,7 @@ const PhoneInput = React.memo(({ form }: PhoneInputProps) => {
           aria-label={field.sg.title.v || 'Номер телефона'}
         />
       </div>
-      <p className="Input-message">{errorMessage}</p>
+      <p className="Input-message">{isSubmitted && errorMessage ? errorMessage : ''}</p>
     </div>
   );
 });

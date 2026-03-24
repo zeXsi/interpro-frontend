@@ -78,7 +78,7 @@ function FilterItem({ filterName, filterType, items, onClickItem }: FilterItemPr
               );
             })}
             <button onClick={toClearTags} className="FilterItem-item-cancel">
-              очистить <CloseIcon />
+              Очистить <CloseIcon />
             </button>
           </div>
         </div>

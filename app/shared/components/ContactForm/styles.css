@@ -1,25 +1,29 @@
 .ContactForm {
   padding-bottom: clamp(2.75rem, calc(1.9rem + 3.625vw), 6.25rem); /* min: 44px, max: 100px */
+
   .ContactForm-title {
     font-family: var(--font-family);
     font-weight: 400;
-    font-size: clamp(3rem, calc(1.483rem + 6.472vw), 9.25rem); /* min: 48px, max: 148px */
+    font-size: clamp(5.25rem, calc(2.583rem + 5.556vw), 9.25rem); /* min: 84px, max: 148px */
     line-height: 110%;
     letter-spacing: -0.04em;
     color: #000;
-    margin-top: 24px;
-    margin-bottom: clamp(2.75rem, calc(1.961rem + 3.366vw), 6rem); /* min: 44px, max: 96px */
+    margin-top: clamp(1rem, calc(0.667rem + 0.694vw), 1.5rem); /* min: 16px, max: 24px */
+    margin-bottom: clamp(4rem, calc(2.667rem + 2.778vw), 6rem); /* min: 64px, max: 96px */
+    width: clamp(37.188rem, calc(14.063rem + 48.177vw), 71.875rem); /* min: 595px, max: 1150px */
   }
 
   .ContactForm_inner {
     width: fit-content;
+    gap: clamp(4rem, calc(2.667rem + 2.778vw), 6rem); /* min: 64px, max: 96px */
+    display: flex;
+    flex-direction: column;
   }
 
   .ContactForm-form {
     display: flex;
     flex-direction: column;
-    gap: 48px;
-    margin-bottom: clamp(2.75rem, calc(1.961rem + 3.366vw), 6rem); /* min: 44px, max: 96px */
+    gap: 82px;
   }
   .btn-send[disabled] {
     opacity: 0.6;
@@ -144,6 +148,39 @@
       }
     }
   }
+
+  @media (max-width: 768px) {
+    .Subtitle {
+      letter-spacing: -0.04em;
+    }
+
+    .ContactForm-title {
+      font-size: clamp(3rem, calc(0.853rem + 9.16vw), 5.25rem); /* min: 48px, max: 84px */
+      letter-spacing: -0.06em;
+      margin-top: 16px;
+      margin-bottom: clamp(2.75rem, calc(1.557rem + 5.089vw), 4rem); /* min: 44px, max: 64px */
+      width: clamp(22.438rem, calc(8.363rem + 60.051vw), 37.188rem); /* min: 359px, max: 595px */
+    }
+
+    .ContactForm_inner {
+      gap: clamp(1.5rem, calc(-0.885rem + 10.178vw), 4rem); /* min: 24px, max: 64px */
+
+      .ContactForm-form {
+        gap: clamp(3rem, calc(0.972rem + 8.651vw), 5.125rem); /* min: 48px, max: 82px */
+      }
+    }
+  }
+
+  @media (max-width: 540px) {
+    .Subtitle {
+      letter-spacing: -0.03em;
+    }
+
+    .ContactForm-title {
+      letter-spacing: -0.04em;
+      line-height: 100%;
+    }
+  }
 }
 
 .ConsentCheckbox {
@@ -242,7 +279,6 @@
   }
   .Input_wrapper {
     border-bottom: 1px solid #e6e6e6;
-    margin-bottom: 4px;
   }
 
   &.error {
@@ -271,15 +307,17 @@
     text-wrap: nowrap;
     font-family: var(--font-family);
     font-weight: 500;
-    font-size: 24px;
+    font-size: clamp(1.25rem, calc(1.189rem + 0.259vw), 1.5rem); /* min: 20px, max: 24px */;
     line-height: 120%;
     letter-spacing: -0.02em;
-    min-height: 30px;
     text-transform: uppercase;
     color: #000;
     cursor: text;
     opacity: 0.5;
-    transition: 0.3s ease-out;
+    transition: 0.3s cubic-bezier(0.65, 0, 0.35, 1);
+    position: absolute;
+    top: 0;
+    transform: translateY(clamp(0rem, calc(-0.273rem + 1.165vw), 1.125rem)); /* min: 0px, max: 18px */
     &::before {
       content: '*';
       display: none;
@@ -293,11 +331,20 @@
       /* min: 9px, max: 12px */
       /* viewPort: 768-1920 */
       opacity: 0.5;
-      transform: translateY(-12px);
+      transform: translateY(0);
 
       &::before {
         content: '*';
         display: none;
+      }
+    }
+  }
+
+  &.error:focus-within,
+  &.error.noEmpty {
+    .Input-label {
+      &::before {
+        display: inline-block;
       }
     }
   }
@@ -311,6 +358,10 @@
     color: #000;
 
     opacity: 0;
+
+    bottom: 0;
+    translate: 0 calc(100% + 4px);
+    position: absolute;
   }
   .Input-self {
     border: none;
@@ -319,11 +370,12 @@
     width: 100%;
     font-family: var(--font-family);
     font-weight: 500;
-    font-size: clamp(1.25rem, calc(1.189rem + 0.259vw), 1.5rem); /* min: 20px, max: 24px */
     line-height: 120%;
     letter-spacing: -0.02em;
     color: #000;
-    padding-bottom: 12px;
+    padding-top: clamp(0.875rem, calc(0.814rem + 0.259vw), 1.125rem); /* min: 14px, max: 18px */;
+    padding-bottom: clamp(0.25rem, calc(0.129rem + 0.518vw), 0.75rem); /* min: 4px, max: 12px */;
+    font-size: clamp(1.25rem, calc(1.189rem + 0.259vw), 1.5rem);
   }
 
   @media (max-width: 768px) {
@@ -332,9 +384,13 @@
     }
   }
 
-  @media (max-width: 500px) {
+  @media (max-width: 540px) {
     .Input-label {
-      font-weight: 400;
+      letter-spacing: -0.04em;
+    }
+
+    .Input-self {
+      letter-spacing: -0.04em;
     }
   }
 }

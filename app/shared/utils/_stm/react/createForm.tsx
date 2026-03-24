@@ -47,7 +47,7 @@ class Form<S extends FormShape> {
       const fieldConfig = this.config[key];
       const sigs = this.formSignals[key];
       sigs.value.v = fieldConfig.initialValue;
-      sigs.errorMessage.v = fieldConfig.errorMessage || '';
+      sigs.errorMessage.v = '';
     });
 
     this.isSubmitted.v = null;
@@ -60,7 +60,7 @@ class Form<S extends FormShape> {
       out[key] = {
         value: makeSignal(fieldConfig.initialValue),
         title: makeSignal(fieldConfig.title ?? ''),
-        errorMessage: makeSignal(fieldConfig.errorMessage ?? ''),
+        errorMessage: makeSignal(''),
       };
     });
     return out;

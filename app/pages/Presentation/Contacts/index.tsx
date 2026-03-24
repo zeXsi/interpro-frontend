@@ -1,13 +1,14 @@
 import './styles.css';
 import Button from 'shared/components/Button';
-import { Link } from 'react-router';
+import Link from 'shared/components/Link';
+import { Link as RouterLink } from 'react-router';
 
 export default function Contacts({ data, id }: any) {
   const fields = data.fields;
 
   if (!fields) return null;
 
-  const discussLink = fields.ct_tg || fields.ct_wa || `mailto:${import.meta.env.VITE_EMAIL}`;
+  const discussLink = fields.ct_tg || fields.ct_wa || import.meta.env.VITE_EMAIL;
   return (
     <section className="Contacts" id={id}>
       <div className="Contacts__content">
@@ -46,13 +47,13 @@ export default function Contacts({ data, id }: any) {
               </a>
             </li>
             <li className="Contacts__list-item">
-              <a href={import.meta.env.VITE_EMAIL}>
+              <Link to={import.meta.env.VITE_EMAIL} typeLink="external">
                 <Button
                   className="Contacts__list-btn"
                   variant="link"
                   children={import.meta.env.VITE_EMAIL_NAME}
                 />
-              </a>
+              </Link>
             </li>
             <li className="Contacts__list-item">
               <a href={discussLink} target="_blank">
@@ -65,9 +66,9 @@ export default function Contacts({ data, id }: any) {
           <p>( наш сайт )</p>
           <ul className="Contacts__list">
             <li className="Contacts__list-item">
-              <Link to="/">
+              <RouterLink to="/">
                 <Button className="Contacts__list-btn" variant="link" children="interpro.pro" />
-              </Link>
+              </RouterLink>
             </li>
           </ul>
         </div>

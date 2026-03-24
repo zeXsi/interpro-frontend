@@ -36,6 +36,7 @@ import { useEffect } from 'react';
 import { lenisManager } from 'shared/utils/lenis';
 import BTNContact from 'shared/components/BTNContact';
 import AdBanner from 'shared/components/AdBanner';
+import CopyToast from 'shared/components/CopyToast';
 
 const YANDEX_COUNTER_ID = 99631636;
 
@@ -152,6 +153,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
           </noscript>
         )}
         {children}
+        {!isPresentationPrint && <CopyToast />}
         {!isPresentationPrint && <ScrollRestoration />}
         {!isPresentationPrint && <Scripts />}
       </body>

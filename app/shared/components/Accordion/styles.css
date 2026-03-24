@@ -3,9 +3,6 @@
   --pd: clamp(2.25rem, calc(2.083rem + 0.347vw), 2.5rem); /* min: 36px, max: 40px */
   padding: var(--pd) 0;
 
-  border-top: 1px solid rgb(0, 0, 0, 0.1);
-  border-bottom: 1px solid rgb(0, 0, 0, 0.1);
-
   .Accordion_header {
     list-style-type: none;
     display: flex;

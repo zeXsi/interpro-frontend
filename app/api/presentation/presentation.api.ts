@@ -1,10 +1,11 @@
 // presentations.api.ts
+import { interproApiBaseURL } from 'api/api.config';
 import { createQuery } from 'shared/utils/querySignal';
 import type { Presentation } from './presentation.types';
 
 export const createPresentationQuery = (slug: string) => {
     const qPresentation = createQuery<Presentation | null>({
-        endpoint: `https://api.interpro.murukae.ru/wp-json/interpro/v1/presentations/${slug}/`,
+        endpoint: `${interproApiBaseURL}/presentations/${slug}/`,
         initial: null,
     });
 

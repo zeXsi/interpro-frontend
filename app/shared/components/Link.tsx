@@ -1,7 +1,8 @@
-import { useEffect, useRef,  } from 'react';
+import { useEffect, useRef } from 'react';
 import { useLenis } from 'lenis/react';
-import { useLocation,Link as RouterLink  } from 'react-router';
+import { useLocation, Link as RouterLink } from 'react-router';
 import { useNavigate as useNavTracker } from './NavigationTracker';
+import { copyEmailToClipboard, isMailtoHref } from 'shared/utils/copyToClipboard';
 
 interface LinkProps {
   to: string | string[];
@@ -122,11 +123,29 @@ const Link = ({ slug = [], ...props }: LinkProps) => {
     }
   };
 
+  const href = Array.isArray(props.to)
+    ? ((props.to.find((t) => !isHash(t)) ?? props.to[0]) as string)
+    : (props.to as string);
+
+  const handleClickExternal = async (e: React.MouseEvent<HTMLAnchorElement>) => {
+    props.onClick?.();
+
+    if (!isMailtoHref(href)) return;
+
+    e.preventDefault();
+
+    const isCopied = await copyEmailToClipboard(href);
+    if (!isCopied) {
+      window.location.href = href;
+    }
+  };
+
   if (props.typeLink === 'external') {
     return (
       <a
         className="Link"
-        href={Array.isArray(props.to) ? (props.to[0] as string) : (props.to as string)}
+        href={href}
+        onClick={handleClickExternal}
         target="_blank"
         rel="noreferrer noreferrer nofollow"
         style={{ display: 'contents', color: 'unset' }}
@@ -135,10 +154,6 @@ const Link = ({ slug = [], ...props }: LinkProps) => {
       </a>
     );
   }
-
-  const href = Array.isArray(props.to)
-    ? ((props.to.find((t) => !isHash(t)) ?? props.to[0]) as string)
-    : (props.to as string);
 
   return (
     <RouterLink
