@@ -55,6 +55,8 @@
       }
     }
     .ButtonArrow {
+      padding-top: 3px;
+
       .Button {
         padding-bottom: 4px;
         &::before {
@@ -80,5 +82,12 @@
   @media (max-width: 1024px) {
     display: flex;
     justify-content: center;
+  }
+  @media (max-width: 768px) {
+    .AdBanner_text {
+      .ButtonArrow {
+        padding-top: clamp(0.188rem, calc(0.31rem + -0.254vw), 0.25rem); /* min: 3px, max: 4px */;
+      }
+    }
   }
 }

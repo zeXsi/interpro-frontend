@@ -15,7 +15,7 @@ export default function ISOCard({ title, namePdf, urlPdf, urlImg }: ISOCardProps
       <Popup/>
       <div className="ISOCard_head">
         <Tag title={ title } subTitle={ 'Сертификат' } />
-        <Tag link={ urlPdf } title={ namePdf } subTitle={ 'Скачать:' } />
+        <Tag link={ urlPdf } title={ namePdf } subTitle={ 'Скачать:' } className='subtitle' />
       </div>
       <div className="ISOCard_img">
         <img src={ urlImg } onClick={ () => showWithData(urlImg)}/>

@@ -12,6 +12,12 @@
     .FilterItem-title {
       opacity: 1;
     }
+
+    .IconPlus {
+      .IconPlus-line {
+        opacity: 1;
+      }
+    }
   }
 
   .FilterItem-title {
@@ -113,4 +119,8 @@
 .IconPlus {
   width: clamp(1.5rem, calc(0.929rem + 1.19vw), 2rem); /* min: 24px, max: 32px */
   height: clamp(1.5rem, calc(0.929rem + 1.19vw), 2rem); /* min: 24px, max: 32px */
+
+  .IconPlus-line {
+    opacity: 1;
+  }
 }

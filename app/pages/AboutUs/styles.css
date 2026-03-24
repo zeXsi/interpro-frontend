@@ -57,19 +57,12 @@
     }
   }
   .ButtonArrow.AboutUs_companies-btn {
-    padding: 0;
-    margin-top: clamp(4.125rem, calc(2.833rem + 2.691vw), 6.063rem);
-
-    /* min: 66px, max: 97px */
-    /* viewPort: 768-1920 */
     @media (max-width: 768px) {
-      margin-top: clamp(2.75rem, calc(1.438rem + 5.598vw), 4.125rem);
-      /* min: 44px, max: 66px */
-      /* viewPort: 375-768 */
+      margin-top: 64px;
     }
 
     .ButtonArrow-icon {
-      margin-top: 4px;
+      margin-top: 0px !important;
       --size: clamp(2rem, calc(1.5rem + 1.042vw), 2.75rem);
       /* min: 32px, max: 44px */
       /* viewPort: 768-1920 */

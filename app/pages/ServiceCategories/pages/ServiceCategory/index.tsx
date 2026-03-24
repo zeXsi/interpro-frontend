@@ -64,7 +64,7 @@ export default function ServiceCategoryPage({ loaderData: data, params }: Route.
   }, [data]);
 
   return (
-    <div className="InteractiveExhibit">
+    <div className="InteractiveExhibit service">
       <div className="wrap-first-wrap px">
         <div className="wrap-first-title">
           <TitlePage title={data?.payload.name!} />
@@ -136,7 +136,7 @@ export default function ServiceCategoryPage({ loaderData: data, params }: Route.
                   </Button.Arrow>
                 </div>
               ) : null}
-              {item?.title && <p className="title">{item.title}</p>}
+              {item?.title && <h2 className="title">{item.title}</h2>}
               {item?.content && (
                 <div
                   className="desc"
@@ -155,7 +155,7 @@ export default function ServiceCategoryPage({ loaderData: data, params }: Route.
           <div className="wrap-next-page">
             <Subtitle>( следующая услуга )</Subtitle>
             <Link
-              to={`/services/${data.nextItem.categorySlug ?? params?.slug}/${data.nextItem.slug}`}
+              to={`/services/${data.nextItem.slug}`}
               slug={data.nextItem.title}
             >
               <Button.Arrow variant="link" direction="right" className="ItemService_btn">

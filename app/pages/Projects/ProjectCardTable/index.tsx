@@ -14,10 +14,14 @@ export default function ProjectCardTable(props: ProjectCardProps) {
           <span className="ProjectCardTable_head-title">{props.title}</span>
           <ArrowSvg className="ProjectCardTable_head-svg" />
         </div>
-        <div className="ProjectCardTable_main">
-          <Tag title={<Text>{props.nameExhibition}</Text>} subTitle={'выставка'} />
-          <Tag title={props.year} subTitle={props.year} />
-        </div>
+        {(props.nameExhibition && props.year) ?? (
+          <div className="ProjectCardTable_main">
+            {props.nameExhibition ?? (
+              <Tag title={<Text>{props.nameExhibition}</Text>} subTitle={'выставка'} />
+            )}
+            {props.year ?? <Tag title={props.year} subTitle={'Год'} />}
+          </div>
+        )}
       </div>
     </Link>
   );

@@ -85,6 +85,19 @@ export default function FeedArticle({ data }: { data: ArticleData }) {
   const { article, articles, slug } = data;
   const { setCrumbs, goTo, getRouteName } = useNavigate();
   const location = useLocation();
+  const relatedArticles = articles
+    .filter(({ id, slug: itemSlug }) => id !== article.id && itemSlug !== article.slug)
+    .slice(0, 3);
+  const labels =
+    slug === 'blog'
+      ? {
+          share: 'Поделиться статьёй',
+          more: 'Ещё статьи',
+        }
+      : {
+          share: 'Поделиться новостью',
+          more: 'Ещё новости',
+        };
 
   useLayoutEffect(() => {
     const path = location.pathname;
@@ -143,16 +156,16 @@ export default function FeedArticle({ data }: { data: ArticleData }) {
             className="Feed-shareBtn"
             variant="link"
           >
-            Поделиться статьёй
+            {labels.share}
           </Button.Arrow>
           <Networks />
 
           <div className="Feed_articles">
-            <div className="Feed_articles-title">Ещё статьи</div>
+            <div className="Feed_articles-title">{labels.more}</div>
             <div className="Feed_articles-inner">
-              {articles.map(({ payload, slug: itemSlug }, index) => (
+              {relatedArticles.map(({ id, payload, slug: itemSlug }) => (
                 <Article
-                  key={index}
+                  key={id}
                   srcImg={payload.cover?.url ?? ''}
                   date={formatDateToRussian(payload.date)}
                   title={payload.title}

@@ -147,13 +147,18 @@
 
 .MWNav_table {
   width: 100vw;
-  padding-top: 64px;
   background: white;
+  overflow: auto;
 
   .IconPlus .IconPlus-line {
-    height: 2.5px;
+    height: 0;
     background: #000;
+    border-bottom: 2.75px solid #000;
     opacity: 1;
+  }
+
+  .MWNav_list {
+    padding-top: 64px;
   }
 
   .MWNav_list-li {
@@ -179,6 +184,7 @@
       --size: clamp(2rem, calc(1.284rem + 3.053vw), 2.75rem); /* min: 32px, max: 44px */
       height: var(--size);
       width: var(--size);
+      margin-top: 0 !important;
     }
 
     &.__projects {
@@ -206,7 +212,7 @@
   .MWNav_container {
     position: fixed;
     top: calc(var(--heightHeader) + var(--adBanner-height));
-    width: 100vw;
+    width: calc(100% - (var(--px) * 2));
     height: calc(100vh - var(--heightHeader) - var(--adBanner-height));
     background: #fff;
     opacity: 0;
@@ -216,13 +222,17 @@
       opacity: 0;
     }
     .ButtonArrow.MWNav_container-btn-comeback {
-      margin-bottom: clamp(2rem, calc(1.284rem + 3.053vw), 2.75rem);
-      /* min: 32px, max: 44px */ /* viewPort: 375-768 */
+      margin-top: 44px;
+      margin-bottom: 8px;
       padding: 0;
       gap: 8px;
       .Button {
         text-decoration: unset;
         text-underline-offset: unset;
+        text-transform: uppercase;
+      }
+      .ButtonArrow-icon {
+        margin-top: 0 !important;
       }
     }
     &.isActiveNested {
@@ -242,6 +252,10 @@
     }
 
     .MWNav_container-list {
+      width: 100%;
+      height: 100%;
+      overflow: auto;
+      padding-top: clamp(1.5rem, calc(0.784rem + 3.053vw), 2rem); /* min: 24px, max: 32px */
       display: flex;
       flex-direction: column;
       gap: clamp(1.5rem, calc(0.844rem + 2.799vw), 2.188rem);
@@ -257,7 +271,7 @@
     .Accordion_header {
       display: flex;
       align-items: center;
-      width: calc(100% - 22px);
+      width: 100%;
       .Accordion_header-title {
         font-family: var(--font-family);
         font-weight: 400;
@@ -268,6 +282,18 @@
         letter-spacing: -0.04em;
         text-transform: uppercase;
         color: #000;
+      }
+    }
+
+    .Accordion_content {
+      .wrap-children {
+        .Accordion_list {
+          padding-bottom: clamp(0.75rem, calc(1.727rem + -2.036vw), 1.25rem); /* min: 12px, max: 20px */;
+        }
+
+        & > *:first-child {
+          padding-top: 24px;
+        }
       }
     }
 
@@ -329,7 +355,7 @@
 }
 
 .Popup.MWNav {
-  width: 100vw;
+  width: 100%;
   height: 100vh;
 
   inset: unset;

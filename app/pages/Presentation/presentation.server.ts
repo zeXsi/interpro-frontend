@@ -1,5 +1,5 @@
 import { createHash, randomUUID } from 'node:crypto';
-import { instance } from 'api/api.config';
+import { instance, interproApiBaseURL } from 'api/api.config';
 import type { Presentation } from 'api/presentation/presentation.types';
 
 const PRESENTATION_PRIME_TTL_MS = 5 * 60 * 1000;
@@ -28,7 +28,7 @@ function cleanupExpired() {
 export async function fetchPresentation(slug: string): Promise<Presentation | null> {
   try {
     const response = await instance.get<Presentation>(
-      `https://api.interpro.murukae.ru/wp-json/interpro/v1/presentations/${slug}/`
+      `${interproApiBaseURL}/presentations/${slug}/`
     );
 
     if (!response.data?.slides?.length) {

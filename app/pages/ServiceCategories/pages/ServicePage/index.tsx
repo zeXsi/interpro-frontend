@@ -7,7 +7,7 @@ import { lenisManager } from 'shared/utils/lenis';
 
 import { useNavigate } from 'shared/components/NavigationTracker';
 
-import { getServiceById } from 'api/services/services.api';
+import { getServiceById, getServiceCategoriesById } from 'api/services/services.api';
 import type { Service } from 'api/services/services.types';
 import { Route } from './+types';
 import Accordion from 'shared/components/Accordion';
@@ -31,6 +31,29 @@ export async function loader({ params }: Route.LoaderArgs): Promise<Service> {
     throw new Response('Not found', { status: 404 });
   }
 
+  const categorySlug = data.payload?.category?.slug;
+  if (categorySlug) {
+    const category = await getServiceCategoriesById({ slug: categorySlug });
+    const posts = category?.payload?.posts ?? [];
+
+    if (posts.length > 1) {
+      const currentIndex = posts.findIndex((post) => post.slug === data.slug);
+
+      if (currentIndex >= 0) {
+        const nextPost = posts[(currentIndex + 1) % posts.length];
+
+        if (nextPost && nextPost.slug !== data.slug) {
+          data.nextItem = {
+            id: nextPost.id,
+            slug: nextPost.slug,
+            title: nextPost.title,
+            categorySlug,
+          };
+        }
+      }
+    }
+  }
+
   return data;
 }
 
@@ -52,19 +75,19 @@ export function meta({ loaderData }: Route.MetaArgs) {
 }
 
 export default function ServicePage({ loaderData: data, params }: Route.ComponentProps) {
-  const { setCrumbs } = useNavigate();
+  const { setCrumbs, goTo } = useNavigate();
   const contactFormRef = useRef<HTMLDivElement>(null);
-  const { goTo } = useNavigate();
 
   useLayoutEffect(() => {
     const path = `/services/${params?.slug}/${params?.slugService}`;
     if (data?.payload.category.name && data?.payload.title) {
       setCrumbs(path, data?.payload.category.name, data?.payload.title);
     }
-  }, [data]);
+
+  }, [data, params?.slug, params?.slugService, setCrumbs]);
 
   return (
-    <div className="InteractiveExhibit">
+    <div className="InteractiveExhibit service">
       <div className="wrap-first-wrap px">
         <div className="wrap-first-title">
           <TitlePage title={data?.payload.title ?? ''} />
@@ -122,7 +145,7 @@ export default function ServicePage({ loaderData: data, params }: Route.Componen
                   </Button.Arrow>
                 </div>
               ) : null}
-              {item?.title && <p className="title">{item.title}</p>}
+              {item?.title && <h2 className="title">{item.title}</h2>}
               {item?.content && (
                 <div
                   className="desc"
@@ -142,7 +165,7 @@ export default function ServicePage({ loaderData: data, params }: Route.Componen
             <Subtitle>( следующая услуга )</Subtitle>
             <Link
               to={`/services/${data.nextItem.categorySlug ?? params?.slug}/${data.nextItem.slug}`}
-              slug={data.nextItem.title}
+              slug={[data?.payload.category.name, data.nextItem.title]}
             >
               <Button.Arrow variant="link" direction="right" className="ItemService_btn">
                 {data.nextItem.title}

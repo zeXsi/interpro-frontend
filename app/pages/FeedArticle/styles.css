@@ -211,10 +211,22 @@
       }
     }
 
+    &.isFirstImg {
+      .Block_imgs {
+        .Block_imgs-item {
+          object-fit: cover;
+        }
+      }
+    }
+
     .Block_imgs {
       display: grid;
       gap: clamp(0.5rem, calc(0.333rem + 0.347vw), 0.75rem);
       /* min: 8px, max: 12px */ /* viewPort: 768-1920 */
+
+      .Block_imgs-item {
+        object-fit: contain;
+      }
 
       &.imgIsSeconds {
         grid-template-columns: 1fr 1fr;

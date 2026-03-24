@@ -1,5 +1,5 @@
 import './styles.css';
-import { useImperativeHandle, useMemo, useRef, useState } from 'react';
+import { useEffect, useImperativeHandle, useMemo, useRef, useState } from 'react';
 import usePopup from './src';
 import '@qtpy/use-popup/index.css';
 import Button from 'shared/components/Button';
@@ -54,11 +54,43 @@ type unionTypes = 'nav' | 'contacts';
 interface ImpMethods {
   getData: () => unionTypes;
 }
+type MWNavController = {
+  showWithData: (data: unionTypes) => void;
+  toOpenPopup: () => void;
+  toClosePopup: () => void;
+  toTogglePopup: () => void;
+};
 export const MWNavMode = signal<unionTypes>('nav');
+const MWNavIsShowed = signal(false);
+const MWNavHostId = signal<number | null>(null);
+const mwNavControllers = new Map<number, MWNavController>();
+let mwNavControllerId = 0;
+
+const getNextMWNavHostId = () => {
+  if (!mwNavControllers.size) return null;
+  return Math.min(...mwNavControllers.keys());
+};
 
 export default function useMWNav() {
+  const instanceIdRef = useRef(0);
+  if (!instanceIdRef.current) {
+    mwNavControllerId += 1;
+    instanceIdRef.current = mwNavControllerId;
+  }
+
+  const instanceId = instanceIdRef.current;
+  const hostId = useSignalValue(MWNavHostId);
+  const isShowed = useSignalValue(MWNavIsShowed);
+  const isHost = hostId === instanceId;
   const refTimeId = useRef<NodeJS.Timeout>(null);
-  const { Popup, toOpenPopup, showWithData, toTogglePopup, toClosePopup, ...props } = usePopup<
+  const {
+    Popup: PopupRoot,
+    toOpenPopup,
+    showWithData,
+    toTogglePopup,
+    toClosePopup,
+    ...props
+  } = usePopup<
     unionTypes,
     ImpMethods
   >(0.1);
@@ -84,29 +116,75 @@ export default function useMWNav() {
     toTogglePopup();
   };
 
-  return Popup.Memo(
+  useEffect(() => {
+    if (MWNavHostId.v === null) {
+      MWNavHostId.v = instanceId;
+    }
+
+    return () => {
+      mwNavControllers.delete(instanceId);
+
+      if (MWNavHostId.v === instanceId) {
+        MWNavHostId.v = getNextMWNavHostId();
+        MWNavIsShowed.v = false;
+      }
+
+      if (!mwNavControllers.size) {
+        MWNavIsShowed.v = false;
+        MWNavMode.v = 'nav';
+      }
+    };
+  }, [instanceId]);
+
+  useEffect(() => {
+    mwNavControllers.set(instanceId, {
+      showWithData,
+      toOpenPopup: _toOpenPopup,
+      toClosePopup: _toClosePopup,
+      toTogglePopup: _toTogglePopup,
+    });
+  }, [instanceId, showWithData, _toOpenPopup, _toClosePopup, _toTogglePopup]);
+
+  useEffect(() => {
+    if (isHost) {
+      MWNavIsShowed.v = props.isShowed;
+    }
+  }, [isHost, props.isShowed]);
+
+  const getController = () =>
+    mwNavControllers.get(MWNavHostId.v ?? instanceId) ?? {
+      showWithData,
+      toOpenPopup: _toOpenPopup,
+      toClosePopup: _toClosePopup,
+      toTogglePopup: _toTogglePopup,
+    };
+
+  return PopupRoot.Memo(
     {
       ...props,
-      showWithData,
-      toTogglePopup: _toTogglePopup,
-      toClosePopup: _toClosePopup,
-      toOpenPopup: _toOpenPopup,
+      isShowed,
+      showWithData: (data) => getController().showWithData(data),
+      toTogglePopup: () => getController().toTogglePopup(),
+      toClosePopup: () => getController().toClosePopup(),
+      toOpenPopup: () => getController().toOpenPopup(),
       Popup: ({ imperativeRef }) => {
         useSignalValue(MWNavMode);
-        const setType = (v: unionTypes) => MWNavMode.v = v
+        const setType = (v: unionTypes) => MWNavMode.v = v;
         useImperativeHandle(imperativeRef, () => ({
           setData: setType,
           getData: () => MWNavMode.v,
         }));
 
+        if (!isHost) return null;
+
         return (
-          <Popup className="MWNav" isOnCloseBG={true} eventCloseBG="onMouseMove">
+          <PopupRoot className="MWNav" isOnCloseBG={true} eventCloseBG="onMouseMove">
             <Switcher type={MWNavMode.v} toClosePopup={_toClosePopup} changeChildren={setType} />
-          </Popup>
+          </PopupRoot>
         );
       },
     },
-    []
+    [isHost]
   );
 }
 
@@ -319,7 +397,7 @@ function Mobile({
 
   return (
     <div className="MWNav_table px">
-      <div className="MWNav_list px">
+      <div className="MWNav_list" data-lenis-prevent>
         <Button.Arrow
           variant="link"
           underline={false}
@@ -370,7 +448,7 @@ function Mobile({
           className="MWNav_list-li "
         />
       </div>
-      <div className={`MWNav_container  ${clIsActiveNested}`}>
+      <div className={`MWNav_container  ${clIsActiveNested}`} data-lenis-prevent>
         <Button.Arrow
           variant="ghostLink"
           className="MWNav_container-btn-comeback"
@@ -398,6 +476,9 @@ interface Props {
 function AboutUs({ toNavigate }: Props) {
   return (
     <ul className="AboutUs_list">
+      <li onClick={() => toNavigate('/about-us')} className="AboutUs_list-item">
+        {'О компании'}
+      </li>
       <li onClick={() => toNavigate('/about-us/feedbacks')} className="AboutUs_list-item">
         {'Отзывы'}
       </li>
@@ -424,7 +505,7 @@ function ServicesNavTable({ toNavigate }: Props) {
   return (
     <>
       <li className="MWNav_title __services" onClick={() => toNavigate('/services')}>
-        все услуги
+        Все услуги
       </li>
       {tree.map((item, index) => {
         const isActive = selectedIndex === index;
@@ -433,7 +514,7 @@ function ServicesNavTable({ toNavigate }: Props) {
             <Accordion onClick={(v) => toClick(v, index)} key={index}>
               <Accordion.Header>
                 <span className="Accordion_header-title">{item.label}</span>
-                <IconPlus isActive={isActive} />
+                <IconPlus isActive={!isActive} />
               </Accordion.Header>
               <Accordion.Content>
                 <ul className="Accordion_list">
