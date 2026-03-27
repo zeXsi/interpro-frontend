@@ -35,7 +35,7 @@ export default function Footer() {
           title="Соц. сети:"
           items={[
             ['telegram-канал', import.meta.env.VITE_TELEGRAM_URL_2, 'external'],
-            ['telegram-live', import.meta.env.VITE_TELEGRAM_URL_3, 'external'],
+            // ['telegram-live', import.meta.env.VITE_TELEGRAM_URL_3, 'external'],
             ['instagram*', import.meta.env.VITE_INSTAGRAM_URL, 'external'],
             ['youtube', import.meta.env.VITE_YOUTUBE_URL, 'external'],
             ['vk', import.meta.env.VITE_VK_URL, 'external'],

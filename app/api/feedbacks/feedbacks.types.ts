@@ -25,7 +25,7 @@ export interface Feedback {
       position: string;
     };
     text: string;
-    pdf: string;
+    pdf: string | null;
     cover: string | null;
     date: string;
   };

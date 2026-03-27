@@ -13,7 +13,7 @@ import { Route } from './+types';
 import Accordion from 'shared/components/Accordion';
 import CrossIcon from 'assets/icons/cross.svg?react';
 import { Swiper, SwiperSlide } from 'swiper/react';
-import { Navigation, Pagination } from 'swiper/modules';
+import { Navigation } from 'swiper/modules';
 import DocOverview from 'shared/sections/DocOverview';
 import MarqueeCarousel from 'shared/components/MarqueeCarousel';
 import ArrowIcon from 'assets/icons/arrow.svg?react';
@@ -23,6 +23,7 @@ import FAQSection from 'shared/sections/FAQSection';
 import Button from 'shared/components/Button';
 import Subtitle from 'shared/components/Subtitle';
 import Link from 'shared/components/Link';
+import ExampleProjects from 'shared/components/ExampleProjects';
 
 export async function loader({ params }: Route.LoaderArgs): Promise<Service> {
   const data = await getServiceById({ slug: params.slugService });
@@ -83,7 +84,6 @@ export default function ServicePage({ loaderData: data, params }: Route.Componen
     if (data?.payload.category.name && data?.payload.title) {
       setCrumbs(path, data?.payload.category.name, data?.payload.title);
     }
-
   }, [data, params?.slug, params?.slugService, setCrumbs]);
 
   return (
@@ -175,52 +175,7 @@ export default function ServicePage({ loaderData: data, params }: Route.Componen
         )}
       </div>
 
-      {(data?.payload.projects?.length ?? 0) > 0 && (
-        <div className="wrap-example-project px">
-          <p className="head-title-project">
-            Примеры <br /> выполненных работ
-          </p>
-          <div className="wrap-slider">
-            <Swiper
-              slidesPerView="auto"
-              spaceBetween={64}
-              pagination={{
-                el: '.wrap-slider .wrap-dots',
-                clickable: true,
-              }}
-              navigation={{
-                prevEl: '.swiper-btn-prev',
-                nextEl: '.swiper-btn-next',
-              }}
-              modules={[Pagination, Navigation]}
-              className="Project__swiper"
-            >
-              {data?.payload.projects?.map((item) => (
-                <SwiperSlide
-                  key={item.id}
-                  onClick={() => goTo(`/projects/${item.slug}`, item.name)}
-                >
-                  {item.name && <p className="title-project">{item.name}</p>}
-                  {item.full_image?.url && (
-                    <img src={item.full_image?.url} alt={`Проект ${item.name}`} />
-                  )}
-                </SwiperSlide>
-              ))}
-            </Swiper>
-            {(data?.payload.projects?.length ?? 0) > 1 && (
-              <>
-                <div className="wrap-dots"></div>
-                <div className="swiper-btn-prev">
-                  <ArrowIcon />
-                </div>
-                <div className="swiper-btn-next">
-                  <ArrowIcon />
-                </div>
-              </>
-            )}
-          </div>
-        </div>
-      )}
+      <ExampleProjects projects={data?.payload.projects} goTo={goTo} />
 
       {(data?.payload.reviews?.length ?? 0) > 0 && (
         <DocOverview

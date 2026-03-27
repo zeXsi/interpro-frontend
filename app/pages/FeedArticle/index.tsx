@@ -6,10 +6,13 @@ import Link from 'shared/components/Link';
 import Subtitle from 'shared/components/Subtitle';
 import ContactForm from 'shared/components/ContactForm';
 import Article from 'shared/components/Article';
+import ExampleProjects from 'shared/components/ExampleProjects';
+import useMWImage, { WithDataMWImage } from 'shared/components/popups/useMWImage';
 
 import { useLayoutEffect } from 'react';
 import { useLocation } from 'react-router';
 import { useNavigate } from 'shared/components/NavigationTracker';
+import { lenisManager } from 'shared/utils/lenis';
 
 import type { FeedItem } from 'api/feed/feed.types';
 import {
@@ -22,11 +25,17 @@ import {
 
 import formatDateToRussian from 'shared/utils/formatDateToRussian';
 import StartPage from 'shared/components/StartPage';
+import InfoList from 'shared/components/InfoList';
 
 export type ArticleData = {
   slug: 'news' | 'blog';
   article: FeedItem;
   articles: FeedItem[];
+};
+
+type AnchorLink = {
+  id: string;
+  title: string;
 };
 
 export async function _loader(_url: string): Promise<ArticleData> {
@@ -84,7 +93,21 @@ export function _meta(data: ArticleData) {
 export default function FeedArticle({ data }: { data: ArticleData }) {
   const { article, articles, slug } = data;
   const { setCrumbs, goTo, getRouteName } = useNavigate();
+  const { Popup, showWithData } = useMWImage();
   const location = useLocation();
+  const contentBlocks = article?.payload?.blocks ?? [];
+  const relatedServices = article?.payload?.related_services ?? [];
+  const anchorLinks = contentBlocks.reduce<AnchorLink[]>((acc, block, index) => {
+    const title = block.title?.trim();
+    if (!title) return acc;
+
+    acc.push({
+      id: `article-block-${index + 1}`,
+      title,
+    });
+
+    return acc;
+  }, []);
   const relatedArticles = articles
     .filter(({ id, slug: itemSlug }) => id !== article.id && itemSlug !== article.slug)
     .slice(0, 3);
@@ -123,32 +146,56 @@ export default function FeedArticle({ data }: { data: ArticleData }) {
   return (
     <StartPage>
       <div className="Feed px">
+        <Popup />
         <div className="Feed-wrapper">
-          <div className="Feed_header">
-            <h1 className="Feed_header-title">{article?.payload?.title}</h1>
-            <span className="Feed_header-date">
-              {formatDateToRussian(article?.payload?.date || '')}
-            </span>
-          </div>
-
           <div className="Feed-wrapper_block">
+            <div className="Feed_header">
+              <h1 className="Feed_header-title">{article?.payload?.title}</h1>
+              <span className="Feed_header-date">
+                {formatDateToRussian(article?.payload?.date || '')}
+              </span>
+            </div>
+
             <Block
               imgs={[article?.payload?.cover]}
               isFirstImg={true}
               className="__first"
               descriptions={[article?.payload?.subtitle || '']}
+              anchorLinks={anchorLinks}
+              onOpenImg={showWithData}
             />
-            <Block imgs={article?.payload?.subtitle_photos} />
-            {article?.payload?.blocks.map((block, i, arr) => (
+            <Block imgs={article?.payload?.subtitle_photos} onOpenImg={showWithData} />
+            {contentBlocks.map((block, i, arr) => (
               <Block
                 key={i}
                 imgs={block.photos}
                 title={block.title}
                 descriptions={block.descriptions}
                 isLastItem={arr.length - 1 <= i}
+                anchorId={block.title?.trim() ? `article-block-${i + 1}` : undefined}
+                onOpenImg={showWithData}
               />
             ))}
           </div>
+
+          {relatedServices.length > 0 && (
+            <InfoList
+              variant={'custom'}
+              underline={'center-right'}
+              title={`( что делаем )`}
+              className="moreServices"
+              onClick={(index) => {
+                const post = relatedServices[index];
+                const category = post?.categories?.[0];
+                if (!post || !category?.slug) return;
+
+                goTo(`/services/${category.slug}/${post.slug}`, category.name, post.title);
+              }}
+              items={relatedServices.map(({ title }) => [title, ''])}
+            />
+          )}
+
+          <ExampleProjects projects={article?.payload?.related_projects} goTo={goTo} />
 
           <Button.Arrow
             onClick={shareLink}
@@ -160,21 +207,23 @@ export default function FeedArticle({ data }: { data: ArticleData }) {
           </Button.Arrow>
           <Networks />
 
-          <div className="Feed_articles">
-            <div className="Feed_articles-title">{labels.more}</div>
-            <div className="Feed_articles-inner">
-              {relatedArticles.map(({ id, payload, slug: itemSlug }) => (
-                <Article
-                  key={id}
-                  srcImg={payload.cover?.url ?? ''}
-                  date={formatDateToRussian(payload.date)}
-                  title={payload.title}
-                  desc={payload.subtitle}
-                  onClick={() => goTo(`/${slug}/${itemSlug}`, payload.title)}
-                />
-              ))}
+          {relatedArticles?.length > 0 && (
+            <div className="Feed_articles">
+              <div className="Feed_articles-title">{labels.more}</div>
+              <div className="Feed_articles-inner">
+                {relatedArticles.map(({ id, payload, slug: itemSlug }) => (
+                  <Article
+                    key={id}
+                    srcImg={payload.cover?.url ?? ''}
+                    date={formatDateToRussian(payload.date)}
+                    title={payload.title}
+                    desc={payload.subtitle}
+                    onClick={() => goTo(`/${slug}/${itemSlug}`, payload.title)}
+                  />
+                ))}
+              </div>
             </div>
-          </div>
+          )}
         </div>
         <ContactForm />
       </div>
@@ -189,14 +238,9 @@ interface BlockProps {
   isFirstImg?: boolean;
   isLastItem?: boolean;
   className?: string;
-}
-interface BlockProps {
-  title?: string;
-  descriptions?: string[];
-  imgs?: (FeedItem['payload']['cover'] | undefined)[];
-  isFirstImg?: boolean;
-  isLastItem?: boolean;
-  className?: string;
+  anchorLinks?: AnchorLink[];
+  anchorId?: string;
+  onOpenImg?: (values: WithDataMWImage) => void;
 }
 
 export function Block({
@@ -206,10 +250,14 @@ export function Block({
   imgs,
   isFirstImg = false,
   className = '',
+  anchorLinks = [],
+  anchorId,
+  onOpenImg,
 }: BlockProps) {
   const clIsFirst = isFirstImg ? 'isFirstImg' : '';
   const clImgIsSeconds = (imgs?.length || 0) > 1 ? 'imgIsSeconds' : '';
   const clIsLastItem = isLastItem ? 'isLastItem' : '';
+  const imageUrls = imgs?.flatMap((props) => (props?.url ? [props.url] : [])) ?? [];
 
   const _isNoneGlobal = { curr: 0 };
 
@@ -229,32 +277,89 @@ export function Block({
     return null;
   }
 
-  const blocks = [
-    <div key="desc" className={`Block-descriptions ${isNone(descriptions?.length, _isNoneLocal)}`}>
-      {descriptions?.map((description, index, arr) => (
-        <Text
-          key={index}
-          data-last-item={arr.length - 1 <= index}
-          className="Block-description"
-          children={description}
-        />
-      ))}
-    </div>,
-    <div
-      key="imgs"
-      className={`Block_imgs ${isNone(imgs?.length, _isNoneLocal)} ${clImgIsSeconds}`}
-    >
-      {imgs?.map((props, index) =>
-        props?.url ? <img key={index} className="Block_imgs-item" src={props.url} /> : null
-      )}
-    </div>,
-  ];
+  const scrollToAnchor = (id: string) => {
+    const element = document.getElementById(id);
+    if (!element) return;
+
+    const lenis = lenisManager.state.v;
+    if (lenis) {
+      lenis.scrollTo(element, { offset: -150, duration: 1.2 });
+      return;
+    }
+
+    const top = element.getBoundingClientRect().top + window.scrollY - 150;
+    window.scrollTo({ top, behavior: 'smooth' });
+  };
 
   return (
-    <div className={`Block ${clIsFirst} ${clIsLastItem} ${className}`}>
+    <div id={anchorId} className={`Block ${clIsFirst} ${clIsLastItem} ${className}`}>
       <div className="Block-wrapper_title_desc">
-        <div className={`Block-title ${isNone(title, _isNoneGlobal)}`}>{title}</div>
-        <div className="Block-wrapper_desc_imgs">{isFirstImg ? blocks.reverse() : blocks}</div>
+        {title?.trim() ? <div className="Block-title">{title}</div> : null}
+        <div className="Block-wrapper_desc_imgs">
+          {descriptions?.length > 0 && (
+            <div key="desc" className={`Block-descriptions`}>
+              {descriptions?.map((description, index, arr) => (
+                <Text
+                  key={index}
+                  data-last-item={arr.length - 1 <= index}
+                  className="Block-description"
+                  children={description}
+                />
+              ))}
+            </div>
+          )}
+
+          {isFirstImg && anchorLinks.length > 0 && (
+            <div className="anchor_links">
+              <p className="anchor_links-title">Содержание статьи:</p>
+              <div className="anchor_links-block">
+                {anchorLinks.map((link) => (
+                  <div
+                    key={link.id}
+                    className="wrap-button"
+                    onMouseEnter={(e) =>
+                      e.currentTarget
+                        .querySelector<HTMLButtonElement>('.Button')
+                        ?.classList.add('isHover')
+                    }
+                    onMouseLeave={(e) =>
+                      e.currentTarget
+                        .querySelector<HTMLButtonElement>('.Button')
+                        ?.classList.remove('isHover')
+                    }
+                    onClick={(e) => {
+                      const target = e.target as HTMLElement;
+                      if (target.closest('button')) return;
+
+                      e.currentTarget.querySelector<HTMLButtonElement>('.Button')?.click();
+                    }}
+                  >
+                    <Button
+                      variant="link"
+                      underline="center-right"
+                      onClick={() => scrollToAnchor(link.id)}
+                    >
+                      {link.title}
+                    </Button>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {imageUrls.length > 0 && (
+            <div key="imgs" className={`Block_imgs ${clImgIsSeconds}`}>
+              {imageUrls.map((src, index) => (
+                <img
+                  key={index}
+                  className="Block_imgs-item"
+                  src={src}
+                  onClick={() => onOpenImg?.([index, imageUrls])}
+                />
+              ))}
+            </div>
+          )}
+        </div>
       </div>
     </div>
   );
@@ -270,11 +375,11 @@ function Networks() {
             Telegram—канал
           </Button>
         </Link>
-        <Link to={import.meta.env.VITE_TELEGRAM_URL_3} typeLink="external">
+        {/* <Link to={import.meta.env.VITE_TELEGRAM_URL_3} typeLink="external">
           <Button subTitle="Жизнь компании" variant="outline">
             Telegram—live
           </Button>
-        </Link>
+        </Link> */}
         <Link to={import.meta.env.VITE_YOUTUBE_URL} typeLink="external">
           <Button className="addPadd" variant="outline">
             Youtube

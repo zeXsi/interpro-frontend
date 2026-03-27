@@ -3,6 +3,7 @@ import { useLoaderData } from 'react-router';
 
 export default function Cover() {
   const presentationResponse = useLoaderData();
+  const hasProjectSize = Number(presentationResponse?.project_size) > 0;
 
   const renderSpans = (arr?: any[]) => arr?.map((item, index) => <span key={index}>{item}</span>);
 
@@ -14,7 +15,7 @@ export default function Cover() {
         {renderSpans(presentationResponse.tax?.expo)}
         {renderSpans(presentationResponse.tax?.stand_type)}
         
-        {presentationResponse?.project_size && (
+        {hasProjectSize && (
           <span>
             {presentationResponse.project_size} м<sup>2</sup>
           </span>

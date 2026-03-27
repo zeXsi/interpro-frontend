@@ -6,7 +6,7 @@ import Subtitle from 'shared/components/Subtitle';
 export interface ReviewItem {
   company: string;
   text: string;
-  pdfUrl: string;
+  pdfUrl?: string | null;
   personName?: string;
   personPosition?: string;
 }

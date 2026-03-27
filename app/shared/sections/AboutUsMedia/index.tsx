@@ -20,11 +20,11 @@ export default function AboutUsMedia() {
             Telegram—канал
           </Button>
         </Link>
-        <Link to={import.meta.env.VITE_TELEGRAM_URL_3} typeLink="external">
+        {/* <Link to={import.meta.env.VITE_TELEGRAM_URL_3} typeLink="external">
           <Button subTitle="Жизнь компании" variant="outline">
             Telegram—live
           </Button>
-        </Link>
+        </Link> */}
         <Link to={import.meta.env.VITE_YOUTUBE_URL} typeLink="external">
           <Button className="addPadd" variant="outline">
             Youtube

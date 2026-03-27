@@ -10,6 +10,7 @@ interface Props {
   subtitle?: React.ReactNode;
   className?: string;
   variant?: 'paragraph' | 'link' | 'custom';
+  underline?: 'left-right' | 'center-right';
   mode?: 'text' | 'button' | 'text_underline';
   onClick?: (index: number) => void;
   isModeSlug?: boolean;
@@ -20,6 +21,7 @@ export default function InfoList({
   items,
   subtitle = "",
   variant = 'link',
+  underline = 'left-right',
   mode = 'button',
   className = '',
   onClick,
@@ -39,7 +41,7 @@ export default function InfoList({
       : [];
 
     const button = (
-      <Button variant="link" className="InfoList-item" underline="left-right">
+      <Button variant="link" className="InfoList-item" underline={underline}>
         {renderLabel(label)}
       </Button>
     );
