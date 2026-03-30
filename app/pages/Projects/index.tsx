@@ -28,6 +28,7 @@ import { toFilterData, toggleFilter, UserFilter } from 'store/stGlobal';
 import { sgProjects } from 'api/projects/projects.api';
 
 import { getFilters, sgFilters } from 'api/filters';
+import { decodeUnicodeEscapes } from 'shared/utils/decodeUnicodeEscapes';
 
 type ViewMode = 'grid' | 'list';
 export const hoveredProject = signal(-Infinity);
@@ -197,18 +198,19 @@ interface ImgProps {
 
 function Img({ title, cover, id, slug }: ImgProps) {
   const { goTo } = useNavigate();
+  const projectTitle = decodeUnicodeEscapes(title);
 
   const clIsHover = hoveredProject.v == id ? 'isHover' : '';
 
   return (
-    <Link to={`/projects/${slug}`} slug={title}>
+    <Link to={`/projects/${slug}`} slug={projectTitle}>
       <div className={`ProjectCardImg ${clIsHover}`}>
         <img
           onMouseEnter={() => (hoveredProject.v = id)}
           onMouseLeave={() => (hoveredProject.v = -id)}
           src={cover}
-          onClick={() => goTo(`/projects/${slug}`, title)}
-          alt={`Обложка проекта: ${title}`}
+          onClick={() => goTo(`/projects/${slug}`, projectTitle)}
+          alt={`Обложка проекта: ${projectTitle}`}
         />
       </div>
     </Link>

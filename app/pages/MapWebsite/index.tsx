@@ -6,6 +6,7 @@ import { sgProjects } from 'api/projects/projects.api';
 import { sgServiceCategories } from 'api/services/services.api';
 import { sgFeedBlogs, sgFeedNews } from 'api/feed/feed.api';
 import StartPage from 'shared/components/StartPage';
+import { decodeUnicodeEscapes } from 'shared/utils/decodeUnicodeEscapes';
 
 export function meta() {
   const title = 'Interpro: карта сайта';
@@ -52,7 +53,10 @@ export default function MapWebsite() {
             <InfoList
               title="проекты:"
               isModeSlug={true}
-              items={sgProjects.v?.map((item) => [item.payload.title, `/projects/${item.slug}`])}
+              items={sgProjects.v?.map((item) => [
+                decodeUnicodeEscapes(item.payload.title),
+                `/projects/${item.slug}`,
+              ])}
             />
             <InfoList
               title="услуги:"

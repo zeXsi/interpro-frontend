@@ -17,6 +17,7 @@ import { sgProjects } from 'api/projects/projects.api';
 import { signal } from 'shared/utils/_stm';
 import { useSignalValue, useWatch } from 'shared/utils/_stm/react/react';
 import { Project } from 'api/projects/projects.types';
+import { decodeUnicodeEscapes } from 'shared/utils/decodeUnicodeEscapes';
 
 export const hoveredProject = signal(-Infinity);
 
@@ -81,6 +82,7 @@ interface ProjectRef {
 function ProjectItem({ ref, id, slug, title, nameCompany, year, square, imgSrc }: ProjectProps) {
   useSignalValue(hoveredProject);
   const refProject = useRef<HTMLDivElement>(null);
+  const projectTitle = decodeUnicodeEscapes(title);
 
   const clIsHover = hoveredProject.v == id ? 'isHover' : '';
 
@@ -88,13 +90,13 @@ function ProjectItem({ ref, id, slug, title, nameCompany, year, square, imgSrc }
 
   useImperativeHandle(ref, () => ({
     refProject,
-    title,
+    title: projectTitle,
     slug,
   }));
 
   return (
     <div ref={refProject} className="Project">
-      <div className="Project-title">{title}</div>
+      <div className="Project-title">{projectTitle}</div>
       <div className="Project_container">
         <div className="Project_header">
           <IsNot
@@ -110,9 +112,9 @@ function ProjectItem({ ref, id, slug, title, nameCompany, year, square, imgSrc }
           className={`Project_img ${clIsHover}`}
           onMouseEnter={() => hoveredProject.v = id}
           onMouseLeave={() => hoveredProject.v = -id}
-          onClick={() => goTo(`/projects/${slug}`, title)}
+          onClick={() => goTo(`/projects/${slug}`, projectTitle)}
         >
-          <img src={imgSrc} alt={`Проект: ${title}, выставка ${nameCompany}, ${year} год`} />
+          <img src={imgSrc} alt={`Проект: ${projectTitle}, выставка ${nameCompany}, ${year} год`} />
         </div>
       </div>
     </div>
@@ -206,6 +208,7 @@ interface Props {
 function ButtonWrap({ slug, id, title }: Props) {
   useSignalValue(hoveredProject);
   const refButton = useRef<HTMLButtonElement | null>(null);
+  const projectTitle = decodeUnicodeEscapes(title);
 
   const { goTo } = useNavigate();
 
@@ -228,14 +231,14 @@ function ButtonWrap({ slug, id, title }: Props) {
       underline="left-right"
       className={`Project-title-button`}
       onClick={() => {
-        goTo(`/projects/${slug}`, title);
+        goTo(`/projects/${slug}`, projectTitle);
       }}
       isHover={id === hoveredProject.v}
       onMouseEnter={() => hoveredProject.v = id}
       onMouseLeave={() => hoveredProject.v = -id}
       ref={refButton}
     >
-      {title}
+      {projectTitle}
     </Button>
   );
 }

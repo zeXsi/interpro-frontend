@@ -24,6 +24,7 @@ export interface ProjectCardProps {
 }
 
 export default function ProjectCard(props: ProjectCardProps) {
+  const projectTitle = decodeUnicodeEscapes(props.title);
 
   const refButton = useRef<HTMLButtonElement | null>(null);
   useWatch(() => { 
@@ -42,8 +43,8 @@ export default function ProjectCard(props: ProjectCardProps) {
 
   return (
     <div className="ProjectCard">
-      <div className="ProjectCard-title_" data-title={props.title}>
-        <Link to={`/projects/${props.slug}`} slug={[props?.title]}>
+      <div className="ProjectCard-title_" data-title={projectTitle}>
+        <Link to={`/projects/${props.slug}`} slug={[projectTitle]}>
           <Button
             variant="link"
             underline="left-right"
@@ -54,7 +55,7 @@ export default function ProjectCard(props: ProjectCardProps) {
             onMouseLeave={() => hoveredProject.v = -props.id}
             ref={refButton}
           >
-            {decodeUnicodeEscapes(props.title)}
+            {projectTitle}
           </Button>
         </Link>
       </div>
@@ -86,15 +87,15 @@ export default function ProjectCard(props: ProjectCardProps) {
           children={<Tag className="__year" subTitle="Год" title={props.year} />}
         />
       </div>
-      <Link to={`/projects/${props.slug}`} slug={[props?.title]}>
+      <Link to={`/projects/${props.slug}`} slug={[projectTitle]}>
         <div className="ProjectCard-img">
           <img
             src={props.image}
-            alt={`Проект: ${props.title}, выставка ${props.nameExhibition}, ${props.year} год`}
+            alt={`Проект: ${projectTitle}, выставка ${props.nameExhibition}, ${props.year} год`}
           />
         </div>
       </Link>
-      <Link to={`/projects/${props.slug}`} slug={[props?.title]}>
+      <Link to={`/projects/${props.slug}`} slug={[projectTitle]}>
         <Button className="ProjectCard-btn" variant="ghostLink">
           Смотреть проект
         </Button>
