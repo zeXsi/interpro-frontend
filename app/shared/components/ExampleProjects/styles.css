@@ -118,6 +118,10 @@
         letter-spacing: -0.04em;
         color: #000;
       }
+
+      img {
+        height: clamp(25.875rem, calc(17.417rem + 17.622vw), 38.563rem); /* min: 414px, max: 617px */
+      }
     }
   }
 }
@@ -168,6 +172,10 @@
         .title-project {
           font-size: clamp(1.125rem, calc(0.767rem + 1.527vw), 1.5rem); /* min: 18px, max: 24px */
           line-height: 110%;
+        }
+
+        img {
+          height: clamp(12.625rem, calc(-0.018rem + 53.944vw), 25.875rem); /* min: 202px, max: 414px */
         }
       }
     }

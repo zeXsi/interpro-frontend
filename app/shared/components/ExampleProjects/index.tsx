@@ -42,7 +42,9 @@ export default function ExampleProjects({ projects = [], goTo }: ExampleProjects
         >
           {projects.map((item) => (
             <SwiperSlide key={item.id} onClick={() => goTo(`/projects/${item.slug}`, item.name)}>
-              {item.name && <p className="title-project">{item.name}</p>}
+              {item.name && (
+                <p className="title-project">{item.name.replace(/\u00AD/g, '')}</p>
+              )}
               {item.full_image?.url && (
                 <img src={item.full_image.url} alt={`Проект ${item.name}`} />
               )}
