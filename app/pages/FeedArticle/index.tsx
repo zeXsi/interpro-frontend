@@ -75,11 +75,9 @@ export async function _loader(_url: string): Promise<ArticleData> {
 }
 
 export function _meta(data: ArticleData) {
-  const titleSegment = data.slug === 'blog' ? 'блог' : 'новости';
-  const subtitle = data.article?.payload?.subtitle ?? 'описание статьи';
-
-  const title = `Interpro: ${titleSegment}`;
-  const description = subtitle;
+  const title = `Interpro: ${data.article?.payload?.title ?? ''}`;
+  const description =
+    data.slug === 'blog' ? 'Читайте статью на нашем сайте' : 'Читайте новость на нашем сайте';
 
   return [
     { title },
