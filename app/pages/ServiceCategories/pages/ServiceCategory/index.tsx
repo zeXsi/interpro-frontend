@@ -16,10 +16,11 @@ import { Route } from './+types';
 import Accordion from 'shared/components/Accordion';
 import CrossIcon from 'assets/icons/cross.svg?react';
 import { Swiper, SwiperSlide } from 'swiper/react';
-import { Navigation, Pagination } from 'swiper/modules';
+import { Navigation } from 'swiper/modules';
 import DocOverview from 'shared/sections/DocOverview';
 import MarqueeCarousel from 'shared/components/MarqueeCarousel';
 import ArrowIcon from 'assets/icons/arrow.svg?react';
+import ExampleProjects from 'shared/components/ExampleProjects';
 
 import svgCompanies from 'assets/companies';
 import FAQSection from 'shared/sections/FAQSection';
@@ -97,7 +98,9 @@ export default function ServiceCategoryPage({ loaderData: data, params }: Route.
         {data?.payload?.posts?.length > 0 && (
           <InfoList
             variant={'custom'}
+            underline={'center-right'}
             title={`( что делаем )`}
+            className='moreServices'
             onClick={(index) => {
               const post = data?.payload?.posts[index];
               if (!post) return;
@@ -166,52 +169,7 @@ export default function ServiceCategoryPage({ loaderData: data, params }: Route.
         )}
       </div>
 
-      {(data?.payload.projects?.length ?? 0) > 0 && (
-        <div className="wrap-example-project px">
-          <p className="head-title-project">
-            Примеры <br /> выполненных работ
-          </p>
-          <div className="wrap-slider">
-            <Swiper
-              slidesPerView="auto"
-              spaceBetween={64}
-              pagination={{
-                el: '.wrap-slider .wrap-dots',
-                clickable: true,
-              }}
-              navigation={{
-                prevEl: '.swiper-btn-prev',
-                nextEl: '.swiper-btn-next',
-              }}
-              modules={[Pagination, Navigation]}
-              className="Project__swiper"
-            >
-              {data?.payload.projects?.map((item) => (
-                <SwiperSlide
-                  key={item.id}
-                  onClick={() => goTo(`/projects/${item.slug}`, item.name)}
-                >
-                  {item.name && <p className="title-project">{item.name}</p>}
-                  {item.full_image?.url && (
-                    <img src={item.full_image?.url} alt={`Проект ${item.name}`} />
-                  )}
-                </SwiperSlide>
-              ))}
-            </Swiper>
-            {(data?.payload.projects?.length ?? 0) > 1 && (
-              <>
-                <div className="wrap-dots"></div>
-                <div className="swiper-btn-prev">
-                  <ArrowIcon />
-                </div>
-                <div className="swiper-btn-next">
-                  <ArrowIcon />
-                </div>
-              </>
-            )}
-          </div>
-        </div>
-      )}
+      <ExampleProjects projects={data?.payload.projects} goTo={goTo} />
 
       {(data?.payload.reviews?.length ?? 0) > 0 && (
         <DocOverview

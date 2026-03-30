@@ -33,6 +33,9 @@ interface TemplateProps {
   tags: string[];
 }
 function Template({ title, tags, link }: TemplateProps) {
+  const visibleTags =
+    tags.length > 5 ? [...tags.slice(0, 4), 'и другие'] : tags.slice(0, 5);
+
   return (
     <div className="Template px">
       <div className="">
@@ -41,7 +44,7 @@ function Template({ title, tags, link }: TemplateProps) {
             {title}
           </div>
           <div className="Template_tags" data-nosnippet>
-            {tags.map((tag, index) => (
+            {visibleTags.map((tag, index) => (
               <Button key={index} variant="outline">
                 {tag}
               </Button>

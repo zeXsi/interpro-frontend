@@ -117,6 +117,35 @@ export interface FeedItem {
       count: number;
       tags: any[];
     }[];
+    related_services?: {
+      id: number;
+      title: string;
+      slug: string;
+      categories: {
+        id: number;
+        slug: string;
+        name: string;
+        parent: number;
+        description: string;
+        cover: {
+          id: number;
+          url: string;
+          width: number;
+          height: number;
+          alt: string;
+          caption: string;
+          mime: string;
+        } | null;
+        order: number;
+        count: number;
+        tags: any[];
+      }[];
+    }[];
+    related_projects?: {
+      id: number;
+      title: string;
+      slug: string;
+    }[];
   };
   _links: {
     self: {

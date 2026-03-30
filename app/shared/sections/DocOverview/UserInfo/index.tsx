@@ -9,13 +9,14 @@ interface UserInfoProps {
   userStatus: string;
   docDescription: string;
   docName: string;
-  docLink: string;
+  docLink?: string | null;
 }
 
 
 
 export default function UserInfo(props: UserInfoProps) {
-  const fileParts = props.docLink.split('?')[0].split('#')[0].split('.');
+  const normalizedDocLink = typeof props.docLink === 'string' ? props.docLink : '';
+  const fileParts = normalizedDocLink.split('?')[0].split('#')[0].split('.');
   const lastPart = fileParts.pop() ?? ''; // защита от undefined
   const ext = lastPart.trim().toLowerCase();
   const fileExtension: string | false = ext ? `.${ext}` : false;
@@ -27,10 +28,10 @@ export default function UserInfo(props: UserInfoProps) {
         <Text className='UserInfo_description'>
           { props.docDescription }
         </Text>
-        {props?.docLink && fileExtension ? (
+        {normalizedDocLink && fileExtension ? (
           <div className="UserInfo_footer">
             <span>Благодарственное письмо:</span>
-            <a href={props?.docLink} rel="noopener noreferrer nofollow" target="_blank">
+            <a href={normalizedDocLink} rel="noopener noreferrer nofollow" target="_blank">
               <Button variant="ghostLink">{`${props.docName}${fileExtension}`}</Button>
             </a>
           </div>

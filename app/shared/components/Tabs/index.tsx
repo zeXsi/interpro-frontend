@@ -71,9 +71,9 @@ export default function Tabs({ children, startTrigger, className = '' }: PropsTa
           modules={[Mousewheel]}
           mousewheel={{
             invert: false,
-            forceToAxis: true,
-            thresholdDelta: 2000,
-            releaseOnEdges: false, 
+            forceToAxis: false,
+            thresholdDelta: 10,
+            releaseOnEdges: true,
           }}
    
  
@@ -90,8 +90,8 @@ export default function Tabs({ children, startTrigger, className = '' }: PropsTa
             },
             1920: {
               spaceBetween: 78,
-              slidesOffsetAfter: 40,
-              slidesOffsetBefore: 40
+              slidesOffsetAfter: 0,
+              slidesOffsetBefore: 0
             },
           } }
         >

@@ -10,6 +10,7 @@ export default function PresentationHeader() {
   const discussLink = contactFields?.ct_tg || contactFields?.ct_wa || import.meta.env.VITE_EMAIL;
 
   const renderSpans = (arr?: any[]) => arr?.map((item, index) => <span key={index}>{item}</span>);
+  const hasProjectSize = Number(presentationResponse?.project_size) > 0;
 
   const pdfHref = name ? `/presentation/${name}/pdf` : '#';
 
@@ -19,7 +20,7 @@ export default function PresentationHeader() {
         <ul className="PresentationHeader__list">
           <li className="PresentationHeader__item">
             {presentationResponse.title && (
-              <div className="PresentationHeader__item-box">
+              <a href="/" className="PresentationHeader__item-box">
                 INTER PRO{' '}
                 <svg
                   width="10"
@@ -34,19 +35,24 @@ export default function PresentationHeader() {
                   />
                 </svg>
                 {presentationResponse.title}
+              </a>
+            )}
+            {(presentationResponse.tax?.year ||
+              presentationResponse.tax?.expo ||
+              presentationResponse.tax?.stand_type ||
+              hasProjectSize) && (
+              <div className="PresentationHeader__item-box">
+                {renderSpans(presentationResponse.tax?.year)}
+                {renderSpans(presentationResponse.tax?.expo)}
+                {renderSpans(presentationResponse.tax?.stand_type)}
+
+                {hasProjectSize && (
+                  <span>
+                    {presentationResponse.project_size} м<sup>2</sup>
+                  </span>
+                )}
               </div>
             )}
-            <div className="PresentationHeader__item-box">
-              {renderSpans(presentationResponse.tax?.year)}
-              {renderSpans(presentationResponse.tax?.expo)}
-              {renderSpans(presentationResponse.tax?.stand_type)}
-
-              {presentationResponse?.project_size && (
-                <span>
-                  {presentationResponse.project_size} м<sup>2</sup>
-                </span>
-              )}
-            </div>
           </li>
           <li className="PresentationHeader__item">
             <a href={pdfHref} target="_blank" rel="noopener noreferrer">
