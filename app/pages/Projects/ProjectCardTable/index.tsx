@@ -5,13 +5,16 @@ import { ProjectCardProps } from '../ProjectCard';
 
 import Text from 'shared/components/Text';
 import Link from 'shared/components/Link';
+import { decodeUnicodeEscapes } from 'shared/utils/decodeUnicodeEscapes';
 
 export default function ProjectCardTable(props: ProjectCardProps) {
+  const projectTitle = decodeUnicodeEscapes(props.title);
+
   return (
-    <Link to={`/projects/${props.slug}`} slug={[props?.title]}>
+    <Link to={`/projects/${props.slug}`} slug={[projectTitle]}>
       <div className="ProjectCardTable">
         <div className="ProjectCardTable_head">
-          <span className="ProjectCardTable_head-title">{props.title}</span>
+          <span className="ProjectCardTable_head-title">{projectTitle}</span>
           <ArrowSvg className="ProjectCardTable_head-svg" />
         </div>
         {(props.nameExhibition && props.year) ?? (

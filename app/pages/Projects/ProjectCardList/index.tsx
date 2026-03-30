@@ -4,6 +4,7 @@ import Text from 'shared/components/Text';
 import './styles.css';
 import IsNot from 'shared/components/IsNot';
 import Link from 'shared/components/Link';
+import { decodeUnicodeEscapes } from 'shared/utils/decodeUnicodeEscapes';
 
 interface Props {
   title: string;
@@ -19,10 +20,12 @@ interface Props {
 }
 
 export default function ProjectCardList(props: Props) {
+  const projectTitle = decodeUnicodeEscapes(props.title);
+
   return (
-    <Link to={`/projects/${props.slug}`} slug={[props?.title]}>
+    <Link to={`/projects/${props.slug}`} slug={[projectTitle]}>
       <div className="ProjectCardList">
-        <div className="ProjectCardList-title">{props.title}</div>
+        <div className="ProjectCardList-title">{projectTitle}</div>
         <IsNot
           value={props.nameExhibition}
           children={

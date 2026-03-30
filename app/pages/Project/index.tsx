@@ -21,6 +21,7 @@ import { Route } from './+types';
 import { getProjectsById } from 'api/projects/projects.api';
 import { Project } from 'api/projects/projects.types';
 import StartPage from 'shared/components/StartPage';
+import { decodeUnicodeEscapes } from 'shared/utils/decodeUnicodeEscapes';
 
 export async function clientLoader({ params }: Route.LoaderArgs) {
   const project = await getProjectsById({ id: params.slug });
@@ -50,13 +51,15 @@ export function meta({ data }: Route.MetaArgs) {
 export default function ProjectPage({ loaderData: data, params }: Route.ComponentProps) {
   const { setCrumbs } = useNavigate();
   const { Popup, showWithData } = useMWImage();
+  const projectTitle = decodeUnicodeEscapes(data?.payload?.title);
+  const nextProjectTitle = decodeUnicodeEscapes(data?.nextItem?.title);
 
   useLayoutEffect(() => {
     try {
       const path = `/projects/${params.slug}`;
-      setCrumbs(path, data!.payload?.title);
+      setCrumbs(path, projectTitle);
     } catch (error) {}
-  }, []);
+  }, [params.slug, projectTitle, setCrumbs]);
 
   const allImages = useMemo(() => {
     return [
@@ -83,7 +86,7 @@ export default function ProjectPage({ loaderData: data, params }: Route.Componen
       <div className="ProjectPage">
         <Popup />
         {/* <link rel="canonical" href={window.location.href} /> */}
-        <h1 className="ProjectPage_title px">{data?.payload?.title}</h1>
+        <h1 className="ProjectPage_title px">{projectTitle}</h1>
 
         <TagsDesktop
           year={data?.payload?.meta?.year?.name ?? ''}
@@ -149,9 +152,9 @@ export default function ProjectPage({ loaderData: data, params }: Route.Componen
 
         <div className="__nextItem">
           <Subtitle>(Следующий проект)</Subtitle>
-          <Link to={`/projects/${data?.nextItem?.slug}`} slug={[data?.nextItem?.title!]}>
+          <Link to={`/projects/${data?.nextItem?.slug}`} slug={[nextProjectTitle]}>
             <Button.Arrow variant="link" direction="right">
-              {data?.nextItem?.title}
+              {nextProjectTitle}
             </Button.Arrow>
           </Link>
         </div>
