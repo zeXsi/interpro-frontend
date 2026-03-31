@@ -1,7 +1,7 @@
 .Popup {
   &.overlay {
     width: 100vw;
-    height: 100vh;
+    height: 100svh;
     z-index: 900;
     position: fixed;
     inset: 0;

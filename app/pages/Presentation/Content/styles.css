@@ -1,5 +1,5 @@
 .Content {
-  height: 100vh;
+  height: 100svh;
   display: grid;
   grid-template-columns: repeat(6, 1fr);
   align-items: center;

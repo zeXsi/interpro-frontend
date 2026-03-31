@@ -366,12 +366,12 @@
       &.imgIsSeconds {
         grid-template-columns: 1fr 1fr;
         .Block_imgs-item {
-          height: min(55.556vh, 600px);
+          height: min(55.556svh, 600px);
           @media (max-width: 768px) {
-            height: min(39.258vh, 600px);
+            height: min(39.258svh, 600px);
           }
           @media (max-width: 500px) {
-            height: min(24.138vh, 600px);
+            height: min(24.138svh, 600px);
           }
         }
         @media (max-width: 500px) {
@@ -382,13 +382,13 @@
       &:not(&.imgIsSeconds) {
         grid-template-columns: 1fr;
         .Block_imgs-item {
-          height: min(55.556vh, 600px);
+          height: min(55.556svh, 600px);
 
           @media (max-width: 768px) {
-            height: min(39.258vh, 600px);
+            height: min(39.258svh, 600px);
           }
           @media (max-width: 500px) {
-            height: min(24.138vh, 600px);
+            height: min(24.138svh, 600px);
           }
         }
       }

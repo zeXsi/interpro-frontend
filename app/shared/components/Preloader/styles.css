@@ -27,7 +27,7 @@
     align-items: center;
 
     span {
-      transform: translateY(10vh);
+      transform: translateY(10svh);
     }
   }
 }

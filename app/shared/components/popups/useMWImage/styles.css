@@ -71,7 +71,7 @@
     position: relative;
     margin-right: auto;
     margin-left: auto;
-    height: 100vh;
+    height: 100svh;
     width: 100vw;
     img {
       width: 100%;
@@ -90,11 +90,11 @@
     }
 
     @media (max-width: 1440px) {
-      /* height: 62.5vh; */
+      /* height: 62.5svh; */
     }
     @media (max-width: 768px) {
       width: 100vw;
-      /* height: 42.188vh; */
+      /* height: 42.188svh; */
     }
   }
 

@@ -1,5 +1,5 @@
 .Video {
-  height: 100vh;
+  height: 100svh;
 
   .Video__print-link {
     display: none;

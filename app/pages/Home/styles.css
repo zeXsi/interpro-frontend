@@ -6,12 +6,12 @@
   .Home-title.hidden {
     position: absolute;
     left: -100%;
-    bottom: -100%;;
+    bottom: -100%;
     inset: 0;
   }
   .motion-main {
     z-index: 2;
-    margin-top: 100vh;
+    margin-top: 100svh;
     max-width: 100%;
     display: flex;
     flex-direction: column;
@@ -35,11 +35,11 @@
   }
 
   .MediaSection.SECTION_1 {
-    margin-bottom: clamp(2rem, calc(1.333rem + 1.389vw), 3rem); 
+    margin-bottom: clamp(2rem, calc(1.333rem + 1.389vw), 3rem);
     /* min: 32px, max: 48px */
     /* viewPort: 768-1920 */
     @media (max-width: 768px) {
-      margin-bottom: clamp(1.5rem, calc(1.023rem + 2.036vw), 2rem); 
+      margin-bottom: clamp(1.5rem, calc(1.023rem + 2.036vw), 2rem);
       /* min: 24px, max: 32px */
       /* viewPort: 375-768 */
     }
@@ -63,10 +63,10 @@
   .ContactForm,
   .DocOverview,
   .AboutUsMedia {
-    margin-top:clamp(7.75rem, calc(4.583rem + 6.597vw), 12.5rem); 
+    margin-top: clamp(7.75rem, calc(4.583rem + 6.597vw), 12.5rem);
     /* min: 124px, max: 200px */ /* viewPort: 768-1920 */
     @media (max-width: 768px) {
-      margin-top: clamp(6rem, calc(4.33rem + 7.125vw), 7.75rem); 
+      margin-top: clamp(6rem, calc(4.33rem + 7.125vw), 7.75rem);
       /* min: 96px, max: 124px */ /* viewPort: 375-768 */
     }
   }

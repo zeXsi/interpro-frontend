@@ -243,7 +243,7 @@
 
     &:not(&.isSecondImgs) {
       grid-template-columns: 1fr;
-      max-height: 80vh;
+      max-height: 80svh;
       height: clamp(25.813rem, calc(-0.146rem + 54.08vw), 64.75rem);
       /* min: 413px, max: 1036px */
       /* viewPort: 768-1920 */
@@ -257,7 +257,7 @@
       /* pointer-events: none; */
       height: 100%;
       overflow: hidden;
-      max-height: 80vh;
+      max-height: 80svh;
       cursor: pointer;
       img {
         width: 100%;

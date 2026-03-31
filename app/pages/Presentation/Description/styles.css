@@ -1,5 +1,5 @@
 .About {
-  min-height: 100vh;
+  min-height: 100svh;
   padding: 0 2.5rem;
   display: flex;
   flex-direction: column;
