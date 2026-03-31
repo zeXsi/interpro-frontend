@@ -7,7 +7,7 @@
 .Popup {
   position: fixed;
   max-width: 100vw;
-  height: 100svh;
+  height: 100vh;
   z-index: 9999;
   inset: 0;
 
