@@ -3,3 +3,7 @@ build
 node_modules
 README.md
 .vscode
+.git
+.gitignore
+*.log
+.DS_Store

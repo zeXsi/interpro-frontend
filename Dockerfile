@@ -1,28 +1,22 @@
-FROM node:22-bookworm-slim AS development-dependencies-env
-COPY . /app
+FROM node:22-bookworm-slim AS deps
 WORKDIR /app
-ENV PLAYWRIGHT_BROWSERS_PATH=0
+ENV PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD=1
+COPY package.json package-lock.json ./
 RUN npm ci --legacy-peer-deps
 
-FROM node:22-bookworm-slim AS production-dependencies-env
-COPY ./package.json package-lock.json /app/
-WORKDIR /app
-ENV PLAYWRIGHT_BROWSERS_PATH=0
-RUN npm ci --omit=dev --legacy-peer-deps
-
-FROM node:22-bookworm-slim AS build-env
-COPY . /app/
-COPY --from=development-dependencies-env /app/node_modules /app/node_modules
-WORKDIR /app
+FROM deps AS build
+COPY . .
 RUN npm run build
+RUN npm prune --omit=dev
 
-FROM node:22-bookworm-slim
-COPY ./package.json package-lock.json /app/
-COPY --from=production-dependencies-env /app/node_modules /app/node_modules
-COPY --from=build-env /app/build /app/build
+FROM node:22-bookworm-slim AS runtime
 WORKDIR /app
-ENV PLAYWRIGHT_BROWSERS_PATH=0
+ENV NODE_ENV=production
+ENV PORT=5027
+ENV PLAYWRIGHT_BROWSERS_PATH=/ms-playwright
+COPY package.json package-lock.json ./
+COPY --from=build /app/node_modules ./node_modules
+COPY --from=build /app/build ./build
 RUN npx playwright install --with-deps chromium
 EXPOSE 5027
-ENV PORT=5027
 CMD ["npm", "run", "start"]

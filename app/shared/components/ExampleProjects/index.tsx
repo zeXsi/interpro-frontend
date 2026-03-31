@@ -25,7 +25,7 @@ export default function ExampleProjects({ projects = [], goTo }: ExampleProjects
   return (
     <div className="wrap-example-project px">
       <p className="head-title-project">
-        РџСЂРёРјРµСЂС‹ <br /> РІС‹РїРѕР»РЅРµРЅРЅС‹С… СЂР°Р±РѕС‚
+        Примеры <br /> выполненных работ
       </p>
       <div className="wrap-slider">
         <Swiper
@@ -49,7 +49,10 @@ export default function ExampleProjects({ projects = [], goTo }: ExampleProjects
               <SwiperSlide key={item.id} onClick={() => goTo(`/projects/${item.slug}`, projectName)}>
                 {projectName && <p className="title-project">{projectName}</p>}
                 {item.full_image?.url && (
-                  <img src={item.full_image.url} alt={`РџСЂРѕРµРєС‚ ${projectName}`} />
+                  <img
+                    src={item.full_image.url}
+                    alt={projectName ? `Проект ${projectName}` : 'Проект'}
+                  />
                 )}
               </SwiperSlide>
             );

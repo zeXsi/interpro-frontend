@@ -302,6 +302,7 @@ export function Block({
                   key={index}
                   data-last-item={arr.length - 1 <= index}
                   className="Block-description"
+                  isReplace
                   children={description}
                 />
               ))}
