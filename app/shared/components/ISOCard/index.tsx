@@ -18,7 +18,7 @@ export default function ISOCard({ title, namePdf, urlPdf, urlImg }: ISOCardProps
         <Tag link={ urlPdf } title={ namePdf } subTitle={ 'Скачать:' } className='subtitle' />
       </div>
       <div className="ISOCard_img">
-        <img src={ urlImg } onClick={ () => showWithData(urlImg)}/>
+        <img src={ urlImg } onClick={ () => showWithData([0, [urlImg]])}/>
       </div>
     </div>
   );

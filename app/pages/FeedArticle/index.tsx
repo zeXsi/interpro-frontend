@@ -256,6 +256,7 @@ export function Block({
   const clImgIsSeconds = (imgs?.length || 0) > 1 ? 'imgIsSeconds' : '';
   const clIsLastItem = isLastItem ? 'isLastItem' : '';
   const imageUrls = imgs?.flatMap((props) => (props?.url ? [props.url] : [])) ?? [];
+  const hasDescriptions = (descriptions?.length ?? 0) > 0;
 
   const _isNoneGlobal = { curr: 0 };
 
@@ -294,13 +295,14 @@ export function Block({
       <div className="Block-wrapper_title_desc">
         {title?.trim() ? <div className="Block-title">{title}</div> : null}
         <div className="Block-wrapper_desc_imgs">
-          {descriptions?.length > 0 && (
+          {hasDescriptions && (
             <div key="desc" className={`Block-descriptions`}>
               {descriptions?.map((description, index, arr) => (
                 <Text
                   key={index}
                   data-last-item={arr.length - 1 <= index}
                   className="Block-description"
+                  isReplace
                   children={description}
                 />
               ))}

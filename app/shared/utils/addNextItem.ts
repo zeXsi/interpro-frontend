@@ -1,5 +1,5 @@
-import type { Project } from './api/projects/projects.types';
-import type { ServiceCategory } from './api/services/services.types';
+import type { Project } from 'api/projects/projects.types';
+import type { ServiceCategory } from 'api/services/services.types';
 
 type Obj = {
   slug: string,

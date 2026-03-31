@@ -25,7 +25,7 @@
   }
 
   .ServiceCategoryPage-img {
-    height: 95.926vh;
+    height: 95.926svh;
     width: 100%;
     margin: clamp(4rem, calc(2.667rem + 2.778vw), 6rem) 0;
     /* min: 64px, max: 96px */ /* viewPort: 768-1920 */
@@ -35,10 +35,10 @@
       object-fit: cover;
     }
     @media (max-width: 768px) {
-      height: 39.258vh;
+      height: 39.258svh;
     }
     @media (max-width: 500px) {
-      height: 24.138vh;
+      height: 24.138svh;
     }
   }
 

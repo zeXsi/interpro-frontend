@@ -107,7 +107,7 @@ export default function usePopup<T = any, TImp extends object = any>(delay: numb
         isShowed?: boolean;
         Popup: React.FC<TProps>;
       } & TExtensions,
-      deps: React.DependencyList[] = []
+      deps: React.DependencyList = []
     ) {
       return useMemo(
         () => ({

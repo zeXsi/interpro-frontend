@@ -7,7 +7,8 @@ import { decodeUnicodeEscapes } from 'shared/utils/decodeUnicodeEscapes';
 type ProjectItem = {
   id: number;
   slug: string;
-  name: string;
+  name?: string;
+  title?: string;
   full_image?: { url: string } | null;
 };
 
@@ -42,15 +43,18 @@ export default function ExampleProjects({ projects = [], goTo }: ExampleProjects
           className="Project__swiper"
         >
           {projects.map((item) => {
-            const projectName = decodeUnicodeEscapes(item.name);
+            const projectName = decodeUnicodeEscapes(item.name ?? item.title ?? '');
 
             return (
-            <SwiperSlide key={item.id} onClick={() => goTo(`/projects/${item.slug}`, projectName)}>
-              {projectName && <p className="title-project">{projectName}</p>}
-              {item.full_image?.url && (
-                <img src={item.full_image.url} alt={`Проект ${projectName}`} />
-              )}
-            </SwiperSlide>
+              <SwiperSlide key={item.id} onClick={() => goTo(`/projects/${item.slug}`, projectName)}>
+                {projectName && <p className="title-project">{projectName}</p>}
+                {item.full_image?.url && (
+                  <img
+                    src={item.full_image.url}
+                    alt={projectName ? `Проект ${projectName}` : 'Проект'}
+                  />
+                )}
+              </SwiperSlide>
             );
           })}
         </Swiper>

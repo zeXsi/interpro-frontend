@@ -15,6 +15,8 @@ export const sgIsHide = signal<StPreloader['isHide']>(false);
 export const sgPercent = signal<StPreloader['percent']>(0);
 export const sgDelayPercent = signal<StPreloader['delayPercent']>(10);
 
+const PRELOADER_MAX_DURATION = 5000;
+
 /* =============== API =============== */
 
 export const toHidePreloader = () => {
@@ -46,9 +48,23 @@ export const usePreloader = (mediaUrls: string[] = []) => {
   const props = useHidePreloader();
 
   useEffect(() => {
+    sgPercent.v = 0;
     window.scrollTo(0, 0);
-    document.documentElement.style.overflow = 'hidden';
+
     let interval: NodeJS.Timeout;
+    let maxDurationTimeout: NodeJS.Timeout;
+    let isFinished = false;
+
+    const finishPreloader = () => {
+      if (isFinished) return;
+      isFinished = true;
+
+      sgPercent.v = 100;
+      if (interval) clearInterval(interval);
+      if (maxDurationTimeout) clearTimeout(maxDurationTimeout);
+
+      toHidePreloader();
+    };
 
     const images = document.querySelectorAll('img');
     const videos = document.querySelectorAll('video');
@@ -56,11 +72,10 @@ export const usePreloader = (mediaUrls: string[] = []) => {
       .map((el) => (el as HTMLImageElement | HTMLVideoElement).src)
       .filter(Boolean);
 
-    const mediaToLoad = [...new Set([...mediaUrls, ...allMedia])];
+    const mediaToLoad = mediaUrls.length ? [...new Set(mediaUrls)] : [...new Set(allMedia)];
 
     if (!mediaToLoad.length) {
-      toHidePreloader();
-      document.documentElement.style.overflow = '';
+      finishPreloader();
       return;
     }
 
@@ -82,23 +97,25 @@ export const usePreloader = (mediaUrls: string[] = []) => {
     );
 
     Promise.all(loadPromises).then(() => {
+      if (isFinished) return;
+
       interval = setInterval(() => {
         const next = sgPercent.v + 2;
         if (next >= 100) {
-          sgPercent.v = 100;
-          clearInterval(interval!);
-          toHidePreloader();
-          setTimeout(() => {
-            document.documentElement.style.overflow = '';
-          }, 1000);
+          finishPreloader();
         } else {
           sgPercent.v = next;
         }
       }, delayPercent);
     });
 
+    maxDurationTimeout = setTimeout(() => {
+      finishPreloader();
+    }, PRELOADER_MAX_DURATION);
+
     return () => {
       if (interval) clearInterval(interval);
+      if (maxDurationTimeout) clearTimeout(maxDurationTimeout);
     };
   }, [...mediaUrls, delayPercent]);
 

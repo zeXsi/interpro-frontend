@@ -10,27 +10,124 @@ export function getElementPositionPercent(el: HTMLElement, step = 0): number {
 }
 
 interface Props {
-  PreElement: React.ElementType;
-  Element: React.ElementType;
+  PreElement: React.ComponentType;
+  Element: React.ComponentType;
 }
+
+interface RevealProps {
+  children: React.ReactNode;
+  className?: string;
+  animationKey?: string;
+  initialOffset?: number;
+  factor?: number;
+}
+
 const smooth = (current: number, target: number, factor = 0.1) =>
   current + (target - current) * factor;
+
+export function ParallaxReveal({
+  children,
+  className = '',
+  animationKey,
+  initialOffset = 1,
+  factor = 0.12,
+}: RevealProps) {
+  const refReveal = useRef<HTMLDivElement>(null);
+  const refPrevPercent = useRef(initialOffset);
+  const refTargetPercent = useRef(0);
+  const refAnimationFrame = useRef<number | null>(null);
+
+  const animateReveal = () => {
+    const reveal = refReveal.current;
+    if (!reveal) {
+      refAnimationFrame.current = null;
+      return;
+    }
+
+    const nextPercent = smooth(refPrevPercent.current, refTargetPercent.current, factor);
+    refPrevPercent.current = nextPercent;
+    reveal.style.transform = `translate3d(0, ${nextPercent * 100}%, 0)`;
+
+    if (Math.abs(nextPercent - refTargetPercent.current) < 0.001) {
+      refPrevPercent.current = refTargetPercent.current;
+      reveal.style.transform = `translate3d(0, ${refTargetPercent.current * 100}%, 0)`;
+      refAnimationFrame.current = null;
+      return;
+    }
+
+    refAnimationFrame.current = requestAnimationFrame(animateReveal);
+  };
+
+  useEffect(() => {
+    const reveal = refReveal.current;
+    if (!reveal) return;
+
+    if (refAnimationFrame.current != null) {
+      cancelAnimationFrame(refAnimationFrame.current);
+    }
+
+    refPrevPercent.current = initialOffset;
+    refTargetPercent.current = 0;
+    reveal.style.transform = `translate3d(0, ${initialOffset * 100}%, 0)`;
+    refAnimationFrame.current = requestAnimationFrame(animateReveal);
+
+    return () => {
+      if (refAnimationFrame.current != null) {
+        cancelAnimationFrame(refAnimationFrame.current);
+        refAnimationFrame.current = null;
+      }
+    };
+  }, [animationKey, initialOffset, factor]);
+
+  return (
+    <div className={`ParallaxReveal ${className}`}>
+      <div className="ParallaxReveal-origin" ref={refReveal}>
+        {children}
+      </div>
+    </div>
+  );
+}
 
 export default function ParallaxFooter({ PreElement, Element }: Props) {
   const refPreFooter = useRef<HTMLDivElement>(null);
   const refFooter = useRef<HTMLDivElement>(null);
   const refFakeFooter = useRef<HTMLDivElement>(null);
-  const refPrevPercent = useRef(0)
+  const refPrevPercent = useRef(0);
+  const refTargetPercent = useRef(0);
+  const refAnimationFrame = useRef<number | null>(null);
+
+  const animateFooter = () => {
+    const footer = refFooter.current;
+    if (!footer) {
+      refAnimationFrame.current = null;
+      return;
+    }
+
+    const nextPercent = smooth(refPrevPercent.current, refTargetPercent.current, 0.12);
+    refPrevPercent.current = nextPercent;
+    footer.style.transform = `translate3d(0, -${nextPercent * 100}%, 0)`;
+
+    if (Math.abs(nextPercent - refTargetPercent.current) < 0.001) {
+      refPrevPercent.current = refTargetPercent.current;
+      footer.style.transform = `translate3d(0, -${refTargetPercent.current * 100}%, 0)`;
+      refAnimationFrame.current = null;
+      return;
+    }
+
+    refAnimationFrame.current = requestAnimationFrame(animateFooter);
+  };
 
 
   useEvent('scroll', () => {
     const preFooter = refPreFooter.current;
-    const footer = refFooter.current;
-    if (!preFooter || !footer) return;
-    const preFooterPercent = getElementPositionPercent(preFooter, -0.2);
-    refPrevPercent.current = smooth(refPrevPercent.current, preFooterPercent, 0.05);
-    footer.style.transform = `translateY(-${preFooterPercent * 100}%)`;
-  });
+    if (!preFooter) return;
+
+    refTargetPercent.current = getElementPositionPercent(preFooter, -0.2);
+
+    if (refAnimationFrame.current == null) {
+      refAnimationFrame.current = requestAnimationFrame(animateFooter);
+    }
+  }, { passive: true });
 
 
   useEffect(() => {
@@ -50,6 +147,14 @@ export default function ParallaxFooter({ PreElement, Element }: Props) {
 
     return () => {
       resizeObserver.unobserve(footer);
+    };
+  }, []);
+
+  useEffect(() => {
+    return () => {
+      if (refAnimationFrame.current != null) {
+        cancelAnimationFrame(refAnimationFrame.current);
+      }
     };
   }, []);
 

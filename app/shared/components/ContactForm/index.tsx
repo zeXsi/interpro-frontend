@@ -68,7 +68,7 @@ type GlobValues = {
 type MiniValues = {
   username: string;
   phone: string;
-};
+} & Pick<PubValues, 'consent' | 'ad'>;
 
 type PopupValues = {
   email: string;
@@ -99,7 +99,7 @@ const publicConf: FormConfig<PubValues> = {
   },
   consent: {
     initialValue: false,
-    validate: (value) => value === true,
+    validate: (value: boolean) => value === true,
     title: 'Согласие',
     errorMessage: 'Для отправки формы необходимо подтвердить согласие',
   },

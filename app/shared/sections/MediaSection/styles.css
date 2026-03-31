@@ -7,10 +7,10 @@
   position: relative;
 
   aspect-ratio: var(--aspectRatioMedia);
-  height: 100vh;
+  height: 100svh;
   width: 100%;
   @media (max-width: 500px) {
-    min-height: 100vh;
+    min-height: 100svh;
   }
   .MediaSection_media {
     width: 100%;

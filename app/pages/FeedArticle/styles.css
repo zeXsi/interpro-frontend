@@ -327,16 +327,39 @@
     }
 
     .Block-description {
+      --font-size: clamp(1.5rem, calc(1.167rem + 0.694vw), 2rem);
+      /* min: 24px, max: 32px */ /* viewPort: 768-1920 */
+
       font-family: var(--font-family);
       font-weight: 400;
-      font-size: clamp(1.5rem, calc(1.167rem + 0.694vw), 2rem);
-      /* min: 24px, max: 32px */ /* viewPort: 768-1920 */
+      font-size: var(--font-size);
+      
       line-height: 136%;
       letter-spacing: -0.04em;
       color: #000;
+      display: flex;
+      flex-direction: column;
+      gap: var(--font-size);
+
+      > span {
+        display: block;
+      }
+
+      > ul,
+      > ol {
+        padding-left: var(--font-size);
+      }
+
+      h3 {
+        margin-top: 10px;
+      }
+
+      li + li {
+        margin-top: clamp(0.5rem, calc(0.333rem + 0.347vw), 0.75rem);
+      }
 
       @media (max-width: 768px) {
-        font-size: clamp(1.125rem, calc(0.767rem + 1.527vw), 1.5rem);
+        --font-size: clamp(1.125rem, calc(0.767rem + 1.527vw), 1.5rem);
         /* min: 18px, max: 24px */ /* viewPort: 375-768 */
       }
     }
@@ -366,12 +389,12 @@
       &.imgIsSeconds {
         grid-template-columns: 1fr 1fr;
         .Block_imgs-item {
-          height: min(55.556vh, 600px);
+          height: min(55.556svh, 600px);
           @media (max-width: 768px) {
-            height: min(39.258vh, 600px);
+            height: min(39.258svh, 600px);
           }
           @media (max-width: 500px) {
-            height: min(24.138vh, 600px);
+            height: min(24.138svh, 600px);
           }
         }
         @media (max-width: 500px) {
@@ -382,13 +405,13 @@
       &:not(&.imgIsSeconds) {
         grid-template-columns: 1fr;
         .Block_imgs-item {
-          height: min(55.556vh, 600px);
+          height: min(55.556svh, 600px);
 
           @media (max-width: 768px) {
-            height: min(39.258vh, 600px);
+            height: min(39.258svh, 600px);
           }
           @media (max-width: 500px) {
-            height: min(24.138vh, 600px);
+            height: min(24.138svh, 600px);
           }
         }
       }
