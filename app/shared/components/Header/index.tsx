@@ -51,16 +51,16 @@ function Header() {
     if (isShowed) return;
 
     refHeader.current?.classList.add('willOpenNav');
-    toOpenPopup();
+    toOpenPopup?.();
   };
 
   const onClickMenu = () => {
     if (!isShowed) {
-      toOpenPopup();
+      toOpenPopup?.();
       return;
     }
 
-    toClosePopup();
+    toClosePopup?.();
   };
 
   return (
@@ -90,7 +90,7 @@ function Header() {
         </li>
         <li
           className="Header_list-li __contacts"
-          onMouseEnter={() => showWithData('contacts')}
+          onMouseEnter={() => showWithData?.('contacts')}
           onClick={() => {
             (window as any).ym?.(99631636, 'reachGoal', 'button_contact');
           }}

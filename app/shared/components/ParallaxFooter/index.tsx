@@ -10,11 +10,83 @@ export function getElementPositionPercent(el: HTMLElement, step = 0): number {
 }
 
 interface Props {
-  PreElement: React.ElementType;
-  Element: React.ElementType;
+  PreElement: React.ComponentType;
+  Element: React.ComponentType;
 }
+
+interface RevealProps {
+  children: React.ReactNode;
+  className?: string;
+  animationKey?: string;
+  initialOffset?: number;
+  factor?: number;
+}
+
 const smooth = (current: number, target: number, factor = 0.1) =>
   current + (target - current) * factor;
+
+export function ParallaxReveal({
+  children,
+  className = '',
+  animationKey,
+  initialOffset = 1,
+  factor = 0.12,
+}: RevealProps) {
+  const refReveal = useRef<HTMLDivElement>(null);
+  const refPrevPercent = useRef(initialOffset);
+  const refTargetPercent = useRef(0);
+  const refAnimationFrame = useRef<number | null>(null);
+
+  const animateReveal = () => {
+    const reveal = refReveal.current;
+    if (!reveal) {
+      refAnimationFrame.current = null;
+      return;
+    }
+
+    const nextPercent = smooth(refPrevPercent.current, refTargetPercent.current, factor);
+    refPrevPercent.current = nextPercent;
+    reveal.style.transform = `translate3d(0, ${nextPercent * 100}%, 0)`;
+
+    if (Math.abs(nextPercent - refTargetPercent.current) < 0.001) {
+      refPrevPercent.current = refTargetPercent.current;
+      reveal.style.transform = `translate3d(0, ${refTargetPercent.current * 100}%, 0)`;
+      refAnimationFrame.current = null;
+      return;
+    }
+
+    refAnimationFrame.current = requestAnimationFrame(animateReveal);
+  };
+
+  useEffect(() => {
+    const reveal = refReveal.current;
+    if (!reveal) return;
+
+    if (refAnimationFrame.current != null) {
+      cancelAnimationFrame(refAnimationFrame.current);
+    }
+
+    refPrevPercent.current = initialOffset;
+    refTargetPercent.current = 0;
+    reveal.style.transform = `translate3d(0, ${initialOffset * 100}%, 0)`;
+    refAnimationFrame.current = requestAnimationFrame(animateReveal);
+
+    return () => {
+      if (refAnimationFrame.current != null) {
+        cancelAnimationFrame(refAnimationFrame.current);
+        refAnimationFrame.current = null;
+      }
+    };
+  }, [animationKey, initialOffset, factor]);
+
+  return (
+    <div className={`ParallaxReveal ${className}`}>
+      <div className="ParallaxReveal-origin" ref={refReveal}>
+        {children}
+      </div>
+    </div>
+  );
+}
 
 export default function ParallaxFooter({ PreElement, Element }: Props) {
   const refPreFooter = useRef<HTMLDivElement>(null);

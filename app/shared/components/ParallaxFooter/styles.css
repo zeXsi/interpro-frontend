@@ -4,6 +4,18 @@
   /* background-color: #fff; */
 }
 
+.ParallaxReveal {
+  width: 100%;
+  overflow: hidden;
+
+  .ParallaxReveal-origin {
+    will-change: transform;
+    transform: translate3d(0, 0, 0);
+    backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
+  }
+}
+
 .ParallaxFooter_element {
   position: relative;
   overflow: hidden;

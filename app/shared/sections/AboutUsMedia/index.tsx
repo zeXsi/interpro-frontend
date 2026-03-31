@@ -2,8 +2,8 @@ import './styles.css';
 import Subtitle from 'shared/components/Subtitle';
 import Button from 'shared/components/Button';
 
-import srcImg1 from 'assets/imgs/AboutUsMedia/1.png';
-import srcImg2 from 'assets/imgs/AboutUsMedia/2.png';
+import srcImg1 from 'assets/imgs/AboutUsMedia/1.webp';
+import srcImg2 from 'assets/imgs/AboutUsMedia/2.webp';
 
 import Link from 'shared/components/Link';
 

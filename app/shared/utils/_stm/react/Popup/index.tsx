@@ -30,12 +30,12 @@ export default function Popup({
 }: Props) {
   const refPopup = useRef<HTMLDivElement>(null);
   const isOpen = useSignal(false)
-  const timeId = useSignal(-1)
+  const timeId = useSignal<ReturnType<typeof setTimeout> | -1>(-1)
 
   useImperativeHandle(impRef, () => ({
     toOpen: () => (isOpen.v = true),
     toClose: (cb) => {
-      if (!!~timeId.v) return;
+      if (timeId.v !== -1) return;
       cb?.(true);
       refPopup.current?.setAttribute?.('remove', 'true');
       timeId.v = setTimeout(() => {

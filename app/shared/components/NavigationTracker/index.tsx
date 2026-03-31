@@ -7,6 +7,7 @@ import { signal } from 'shared/utils/_stm';
 import { Active } from 'shared/utils/_stm/react/Active';
 import { sgIsErrorPage } from 'store/stGlobal';
 import { useSignalValue } from 'shared/utils/_stm/react/react';
+import { ParallaxReveal } from 'shared/components/ParallaxFooter';
 
 interface State {
   dynamicPath: string | null;
@@ -151,30 +152,32 @@ export default function NavigationTracker({ ref }: Props) {
 
   return (
     <Active sg={sgIsErrorPage} is={false}>
-      <div className="NavigationTracker pt-header px" ref={refNv}>
-        {['', ...pathnames].map((_, index) => {
-          const { to, isLastItem } = getPathInfo(index, pathnames);
-          const label = getRouteName(to);
-          if (!label || isDynamicAndNotLoaded(to, label, pathnames, index)) {
-            return null;
-          }
+      <ParallaxReveal animationKey={location.pathname}>
+        <div className="NavigationTracker pt-header px" ref={refNv}>
+          {['', ...pathnames].map((_, index) => {
+            const { to, isLastItem } = getPathInfo(index, pathnames);
+            const label = getRouteName(to);
+            if (!label || isDynamicAndNotLoaded(to, label, pathnames, index)) {
+              return null;
+            }
 
-          const isActive = location.pathname === to;
-          const shouldRenderLineResult = shouldRenderLine(index, pathnames, getRouteName);
-          return (
-            <React.Fragment key={to}>
-              <span
-                onClick={isLastItem ? () => goTo(to) : undefined}
-                className={`NavigationTracker-item ${isActive ? 'active' : ''}`}
-                children={label}
-              />
-              {isLastItem && shouldRenderLineResult && (
-                <span className="NavigationTracker-line line">-</span>
-              )}
-            </React.Fragment>
-          );
-        })}
-      </div>
+            const isActive = location.pathname === to;
+            const shouldRenderLineResult = shouldRenderLine(index, pathnames, getRouteName);
+            return (
+              <React.Fragment key={to}>
+                <span
+                  onClick={isLastItem ? () => goTo(to) : undefined}
+                  className={`NavigationTracker-item ${isActive ? 'active' : ''}`}
+                  children={label}
+                />
+                {isLastItem && shouldRenderLineResult && (
+                  <span className="NavigationTracker-line line">-</span>
+                )}
+              </React.Fragment>
+            );
+          })}
+        </div>
+      </ParallaxReveal>
     </Active>
   );
 }

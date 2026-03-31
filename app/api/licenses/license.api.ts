@@ -4,7 +4,7 @@ import { createQuery } from 'shared/utils/querySignal';
 
 const qLicenses = createQuery<License[], void>({
   endpoint: '/licenses',
-  initial: null,
+  initial: [],
 });
 
 export const sgLicenses = qLicenses.sg;

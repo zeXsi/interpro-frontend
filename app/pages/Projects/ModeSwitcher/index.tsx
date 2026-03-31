@@ -6,7 +6,7 @@ interface Props<T extends string> {
   startVal: T;
   onClick?: (value: T) => void;
   className?: string
-  list: [type: T, text: string, Icon: React.ElementType][];
+  list: [type: T, text: string, Icon: React.ComponentType<{ className?: string }>][];
 }
 
 export default function ModeSwitcher<T extends string>({ onClick, className = '', list, startVal }: Props<T>) {
@@ -25,7 +25,7 @@ export default function ModeSwitcher<T extends string>({ onClick, className = ''
             key={index}
             onClick={() => handleOnClick?.(type)}
             text={text as string}
-            Icon={Icon as React.ElementType}
+            Icon={Icon}
           />
         );
       })}
@@ -34,7 +34,7 @@ export default function ModeSwitcher<T extends string>({ onClick, className = ''
 }
 
 interface PropsItem extends React.HTMLAttributes<HTMLElement> {
-  Icon: React.ElementType;
+  Icon: React.ComponentType<{ className?: string }>;
   text: string;
   isActive?: boolean;
 }

@@ -2,7 +2,7 @@
 import React, { useImperativeHandle, useRef, useEffect } from 'react';
 import { useSignal, useWatch } from '../../_stm/react/react';
 import { Active } from './Active';
-import type { Signal, SignalV } from '..';
+import type { Signal } from '..';
 
 interface GlobalSub<T = any> {
   params: any;
@@ -32,9 +32,9 @@ export const AwaitGlobal = {
 export interface AwaitHandle<T = any> {
   run: (...args: any[]) => Promise<T>;
   reset: () => void;
-  status: SignalV<'idle' | 'pending' | 'fulfilled' | 'rejected'>;
-  value: SignalV<T | null>;
-  error: SignalV<any>;
+  status: Signal<'idle' | 'pending' | 'fulfilled' | 'rejected'>;
+  value: Signal<T | null>;
+  error: Signal<any>;
 }
 
 interface AwaitProps<T> {

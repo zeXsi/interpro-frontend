@@ -165,7 +165,7 @@ export default function ServicePage({ loaderData: data, params }: Route.Componen
             <Subtitle>( следующая услуга )</Subtitle>
             <Link
               to={`/services/${data.nextItem.categorySlug ?? params?.slug}/${data.nextItem.slug}`}
-              slug={[data?.payload.category.name, data.nextItem.title]}
+              slug={[data?.payload.category.name ?? '', data.nextItem.title ?? '']}
             >
               <Button.Arrow variant="link" direction="right" className="ItemService_btn">
                 {data.nextItem.title}

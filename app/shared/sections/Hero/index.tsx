@@ -1,6 +1,6 @@
 import './styles.css';
 import HeroTileSvg from 'assets/icons/heroTitle.svg?react';
-import srcCover from 'assets/imgs/hero.png';
+import srcCover from 'assets/imgs/hero.webp';
 import { memo } from 'react';
 import { Preloader } from 'shared/components/Preloader';
 import VideoPlayer from 'shared/components/VideoPlayer';
@@ -13,7 +13,7 @@ function Hero() {
     <div className={`Hero px ${clIsHidePreload}`}>
       <HeroTileSvg className="Hero-icon" />
       <div className="Hero-wrapper">
-        <Preloader />
+        <Preloader mediaUrls={[srcCover]} />
         <VideoPlayer
           className="Hero-bg"
           cover={srcCover}

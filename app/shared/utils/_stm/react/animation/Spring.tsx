@@ -161,7 +161,7 @@ export function Spring({
 
     const ranges: RangeList = [];
 
-    for (const key in spring) {
+    for (const key of Object.keys(spring) as Array<keyof typeof initConfig>) {
       const cfg = spring[key];
       if (!cfg || !cfg.debug) continue;
 

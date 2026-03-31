@@ -9,6 +9,7 @@ interface LinkProps {
   slug?: string[] | string;
   onClick?: () => void;
   typeLink?: 'external' | 'internal';
+  disableMailtoCopy?: boolean;
   children: React.ReactNode;
 }
 
@@ -130,7 +131,7 @@ const Link = ({ slug = [], ...props }: LinkProps) => {
   const handleClickExternal = async (e: React.MouseEvent<HTMLAnchorElement>) => {
     props.onClick?.();
 
-    if (!isMailtoHref(href)) return;
+    if (!isMailtoHref(href) || props.disableMailtoCopy) return;
 
     e.preventDefault();
 

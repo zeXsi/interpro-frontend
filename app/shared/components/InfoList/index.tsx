@@ -2,10 +2,19 @@ import './styles.css';
 import Button from 'shared/components/Button';
 import Link from 'shared/components/Link';
 
+interface InfoListItemOptions {
+  disableMailtoCopy?: boolean;
+}
+
 interface Props {
   title: string;
   items: Array<
-    [title: string | string[], link?: string | string[], typeLink?: 'external' | 'internal']
+    [
+      title: string | string[],
+      link?: string | string[],
+      typeLink?: 'external' | 'internal',
+      options?: InfoListItemOptions,
+    ]
   >;
   subtitle?: React.ReactNode;
   className?: string;
@@ -14,6 +23,7 @@ interface Props {
   mode?: 'text' | 'button' | 'text_underline';
   onClick?: (index: number) => void;
   isModeSlug?: boolean;
+  disableMailtoCopy?: boolean;
 }
 
 export default function InfoList({
@@ -26,6 +36,7 @@ export default function InfoList({
   className = '',
   onClick,
   isModeSlug,
+  disableMailtoCopy = false,
 }: Props) {
   const clIsMode = mode === 'text' ? '__mode-text' : '';
   const clIsModeUnderline = mode === 'text_underline' ? '__mode-underline' : '';
@@ -33,7 +44,13 @@ export default function InfoList({
   const renderLabel = (label: string | string[]) =>
     typeof label === 'object' ? label[1] ?? label[0] : label;
 
-  const renderItem = (label: any, index: number, src?: any, typeLink?: any) => {
+  const renderItem = (
+    label: any,
+    index: number,
+    src?: any,
+    typeLink?: any,
+    itemOptions?: InfoListItemOptions
+  ) => {
     const slugArr = isModeSlug
       ? Array.isArray(label)
         ? label
@@ -78,6 +95,7 @@ export default function InfoList({
         to={src}
         slug={slugArr}
         typeLink={typeLink}
+        disableMailtoCopy={disableMailtoCopy || itemOptions?.disableMailtoCopy}
         onClick={() => onClick?.(index)}
       >
         {button}
@@ -89,8 +107,8 @@ export default function InfoList({
     <div className={`InfoList ${className} ${clIsMode} ${clIsModeUnderline}`}>
       <span className="InfoList-title">{title}</span>
       <div className="InfoList-container">
-        {items.map(([label, src, typeLink], index) =>
-          renderItem(label, index, src, typeLink)
+        {items.map(([label, src, typeLink, itemOptions], index) =>
+          renderItem(label, index, src, typeLink, itemOptions)
         )}
         {subtitle && (
           <p className='subtitle'>{subtitle}</p>

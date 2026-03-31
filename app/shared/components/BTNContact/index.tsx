@@ -11,11 +11,11 @@ export default function BTNContact() {
 
   const onClickContact = () => {
     if (!isShowed || mode === 'nav') {
-      showWithData('contacts');
+      showWithData?.('contacts');
       return;
     }
 
-    toClosePopup();
+    toClosePopup?.();
   };
 
   return (
