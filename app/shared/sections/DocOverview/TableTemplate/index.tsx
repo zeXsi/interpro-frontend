@@ -8,18 +8,8 @@ import { useState } from 'react';
 import Button from 'shared/components/Button';
 import Link from 'shared/components/Link';
 import IsNot from 'shared/components/IsNot';
-import { DocOverviewProps, ReviewItem } from '..';
-import { sgFeedbacks } from 'api/feedbacks/feedbacks.api';
-
-function feedbacksToItems(): ReviewItem[] {
-  return sgFeedbacks.v.map(({ payload }) => ({
-    company: payload.company,
-    text: payload.text,
-    pdfUrl: payload.pdf,
-    personName: payload.person?.name,
-    personPosition: payload.person?.position,
-  }));
-}
+import { DocOverviewProps } from '..';
+import feedbacksToItems from '../feedbacksToItems';
 
 export default function TableTemplate({ isNotPage, items }: DocOverviewProps) {
   const { getRef } = useRefMap<RefAnimatedLabel>();
@@ -31,7 +21,7 @@ export default function TableTemplate({ isNotPage, items }: DocOverviewProps) {
     getRef(`feedback_${index}`).current?.setIsActive?.(v);
   };
 
-  const list = items ?? feedbacksToItems();
+  const list = items ?? feedbacksToItems(isNotPage);
 
   return (
     <div className="TableTemplate">

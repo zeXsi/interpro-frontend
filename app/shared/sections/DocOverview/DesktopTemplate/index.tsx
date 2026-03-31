@@ -5,19 +5,9 @@ import AnimatedLabel from 'shared/components/AnimatedLabel';
 import UserInfo from '../UserInfo';
 import Button from 'shared/components/Button';
 import Link from 'shared/components/Link';
-import { DocOverviewProps, ReviewItem } from '..';
+import { DocOverviewProps } from '..';
 import IsNot from 'shared/components/IsNot';
-import { sgFeedbacks } from 'api/feedbacks/feedbacks.api';
-
-function feedbacksToItems(isNotPage?: boolean): ReviewItem[] {
-  return sgFeedbacks.v.slice(0, !isNotPage ? Infinity : 4).map(({ payload }) => ({
-    company: payload.company,
-    text: payload.text,
-    pdfUrl: payload.pdf,
-    personName: payload.person?.name,
-    personPosition: payload.person?.position,
-  }));
-}
+import feedbacksToItems from '../feedbacksToItems';
 
 export default function DesktopTemplate({ isNotPage, items }: DocOverviewProps) {
   const [activeClient, setActiveClient] = useState<number>(0);
