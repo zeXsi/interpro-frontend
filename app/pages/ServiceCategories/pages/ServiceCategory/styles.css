@@ -37,7 +37,7 @@
     @media (max-width: 768px) {
       height: 39.258svh;
     }
-    @media (max-width: 500px) {
+    @media (max-width: 540px) {
       height: 24.138svh;
     }
   }

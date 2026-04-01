@@ -9,7 +9,7 @@
   aspect-ratio: var(--aspectRatioMedia);
   height: 100svh;
   width: 100%;
-  @media (max-width: 500px) {
+  @media (max-width: 540px) {
     min-height: 100svh;
   }
   .MediaSection_media {
