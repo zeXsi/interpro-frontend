@@ -293,7 +293,7 @@ export function Block({
   return (
     <div id={anchorId} className={`Block ${clIsFirst} ${clIsLastItem} ${className}`}>
       <div className="Block-wrapper_title_desc">
-        {title?.trim() ? <div className="Block-title">{title}</div> : null}
+        {title?.trim() ? <h2 className="Block-title">{title}</h2> : null}
         <div className="Block-wrapper_desc_imgs">
           {hasDescriptions && (
             <div key="desc" className={`Block-descriptions`}>

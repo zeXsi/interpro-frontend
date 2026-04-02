@@ -345,6 +345,10 @@
         display: block;
       }
 
+      h3 {
+        font-weight: 500;
+      }
+
       > ul,
       > ol {
         padding-left: var(--font-size);
