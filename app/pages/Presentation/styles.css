@@ -65,11 +65,11 @@ main {
   gap: 1rem;
 
   @media (max-width: 1024px) {
-    gap: 7.75rem;
+    /* gap: 7.75rem; */
   }
 
   @media (max-width: 540px) {
-    gap: 4rem;
+    /* gap: 4rem; */
   }
 }
 
