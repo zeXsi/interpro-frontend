@@ -11,4 +11,4 @@ const qFeedbacks = createQuery<Feedback[], PaginationParams>({
 });
 
 export const sgFeedbacks = qFeedbacks.sg;
-export const getFeedbacks = (): Promise<Feedback[]> => qFeedbacks.fetch({ per_page: 1000 });
+export const getFeedbacks = (): Promise<Feedback[]> => qFeedbacks.fetch({ per_page: 100 });
