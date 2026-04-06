@@ -2,7 +2,11 @@ import { createQuery } from 'shared/utils/querySignal';
 import type { Service, ServiceCategory } from './services.types';
 import { addNextItem } from 'shared/utils/addNextItem';
 
-const qServiceCategories = createQuery<ServiceCategory[]>({
+type PaginationParams = {
+  per_page: number;
+};
+
+const qServiceCategories = createQuery<ServiceCategory[], PaginationParams>({
   endpoint: '/service_category',
   initial: [],
   middleware: (data) => {
@@ -12,7 +16,7 @@ const qServiceCategories = createQuery<ServiceCategory[]>({
 });
 
 export const sgServiceCategories = qServiceCategories.sg;
-export const getServiceCategories = () => qServiceCategories.fetch({});
+export const getServiceCategories = () => qServiceCategories.fetch({ per_page: 1000 });
 
 type Param = { slug: string };
 const qServiceCategoryById = createQuery<ServiceCategory | undefined, Param, ServiceCategory[]>({
@@ -26,7 +30,7 @@ const qServiceCategoryById = createQuery<ServiceCategory | undefined, Param, Ser
 export const sgCurrServiceCategory = qServiceCategoryById.sg;
 export const getServiceCategoriesById = (params: Param) => qServiceCategoryById.fetch(params);
 
-const qServices = createQuery<Service[]>({
+const qServices = createQuery<Service[], PaginationParams>({
   endpoint: '/service',
   initial: [],
   middleware: (data) => {
@@ -36,7 +40,7 @@ const qServices = createQuery<Service[]>({
 });
 
 export const sgServices = qServices.sg;
-export const getServices = () => qServices.fetch({});
+export const getServices = () => qServices.fetch({ per_page: 1000 });
 
 // проверить
 const qServiceById = createQuery<Service | undefined, Param, Service[]>({
