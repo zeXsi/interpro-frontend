@@ -16,7 +16,7 @@ const qServiceCategories = createQuery<ServiceCategory[], PaginationParams>({
 });
 
 export const sgServiceCategories = qServiceCategories.sg;
-export const getServiceCategories = () => qServiceCategories.fetch({ per_page: 1000 });
+export const getServiceCategories = () => qServiceCategories.fetch({ per_page: 100 });
 
 type Param = { slug: string };
 const qServiceCategoryById = createQuery<ServiceCategory | undefined, Param, ServiceCategory[]>({
@@ -40,7 +40,7 @@ const qServices = createQuery<Service[], PaginationParams>({
 });
 
 export const sgServices = qServices.sg;
-export const getServices = () => qServices.fetch({ per_page: 1000 });
+export const getServices = () => qServices.fetch({ per_page: 100 });
 
 // проверить
 const qServiceById = createQuery<Service | undefined, Param, Service[]>({
