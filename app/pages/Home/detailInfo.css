@@ -4,7 +4,7 @@
   gap: 16px;
   margin-top: clamp(3.75rem, calc(2.083rem + 3.472vw), 6.25rem); /* min: 60px, max: 100px */
 
-  h1 {
+  .DetailInfo-title {
     font-family: var(--font-family);
     font-weight: 500;
     font-size: clamp(1.25rem, calc(1.083rem + 0.347vw), 1.5rem); /* min: 20px, max: 24px */
@@ -31,10 +31,6 @@
 
     --font-size: clamp(1.125rem, calc(0.708rem + 0.868vw), 1.75rem);
     --detail-info-line-height: 1.36;
-    --detail-info-preview-lines: 3;
-    --detail-info-preview-height: calc(
-      var(--detail-info-preview-lines) * var(--detail-info-line-height) * 1em
-    );
     /* min: 18px, max: 28px */ /* viewPort: 768-1920 */
 
     font-size: var(--font-size);
@@ -57,21 +53,14 @@
       display: block;
     }
 
-    .DetailInfo-textIntro--preview {
-      display: -webkit-box;
-      line-clamp: var(--detail-info-preview-lines);
-      -webkit-line-clamp: var(--detail-info-preview-lines);
-      -webkit-box-orient: vertical;
-      overflow: hidden;
-    }
+    .DetailInfo-textExpanded {
+      display: flex;
+      flex-direction: column;
+      gap: var(--font-size);
 
-    .DetailInfo-textRest {
-      overflow: hidden;
-      margin-bottom: calc(-1 * var(--detail-info-preview-height));
-    }
-
-    .DetailInfo-textIntro--rest {
-      transform: translateY(calc(-1 * var(--detail-info-preview-height)));
+      > p:empty {
+        display: none;
+      }
     }
 
     h2 {
@@ -97,7 +86,7 @@
   @media (max-width: 768px) {
     margin-top: clamp(3.25rem, calc(2.773rem + 2.036vw), 3.75rem); /* min: 52px, max: 60px */
 
-    h1 {
+    .DetailInfo-title {
       font-size: clamp(0.875rem, calc(0.517rem + 1.527vw), 1.25rem); /* min: 14px, max: 20px */
       letter-spacing: -0.04em;
     }

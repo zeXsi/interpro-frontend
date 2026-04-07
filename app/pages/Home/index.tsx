@@ -60,12 +60,22 @@ export function meta() {
 
 const DETAIL_INFO_SEO_CONTENT_ID = 'detail-info-seo-content';
 
-const DetailInfoSeoIntro = (props: ComponentProps<'p'>) => {
+const DetailInfoSeoPreview = (props: ComponentProps<'p'>) => {
   return (
     <p {...props}>
       <span>
         <b>Выставочный стенд</b> — инструмент коммуникации бренда, который за секунды должен
-        привлечь внимание, выделить компанию среди конкурентов и создать условия для переговоров. На
+        привлечь внимание, выделить компанию среди конкурентов и создать условия для переговоров.
+      </span>
+    </p>
+  );
+};
+
+const DetailInfoSeoIntro = (props: ComponentProps<'p'>) => {
+  return (
+    <p {...props}>
+      <span>
+        На
         крупной выставке посетитель проходит мимо десятков стендов — важно не просто остановить
         взгляд, но и заинтересовать настолько, чтобы человек зашел, задал вопросы, оставил контакты.
         Шаблонные решения не работают — каждый продукт, каждая отрасль требует индивидуального
@@ -398,29 +408,23 @@ const DetailInfoSeo = () => {
 
   return (
     <div className="DetailInfo-text">
+      <DetailInfoSeoPreview className="DetailInfo-textIntro" />
       <noindex>
-        <DetailInfoSeoIntro
-          className="DetailInfo-textIntro DetailInfo-textIntro--preview"
-          aria-hidden={isExpanded}
-          data-nosnippet
+        <Button
+          className="btn-openclose"
+          variant="ghostLink"
+          type="button"
+          aria-expanded={isExpanded}
+          aria-controls={DETAIL_INFO_SEO_CONTENT_ID}
+          onClick={() => setIsExpanded((value) => !value)}
+          children={isExpanded ? 'Свернуть' : 'Читать далее'}
         />
       </noindex>
-      <Button
-        className="btn-openclose"
-        variant="ghostLink"
-        type="button"
-        aria-expanded={isExpanded}
-        aria-controls={DETAIL_INFO_SEO_CONTENT_ID}
-        onClick={() => setIsExpanded((value) => !value)}
-        children={isExpanded ? 'Свернуть' : 'Читать далее'}
-      />
       {isExpanded ? (
-        <>
-          <div className="DetailInfo-textRest" id={DETAIL_INFO_SEO_CONTENT_ID}>
-            <DetailInfoSeoIntro className="DetailInfo-textIntro DetailInfo-textIntro--rest" />
-          </div>
+        <div className="DetailInfo-textExpanded" id={DETAIL_INFO_SEO_CONTENT_ID}>
+          <DetailInfoSeoIntro className="DetailInfo-textIntro" />
           <DetailInfoSeoContent />
-        </>
+        </div>
       ) : null}
     </div>
   );
@@ -455,9 +459,9 @@ export default function Home() {
   return (
     <StartPage>
       <div className="Home">
-        {/* <h1 className="Home-title" style={{ opacity: 0 }}>
+        <h1 className="Home-title" style={{ opacity: 0 }}>
           Interpro - производство выставочных стендов в Москве
-        </h1> */}
+        </h1>
 
         <Hero />
         <div
@@ -502,7 +506,7 @@ export default function Home() {
           </div>
 
           <div className="DetailInfo px">
-            <h1>( Выставочные стенды на заказ )</h1>
+            <p className="DetailInfo-title">( Выставочные стенды на заказ )</p>
             <DetailInfoSeo />
           </div>
 

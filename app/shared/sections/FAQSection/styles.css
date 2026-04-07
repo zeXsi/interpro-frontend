@@ -145,7 +145,7 @@
     .FAQSection_right {
       display: flex;
       flex-direction: column;
-      align-items: center;
+      /* align-items: center; */
 
       .FAQSection_right-items {
         width: 100%;
