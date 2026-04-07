@@ -459,9 +459,9 @@ export default function Home() {
   return (
     <StartPage>
       <div className="Home">
-        <h1 className="Home-title" style={{ opacity: 0 }}>
+        {/* <h1 className="Home-title" style={{ opacity: 0 }}>
           Interpro - производство выставочных стендов в Москве
-        </h1>
+        </h1> */}
 
         <Hero />
         <div
@@ -506,7 +506,7 @@ export default function Home() {
           </div>
 
           <div className="DetailInfo px">
-            <p className="DetailInfo-title">( Выставочные стенды на заказ )</p>
+            <h1 className="DetailInfo-title">Interpro - производство выставочных стендов в Москве</h1>
             <DetailInfoSeo />
           </div>
 
