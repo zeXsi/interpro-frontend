@@ -1,6 +1,7 @@
 import { instance } from './api.config';
+import { withStoredUtm } from './utm';
 
-export interface LeadData {
+export interface LeadData extends UtmFields {
   name: string;
   phone: string;
   company?: string;
@@ -8,7 +9,7 @@ export interface LeadData {
   extraInfo?: string;
 }
 
-export interface LeadDataPopup {
+export interface LeadDataPopup extends UtmFields {
   name: string;
   phone: string;
   email: string;
@@ -16,7 +17,7 @@ export interface LeadDataPopup {
   extraInfo?: string;
 }
 
-export interface LeadDataExcursion {
+export interface LeadDataExcursion extends UtmFields {
   name: string;
   phone: string;
   email: string;
@@ -24,6 +25,14 @@ export interface LeadDataExcursion {
   post: string;
   consent: boolean;
   extraInfo?: string;
+}
+
+export interface UtmFields {
+  utm_source?: string;
+  utm_medium?: string;
+  utm_campaign?: string;
+  utm_content?: string;
+  utm_term?: string;
 }
 
 export interface LeadResponse {
@@ -35,18 +44,17 @@ export interface LeadResponse {
 
 export async function sendLead(data: LeadData): Promise<LeadResponse> {
   try {
-    const res = await instance.post<LeadResponse>(`/send`, data);
+    const res = await instance.post<LeadResponse>(`/send`, withStoredUtm(data));
     return res.data;
   } catch (err: any) {
     console.error('Ошибка при отправке:', err);
     return { ok: false, error: err.message };
   }
 }
-
 
 export async function sendLeadPopup(data: LeadDataPopup): Promise<LeadResponse> {
   try {
-    const res = await instance.post<LeadResponse>(`/send-widget`, data);
+    const res = await instance.post<LeadResponse>(`/send-widget`, withStoredUtm(data));
     return res.data;
   } catch (err: any) {
     console.error('Ошибка при отправке:', err);
@@ -54,10 +62,9 @@ export async function sendLeadPopup(data: LeadDataPopup): Promise<LeadResponse> 
   }
 }
 
-
 export async function sendExcursion(data: LeadDataExcursion): Promise<LeadResponse> {
   try {
-    const res = await instance.post<LeadResponse>(`/send-excursion`, data);
+    const res = await instance.post<LeadResponse>(`/send-excursion`, withStoredUtm(data));
     return res.data;
   } catch (err: any) {
     console.error('Ошибка при отправке:', err);
