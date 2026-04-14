@@ -11,6 +11,10 @@ export default function PresentationHeader() {
 
   const renderSpans = (arr?: any[]) => arr?.map((item, index) => <span key={index}>{item}</span>);
   const hasProjectSize = Number(presentationResponse?.project_size) > 0;
+  const hasYear = Boolean(presentationResponse.tax?.year?.length);
+  const hasExpo = Boolean(presentationResponse.tax?.expo?.length);
+  const hasStandType = Boolean(presentationResponse.tax?.stand_type?.length);
+  const hasTags = hasYear || hasExpo || hasStandType || hasProjectSize;
 
   const pdfHref = name ? `/presentation/${name}/pdf` : '#';
 
@@ -37,10 +41,7 @@ export default function PresentationHeader() {
                 {presentationResponse.title}
               </a>
             )}
-            {(presentationResponse.tax?.year ||
-              presentationResponse.tax?.expo ||
-              presentationResponse.tax?.stand_type ||
-              hasProjectSize) && (
+            {hasTags && (
               <div className="PresentationHeader__item-box">
                 {renderSpans(presentationResponse.tax?.year)}
                 {renderSpans(presentationResponse.tax?.expo)}
