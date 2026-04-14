@@ -28,11 +28,13 @@ export default function PresentationDocument({
 }: {
   presentationResponse: any;
 }) {
+  const shouldShowFirstSlide = presentationResponse?.show_first_slide !== false;
+
   return (
     <>
       <PresentationHeader />
       <main className={presentationResponse.theme}>
-        <Cover />
+        {shouldShowFirstSlide && <Cover />}
         {presentationResponse.slides.map((item: any) => {
           const Component = COMPONENTS[item.type];
           if (!Component) return null;
