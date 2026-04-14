@@ -3,7 +3,7 @@ import Button from '../Button';
 import Subtitle from '../Subtitle';
 
 import CheckmarkIcon from 'assets/icons/checkmark.svg?react';
-import React, { Activity, PropsWithChildren, useId, useRef } from 'react';
+import React, { Activity, PropsWithChildren, useEffect, useId, useRef } from 'react';
 
 import Form, { useForm, type FormConfig } from 'shared/utils/_stm/react/createForm';
 import { useNavigate } from '../NavigationTracker';
@@ -12,6 +12,7 @@ import { useSignalValue, useWatch } from 'shared/utils/_stm/react/react';
 import { email, pipe, safeParse, string } from 'valibot';
 import { MWForm } from '../popups/useMWForm';
 import { signal } from 'shared/utils/_stm';
+import { saveUtmToStorage } from 'api/utm';
 
 function vld<T>(schema: any) {
   return (value: T) => safeParse(schema, value).success;
@@ -38,7 +39,11 @@ function formatPhoneDisplay(digits: string): string {
 }
 
 // Индекс цифры для удаления: перед курсором (Backspace) или после (Delete)
-function getDigitIndexToRemove(formatted: string, cursorPos: number, forBackspace: boolean): number {
+function getDigitIndexToRemove(
+  formatted: string,
+  cursorPos: number,
+  forBackspace: boolean
+): number {
   let digitIndex = -1;
   for (let i = 0; i < formatted.length; i++) {
     if (/\d/.test(formatted[i])) {
@@ -193,6 +198,9 @@ export default function ContactForm({
   serviceName,
 }: PropsContactForm) {
   const { goTo } = useNavigate();
+  useEffect(() => {
+    saveUtmToStorage();
+  }, []);
 
   const form = useForm(
     type === 'popup'
@@ -284,9 +292,7 @@ export default function ContactForm({
       <Subtitle>( {!subtitle ? 'ЕСТЬ ИДЕИ?' : subtitle} )</Subtitle>
       <div className="ContactForm-title">
         <Activity mode={title ? 'visible' : 'hidden'}>{title}</Activity>
-        <Activity mode={!title ? 'visible' : 'hidden'}>
-          Давайте обсудим ваш проект
-        </Activity>
+        <Activity mode={!title ? 'visible' : 'hidden'}>Давайте обсудим ваш проект</Activity>
       </div>
       <div className="ContactForm_inner">
         <div className="ContactForm-form">
@@ -369,13 +375,19 @@ interface InputProps {
   form: Form<any>;
 }
 
-const InputMessage = React.memo(({ field, form }: { field: ReturnType<Form<any>['useField']>; form: Form<any> }) => {
-  const value = useSignalValue(field.sg.value);
-  const errorMessage = useSignalValue(field.sg.errorMessage) ?? '';
-  const isSubmitted = useSignalValue(form.isSubmitted);
+const InputMessage = React.memo(
+  ({ field, form }: { field: ReturnType<Form<any>['useField']>; form: Form<any> }) => {
+    const value = useSignalValue(field.sg.value);
+    const errorMessage = useSignalValue(field.sg.errorMessage) ?? '';
+    const isSubmitted = useSignalValue(form.isSubmitted);
 
-  return <p className="Input-message">{(!!value || !!isSubmitted) && errorMessage ? errorMessage : ''}</p>;
-});
+    return (
+      <p className="Input-message">
+        {(!!value || !!isSubmitted) && errorMessage ? errorMessage : ''}
+      </p>
+    );
+  }
+);
 
 const Input = React.memo(({ name, form }: InputProps) => {
   const field = form.useField(name);
