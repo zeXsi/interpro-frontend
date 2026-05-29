@@ -14,7 +14,7 @@
   --heightImg: 617px;
   --gapHeadToImg: 12px;
 
-  margin-top: clamp(3.75rem, calc(2.083rem + 3.472vw), 6.25rem); /* min: 60px, max: 100px */
+  /* margin-top: clamp(3.75rem, calc(2.083rem + 3.472vw), 6.25rem); /* min: 60px, max: 100px */
   padding-top: clamp(4rem, calc(2.5rem + 3.125vw), 6.25rem); /* min: 64px, max: 100px */
 
   .ProjectsSection-container {

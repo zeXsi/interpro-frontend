@@ -21,7 +21,9 @@ import ParallaxFooter from 'shared/components/ParallaxFooter';
 
 import srcVideo2Cover from 'assets/videos/video_2/cover.jpg';
 import srcVideo3Cover from 'assets/videos/video_3/cover.jpg';
+import srcVideo4Cover from 'assets/videos/video_4/cover.jpg';
 import srcVideo2CoverMobile from 'assets/videos/video_2/cover_mobile.jpg';
+import srcVideo4CoverMobile from 'assets/videos/video_4/cover_mobile.jpg';
 import StartPage from 'shared/components/StartPage';
 import Subtitle from 'shared/components/Subtitle';
 import Button from 'shared/components/Button';
@@ -29,7 +31,9 @@ import Button from 'shared/components/Button';
 // HLS видео пути
 const srcVideo2 = '/videos/video_2/hls/video.m3u8';
 const srcVideo3 = '/videos/video_3/hls/video.m3u8';
+const srcVideo4 = '/videos/video_4/hls/video.m3u8';
 const srcVideo2Mobile = '/videos/video_2/hls/video_mobile.m3u8';
+const srcVideo4Mobile = srcVideo4;
 // video_3: мобилка использует те же видео и обложку что десктоп
 const srcVideo3Mobile = srcVideo3;
 
@@ -75,8 +79,7 @@ const DetailInfoSeoIntro = (props: ComponentProps<'p'>) => {
   return (
     <p {...props}>
       <span>
-        На
-        крупной выставке посетитель проходит мимо десятков стендов — важно не просто остановить
+        На крупной выставке посетитель проходит мимо десятков стендов — важно не просто остановить
         взгляд, но и заинтересовать настолько, чтобы человек зашел, задал вопросы, оставил контакты.
         Шаблонные решения не работают — каждый продукт, каждая отрасль требует индивидуального
         подхода.
@@ -444,12 +447,22 @@ export default function Home() {
 
   const configMedia = useBreakpoints(
     {
-      500: { srcVideo2, srcVideo3, srcVideo2Cover, srcVideo3Cover, aspectRatio: '1920/1080' },
+      500: {
+        srcVideo2,
+        srcVideo3,
+        srcVideo4,
+        srcVideo2Cover,
+        srcVideo3Cover,
+        srcVideo4Cover,
+        aspectRatio: '1920/1080',
+      },
       0: {
         srcVideo2: srcVideo2Mobile,
         srcVideo3: srcVideo3Mobile,
+        srcVideo4: srcVideo4Mobile,
         srcVideo2Cover: srcVideo2CoverMobile,
         srcVideo3Cover: srcVideo3Cover, // video_3: та же обложка что десктоп
+        srcVideo4Cover: srcVideo4Cover,
         aspectRatio: '375/940',
       },
     },
@@ -473,12 +486,11 @@ export default function Home() {
             className="SECTION_1"
             aspectRation={configMedia.aspectRatio}
             source={{
-              src: configMedia.srcVideo2,
-              cover: configMedia.srcVideo2Cover,
+              src: configMedia.srcVideo4,
+              cover: configMedia.srcVideo4Cover,
               type: 'application/x-mpegURL',
             }}
           />
-          <TeamBoostSection />
           <div ref={refProjects}>
             <Projects />
           </div>
@@ -494,11 +506,12 @@ export default function Home() {
             }
             aspectRation={configMedia.aspectRatio}
             source={{
-              src: configMedia.srcVideo3,
-              cover: configMedia.srcVideo3Cover,
+              src: configMedia.srcVideo2,
+              cover: configMedia.srcVideo2Cover,
               type: 'application/x-mpegURL',
             }}
           />
+          <TeamBoostSection />
           <DocOverview />
           <AboutUsMedia />
           <div ref={refFAQSection}>
@@ -506,7 +519,9 @@ export default function Home() {
           </div>
 
           <div className="DetailInfo px">
-            <h1 className="DetailInfo-title">Interpro - производство выставочных стендов в Москве</h1>
+            <h1 className="DetailInfo-title">
+              Interpro - производство выставочных стендов в Москве
+            </h1>
             <DetailInfoSeo />
           </div>
 

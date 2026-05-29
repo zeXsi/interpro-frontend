@@ -35,13 +35,38 @@
   }
 
   .MediaSection.SECTION_1 {
-    margin-bottom: clamp(2rem, calc(1.333rem + 1.389vw), 3rem);
+    /* margin-bottom: clamp(2rem, calc(1.333rem + 1.389vw), 3rem); */
     /* min: 32px, max: 48px */
     /* viewPort: 768-1920 */
     @media (max-width: 768px) {
       margin-bottom: clamp(1.5rem, calc(1.023rem + 2.036vw), 2rem);
       /* min: 24px, max: 32px */
       /* viewPort: 375-768 */
+      height: auto;
+      min-height: 0;
+      aspect-ratio: 376 / 212;
+      .MediaSection_text {
+        display: none;
+      }
+
+      .MediaSection_media {
+        display: block;
+        height: 100%;
+        inset: 0;
+        position: absolute;
+        width: 100%;
+
+        .VideoPlayer-video {
+          display: block;
+          height: 100%;
+          margin: 0;
+          object-fit: cover;
+        }
+      }
+    }
+
+    @media (max-width: 540px) {
+      margin-bottom: 0;
     }
   }
 

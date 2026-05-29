@@ -6,18 +6,18 @@ import { getProjects, sgProjects } from "api/projects/projects.api";
 import { getServiceCategories, sgServiceCategories } from "api/services/services.api";
 import { getFeedNews, getFeedBlog, sgFeedNews, sgFeedBlogs } from "api/feed/feed.api";
 
-const __dirname = import.meta.dirname;
-
 let schedulerStarted = false;
 
 function resolveSitemapPath() {
-  const isProd = process.env.NODE_ENV === "production";
-
-  if (isProd) {
-    return path.resolve(__dirname, "../client/sitemap.xml");
+  if (process.env.SITEMAP_PATH) {
+    return path.isAbsolute(process.env.SITEMAP_PATH)
+      ? process.env.SITEMAP_PATH
+      : path.resolve(process.cwd(), process.env.SITEMAP_PATH);
   }
 
-  return path.resolve(process.cwd(), "public/sitemap.xml");
+  const isProd = process.env.NODE_ENV === "production";
+
+  return path.resolve(process.cwd(), isProd ? "build/client/sitemap.xml" : "public/sitemap.xml");
 }
 
 async function buildSitemap() {
@@ -82,7 +82,7 @@ ${allUrls
   .map(([loc, freq, priority, updated]) => {
     return `  <url>
     <loc>${BASE}${loc}</loc>
-    <lastmod>${updated}</lastmod>
+    <lastmod>${updated ?? lastmod}</lastmod>
     <changefreq>${freq}</changefreq>
     <priority>${priority}</priority>
   </url>`;
