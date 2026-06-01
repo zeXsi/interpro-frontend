@@ -7,7 +7,7 @@ import React, { Activity, PropsWithChildren, useEffect, useId, useRef } from 're
 
 import Form, { useForm, type FormConfig } from 'shared/utils/_stm/react/createForm';
 import { useNavigate } from '../NavigationTracker';
-import { sendExcursion, sendLead, sendLeadPopup } from 'api/form';
+import { sendExcursion, sendLead, sendLeadPopup, type LeadResponse } from 'api/form';
 import { useSignalValue, useWatch } from 'shared/utils/_stm/react/react';
 import { email, pipe, safeParse, string } from 'valibot';
 import { MWForm } from '../popups/useMWForm';
@@ -215,16 +215,6 @@ export default function ContactForm({
   const refSend = useRef<HTMLSpanElement>(null);
 
   const submit = () => {
-    const ym = typeof window !== 'undefined' ? (window as any).ym : undefined;
-    const _tmr = typeof window !== 'undefined' ? window._tmr : undefined;
-    if (type === 'popup') {
-      ym?.(99631636, 'reachGoal', 'request_popup');
-      _tmr?.push({ type: 'reachGoal', id: 3746602, goal: 'reach_goal_popup' });
-    } else {
-      ym?.(99631636, 'reachGoal', 'request_form');
-      _tmr?.push({ type: 'reachGoal', id: 3746602, goal: 'reach_goal_final' });
-    }
-
     form.onSubmit(async (data: any) => {
       refSend.current?.toggleAttribute('disabled', true);
       const extraInfoByType =
@@ -238,8 +228,9 @@ export default function ContactForm({
                 : undefined
               : 'Основная заявка';
 
+      let response: LeadResponse;
       if (type === 'excursion') {
-        await sendExcursion({
+        response = await sendExcursion({
           name: data.username,
           phone: data.phone ?? '',
           email: data.email,
@@ -249,7 +240,7 @@ export default function ContactForm({
           extraInfo: extraInfoByType,
         });
       } else if (type === 'popup') {
-        await sendLeadPopup({
+        response = await sendLeadPopup({
           name: data.username,
           phone: data.phone ?? '',
           email: data.email,
@@ -257,7 +248,7 @@ export default function ContactForm({
           extraInfo: extraInfoByType,
         });
       } else if (type === 'mini-normal') {
-        await sendLead({
+        response = await sendLead({
           name: data.username,
           phone: data.phone,
           company: '',
@@ -265,13 +256,28 @@ export default function ContactForm({
           extraInfo: extraInfoByType,
         });
       } else {
-        await sendLead({
+        response = await sendLead({
           name: data.username,
           phone: data.phone,
           company: data.nameCompany,
           consent: data.ad,
           extraInfo: extraInfoByType,
         });
+      }
+
+      if (!response.ok) {
+        refSend.current?.toggleAttribute('disabled', false);
+        return;
+      }
+
+      const ym = typeof window !== 'undefined' ? (window as any).ym : undefined;
+      const _tmr = typeof window !== 'undefined' ? window._tmr : undefined;
+      if (type === 'popup') {
+        ym?.(99631636, 'reachGoal', 'request_popup_full');
+        _tmr?.push({ type: 'reachGoal', id: 3746602, goal: 'reach_goal_popup' });
+      } else {
+        ym?.(99631636, 'reachGoal', 'request_form_full');
+        _tmr?.push({ type: 'reachGoal', id: 3746602, goal: 'reach_goal_final' });
       }
 
       refSend.current?.toggleAttribute('false', true);
