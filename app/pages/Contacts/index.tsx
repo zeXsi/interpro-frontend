@@ -57,7 +57,6 @@ export default function Contacts() {
                 ['Whatsapp', import.meta.env.VITE_WHATSAPP_URL, 'external'],
                 ['+7 (499) 390 03-75', import.meta.env.VITE_PHONE, 'external'],
                 [import.meta.env.VITE_EMAIL_NAME, import.meta.env.VITE_EMAIL, 'external'],
-                ['mail@interpro.pro2', 'mailto:mail@interpro.pro?subject=Заявка%20с%20interpro.pro&body=Привет,%20хочу%20сделать%20заказ.%0A%0AИсточник:%20сайт%20interpro.pro%0AСтраница:%20главная', 'external', { disableMailtoCopy: true }]
               ]}
             />
             <InfoList
