@@ -25,6 +25,9 @@ import Subtitle from 'shared/components/Subtitle';
 import Link from 'shared/components/Link';
 import ExampleProjects from 'shared/components/ExampleProjects';
 
+import JsonLd from 'shared/seo/JsonLd';
+import { getFaqSchema, getReviewSchemas } from 'shared/seo/schemas';
+
 export async function loader({ params }: Route.LoaderArgs): Promise<Service> {
   const data = await getServiceById({ slug: params.slugService });
 
@@ -88,6 +91,9 @@ export default function ServicePage({ loaderData: data, params }: Route.Componen
 
   return (
     <div className="InteractiveExhibit service">
+      <JsonLd data={getFaqSchema(data?.payload?.faq)} />
+      <JsonLd data={getReviewSchemas(data?.payload?.reviews)} />
+      
       <div className="wrap-first-wrap px">
         <div className="wrap-first-title">
           <TitlePage title={data?.payload.title ?? ''} />
