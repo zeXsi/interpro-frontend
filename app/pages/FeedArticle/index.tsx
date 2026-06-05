@@ -27,6 +27,9 @@ import formatDateToRussian from 'shared/utils/formatDateToRussian';
 import StartPage from 'shared/components/StartPage';
 import InfoList from 'shared/components/InfoList';
 
+import JsonLd from 'shared/seo/JsonLd';
+import { getArticleSchema } from 'shared/seo/schemas';
+
 export type ArticleData = {
   slug: 'news' | 'blog';
   article: FeedItem;
@@ -143,6 +146,8 @@ export default function FeedArticle({ data }: { data: ArticleData }) {
 
   return (
     <StartPage>
+      <JsonLd data={getArticleSchema(data)} />
+      
       <div className="Feed px">
         <Popup />
         <div className="Feed-wrapper">

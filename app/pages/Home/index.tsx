@@ -28,6 +28,12 @@ import StartPage from 'shared/components/StartPage';
 import Subtitle from 'shared/components/Subtitle';
 import Button from 'shared/components/Button';
 
+import JsonLd from 'shared/seo/JsonLd';
+import { getFaqSchema, getFeedbackReviewSchemas } from 'shared/seo/schemas';
+import { sgFaqs } from 'api/faq/faq.api';
+import { sgFeedbacks } from 'api/feedbacks/feedbacks.api';
+import { useSignalValue } from 'shared/utils/_stm/react/react';
+
 // HLS видео пути
 const srcVideo2 = '/videos/video_2/hls/video.m3u8';
 const srcVideo3 = '/videos/video_3/hls/video.m3u8';
@@ -434,6 +440,9 @@ const DetailInfoSeo = () => {
 };
 
 export default function Home() {
+  useSignalValue(sgFaqs);
+  useSignalValue(sgFeedbacks);
+
   const refProjects = useRef<HTMLDivElement>(null);
   const refFAQSection = useRef<HTMLDivElement>(null);
 
@@ -471,6 +480,16 @@ export default function Home() {
 
   return (
     <StartPage>
+      <JsonLd
+        data={getFaqSchema(
+          sgFaqs.v.slice(0, 4).map(({ payload }) => ({
+            question: payload.question,
+            answer: payload.answer,
+          }))
+        )}
+      />
+      <JsonLd data={getFeedbackReviewSchemas(sgFeedbacks.v)} />
+      
       <div className="Home">
         {/* <h1 className="Home-title" style={{ opacity: 0 }}>
           Interpro - производство выставочных стендов в Москве

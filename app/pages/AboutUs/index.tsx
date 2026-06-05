@@ -21,6 +21,12 @@ import Certificates from 'shared/sections/Certificates';
 import Link from 'shared/components/Link';
 import StartPage from 'shared/components/StartPage';
 
+import JsonLd from 'shared/seo/JsonLd';
+import { getFaqSchema, getFeedbackReviewSchemas } from 'shared/seo/schemas';
+import { sgFaqs } from 'api/faq/faq.api';
+import { sgFeedbacks } from 'api/feedbacks/feedbacks.api';
+import { useSignalValue } from 'shared/utils/_stm/react/react';
+
 
 export function meta() {
   const title = "Interpro: о компании и нашей миссии";
@@ -39,6 +45,9 @@ export function meta() {
 
 
 export default function AboutUs() {
+  useSignalValue(sgFaqs);
+  useSignalValue(sgFeedbacks);
+
   const configMedia = useBreakpoints(
     {
       500: { srcVideo2, srcVideo2Cover, aspectRatio: '1920/1080' },
@@ -59,6 +68,16 @@ export default function AboutUs() {
 
   return (
     <StartPage>
+      <JsonLd
+        data={getFaqSchema(
+          sgFaqs.v.slice(0, 4).map(({ payload }) => ({
+            question: payload.question,
+            answer: payload.answer,
+          }))
+        )}
+      />
+      <JsonLd data={getFeedbackReviewSchemas(sgFeedbacks.v)} />
+      
       <div className="AboutUs px" style={{ background: isInViewProjects ? '#EBEBEB' : '#FFF' }}>
         <TitlePage title={'О компании'} className="title-1" />
         <ServicesDesc title="что делаем">

@@ -25,6 +25,9 @@ import ExampleProjects from 'shared/components/ExampleProjects';
 import svgCompanies from 'assets/companies';
 import FAQSection from 'shared/sections/FAQSection';
 
+import JsonLd from 'shared/seo/JsonLd';
+import { getFaqSchema, getReviewSchemas } from 'shared/seo/schemas';
+
 export async function loader({ params }: Route.LoaderArgs) {
   const data = await getServiceCategoriesById({ slug: params.slug });
 
@@ -66,6 +69,9 @@ export default function ServiceCategoryPage({ loaderData: data, params }: Route.
 
   return (
     <div className="InteractiveExhibit service">
+      <JsonLd data={getFaqSchema(data?.payload?.faq)} />
+      <JsonLd data={getReviewSchemas(data?.payload?.reviews)} />
+      
       <div className="wrap-first-wrap px">
         <div className="wrap-first-title">
           <TitlePage title={data?.payload.name!} />
