@@ -3,6 +3,11 @@ import DocOverview from 'shared/sections/DocOverview';
 import ContactForm from 'shared/components/ContactForm';
 import TitlePage from 'shared/components/TitlePage';
 
+import JsonLd from 'shared/seo/JsonLd';
+import { getFeedbackReviewSchemas } from 'shared/seo/schemas';
+import { sgFeedbacks } from 'api/feedbacks/feedbacks.api';
+import { useSignalValue } from 'shared/utils/_stm/react/react';
+
 export function meta() {
   const title = 'Interpro: отзывы';
   const description =
@@ -19,8 +24,10 @@ export function meta() {
 }
 
 export default function Feedbacks() {
+  useSignalValue(sgFeedbacks);
   return (
     <div className="Feedbacks px">
+      <JsonLd data={getFeedbackReviewSchemas(sgFeedbacks.v)} />
       <TitlePage title="Отзывы" />
       <DocOverview isNotPage={false} />
       <ContactForm />

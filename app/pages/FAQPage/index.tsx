@@ -3,6 +3,11 @@ import FAQSection from 'shared/sections/FAQSection';
 import ContactForm from 'shared/components/ContactForm';
 import StartPage from 'shared/components/StartPage';
 
+import JsonLd from 'shared/seo/JsonLd';
+import { getFaqSchema } from 'shared/seo/schemas';
+import { sgFaqs } from 'api/faq/faq.api';
+import { useSignalValue } from 'shared/utils/_stm/react/react';
+
 export function meta() {
   const title = "Interpro: ответы на часто задаваемые вопросы";
   const description =
@@ -18,8 +23,17 @@ export function meta() {
 }
 
 export default function FAQPage() {
+  useSignalValue(sgFaqs);
   return (
     <StartPage>
+      <JsonLd
+        data={getFaqSchema(
+          sgFaqs.v.map(({ payload }) => ({
+            question: payload.question,
+            answer: payload.answer,
+          }))
+        )}
+      />
       <div className="FAQPage px">
         <FAQSection />
         <ContactForm />
