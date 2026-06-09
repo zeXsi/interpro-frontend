@@ -3,6 +3,10 @@ import './styles.css';
 import { useNavigate } from 'shared/components/NavigationTracker';
 import StartPage from 'shared/components/StartPage';
 
+export function loader() {
+  throw new Response('Not found', { status: 404 });
+}
+
 export default function ErrorNotFound() {
   const { goTo } = useNavigate();
 

@@ -7,19 +7,14 @@ import JsonLd from 'shared/seo/JsonLd';
 import { getFaqSchema } from 'shared/seo/schemas';
 import { sgFaqs } from 'api/faq/faq.api';
 import { useSignalValue } from 'shared/utils/_stm/react/react';
+import { getOpenGraphMeta } from 'shared/seo/meta';
 
 export function meta() {
   const title = "Interpro: ответы на часто задаваемые вопросы";
   const description =
     "На странице FAQ Interpro вы найдете ответы на часто задаваемые вопросы о сервисе, услугах и возможностях платформы.";
 
-  return [
-    { title },
-    { name: "description", content: description },
-
-    { property: "og:title", content: title },
-    { property: "og:description", content: description },
-  ];
+  return getOpenGraphMeta({ title, description, pathname: '/faq' });
 }
 
 export default function FAQPage() {

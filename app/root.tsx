@@ -44,6 +44,7 @@ import {
   getLocalBusinessSchema,
   getOrganizationSchema,
 } from 'shared/seo/schemas';
+import { getOpenGraphMeta } from 'shared/seo/meta';
 
 const YANDEX_COUNTER_ID = 99631636;
 
@@ -169,31 +170,16 @@ export function Layout({ children }: { children: React.ReactNode }) {
 }
 
 export function meta({}: Route.MetaArgs) {
-  const siteUrl = import.meta.env.VITE_ORIGINAL_URL || 'https://interpro.pro';
   const title = 'Interpro';
   const description = 'Мы находимся в Telegram, Instagram*, YouTube, VK и других соцсетях.';
-  const image = `${siteUrl}/og-image.jpg`;
 
   return [
-    { title },
     { charSet: 'utf-8' },
     {
       name: 'viewport',
       content: 'width=device-width, initial-scale=1, viewport-fit=cover',
     },
-    { name: 'description', content: description },
-
-    { property: 'og:type', content: 'website' },
-    { property: 'og:site_name', content: 'Interpro' },
-    { property: 'og:url', content: siteUrl },
-    { property: 'og:title', content: title },
-    { property: 'og:description', content: description },
-    { property: 'og:image', content: image },
-
-    { name: 'twitter:card', content: 'summary_large_image' },
-    { name: 'twitter:title', content: title },
-    { name: 'twitter:description', content: description },
-    { name: 'twitter:image', content: image },
+    ...getOpenGraphMeta({ title, description }),
   ];
 }
 

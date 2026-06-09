@@ -153,6 +153,20 @@ type ArticleSchemaItem = {
   };
 };
 
+function toPlainText(value?: string) {
+  return value
+    ?.replace(/<br\s*\/?>/gi, '\n')
+    .replace(/<[^>]*>/g, ' ')
+    .replace(/&nbsp;/gi, ' ')
+    .replace(/&amp;/gi, '&')
+    .replace(/&quot;/gi, '"')
+    .replace(/&#39;|&apos;/gi, "'")
+    .replace(/&lt;/gi, '<')
+    .replace(/&gt;/gi, '>')
+    .replace(/\s+/g, ' ')
+    .trim();
+}
+
 export function getArticleSchema(data?: ArticleSchemaItem) {
   if (data?.slug !== 'blog') {
     return null;
@@ -169,12 +183,20 @@ export function getArticleSchema(data?: ArticleSchemaItem) {
   const image = typeof cover === 'string' ? cover : cover?.url;
   const description = payload.subtitle || '';
   const pathname = article.slug ? `/blog/${article.slug}` : '';
+  const articleBody = [
+    payload.subtitle,
+    ...(payload.blocks?.flatMap((block) => [block.title, ...(block.descriptions ?? [])]) ?? []),
+  ]
+    .map(toPlainText)
+    .filter(Boolean)
+    .join('\n\n');
 
   return {
     '@context': 'https://schema.org',
     '@type': 'Article',
     headline: payload.title,
     description,
+    articleBody: articleBody || undefined,
     image: image || undefined,
     datePublished: payload.date || article.date || undefined,
     dateModified: article.modified || payload.date || article.date || undefined,

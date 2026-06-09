@@ -27,6 +27,7 @@ import ExampleProjects from 'shared/components/ExampleProjects';
 
 import JsonLd from 'shared/seo/JsonLd';
 import { getFaqSchema, getReviewSchemas } from 'shared/seo/schemas';
+import { getOpenGraphMeta } from 'shared/seo/meta';
 
 export async function loader({ params }: Route.LoaderArgs): Promise<Service> {
   const data = await getServiceById({ slug: params.slugService });
@@ -61,7 +62,7 @@ export async function loader({ params }: Route.LoaderArgs): Promise<Service> {
   return data;
 }
 
-export function meta({ loaderData }: Route.MetaArgs) {
+export function meta({ loaderData, location }: Route.MetaArgs) {
   const titlePart = loaderData?.payload?.title || '';
   const description =
     loaderData?.payload?.description ||
@@ -69,13 +70,12 @@ export function meta({ loaderData }: Route.MetaArgs) {
 
   const title = `Interpro: услуга ${titlePart}`;
 
-  return [
-    { title },
-    { name: 'description', content: description },
-
-    { property: 'og:title', content: title },
-    { property: 'og:description', content: description },
-  ];
+  return getOpenGraphMeta({
+    title,
+    description,
+    pathname: location.pathname,
+    image: loaderData?.payload?.cover,
+  });
 }
 
 export default function ServicePage({ loaderData: data, params }: Route.ComponentProps) {

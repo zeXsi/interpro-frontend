@@ -33,6 +33,7 @@ import { getFaqSchema, getFeedbackReviewSchemas } from 'shared/seo/schemas';
 import { sgFaqs } from 'api/faq/faq.api';
 import { sgFeedbacks } from 'api/feedbacks/feedbacks.api';
 import { useSignalValue } from 'shared/utils/_stm/react/react';
+import { getOpenGraphMeta } from 'shared/seo/meta';
 
 // HLS видео пути
 const srcVideo2 = '/videos/video_2/hls/video.m3u8';
@@ -49,23 +50,7 @@ export function meta() {
   const description =
     'Стенды для выставки на заказ от компании Interpro в Москве. Широкий спектр услуг для бизнеса и частных клиентов. Проектируем и строим выставочные стенды любого масштаба!';
 
-  return [
-    { title },
-
-    {
-      name: 'description',
-      content: description,
-    },
-
-    {
-      property: 'og:title',
-      content: title,
-    },
-    {
-      property: 'og:description',
-      content: description,
-    },
-  ];
+  return getOpenGraphMeta({ title, description });
 }
 
 const DETAIL_INFO_SEO_CONTENT_ID = 'detail-info-seo-content';
