@@ -374,7 +374,9 @@
       }
       .Block_imgs {
         .Block_imgs-item {
-          object-fit: cover;
+          img {
+            object-fit: cover;
+          }
         }
       }
     }
@@ -385,9 +387,13 @@
       /* min: 8px, max: 12px */ /* viewPort: 768-1920 */
 
       .Block_imgs-item {
-        object-fit: contain;
-        background-color: #ebebeb;
+        overflow: hidden;
         cursor: pointer;
+
+        img {
+          object-fit: contain;
+          background-color: #ebebeb;
+        }
       }
 
       &.imgIsSeconds {

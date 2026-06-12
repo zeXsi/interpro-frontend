@@ -120,6 +120,8 @@
 }
 
 .btn-controller {
+  --controller-offset: var(--pdX);
+
   display: flex;
   align-items: center;
   position: absolute;
@@ -131,7 +133,7 @@
 
   &.MWImage-prev {
     left: 0;
-    padding-left: var(--pdX);
+    padding-left: var(--controller-offset);
 
     svg {
       transform: rotate(180deg);
@@ -140,7 +142,7 @@
   &.MWImage-next {
     right: 0;
     justify-content: flex-end;
-    padding-right: var(--pdX);
+    padding-right: var(--controller-offset);
   }
   button {
     width: 64px;
@@ -154,10 +156,24 @@
       width: 32px;
       height: 32px;
     }
+  }
 
-    @media (max-width: 768px) {
-      display: none;
+  @media (max-width: 1024px) {
+    --controller-offset: 1rem;
+
+    button {
+      width: 44px;
+      height: 44px;
+
+      svg {
+        width: 22px;
+        height: 22px;
+      }
     }
+  }
+
+  @media (max-width: 768px) {
+    --controller-offset: 0.5rem;
   }
 }
 

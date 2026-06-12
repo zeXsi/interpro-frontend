@@ -8,6 +8,7 @@ import ContactForm from 'shared/components/ContactForm';
 import Article from 'shared/components/Article';
 import ExampleProjects from 'shared/components/ExampleProjects';
 import useMWImage, { WithDataMWImage } from 'shared/components/popups/useMWImage';
+import GalleryImage from 'shared/components/GalleryImage';
 
 import { useLayoutEffect } from 'react';
 import { useLocation } from 'react-router';
@@ -356,9 +357,9 @@ export function Block({
           {imageUrls.length > 0 && (
             <div key="imgs" className={`Block_imgs ${clImgIsSeconds}`}>
               {imageUrls.map((src, index) => (
-                <img
+                <GalleryImage
                   key={index}
-                  className="Block_imgs-item"
+                  wrapperClassName="Block_imgs-item"
                   src={src}
                   onClick={() => onOpenImg?.([index, imageUrls])}
                 />
