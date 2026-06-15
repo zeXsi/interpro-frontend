@@ -152,6 +152,10 @@
     z-index: 999;
     cursor: pointer;
 
+    justify-content: center;
+    align-items: center;
+    display: flex;
+
     svg {
       width: 32px;
       height: 32px;
