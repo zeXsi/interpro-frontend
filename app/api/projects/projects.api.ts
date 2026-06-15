@@ -36,15 +36,15 @@ const qProjects = createQuery<Project[]>({
 export const sgProjects = qProjects.sg;
 export const getProjects = (): Promise<Project[] | null> => qProjects.fetch({});
 
-const qProjectById = createQuery<Project | undefined, { id: string }, Project[]>({
+const qProjectById = createQuery<Project | undefined, { slug: string }, Project[]>({
   endpoint: '/projects',
   parent: sgProjects,
-  findInParent: (projects, params) => projects?.find((p) => p.slug === params.id),
+  findInParent: (projects, params) => projects?.find((p) => p.slug === params.slug),
   takeFirst: true,
   initial: undefined,
   middleware: (project) => normalizeProject(project),
 });
 
 export const sgCurrProject = qProjectById.sg;
-export const getProjectsById = (params: { id: string }): Promise<Project | undefined> =>
+export const getProjectsById = (params: { slug: string }): Promise<Project | undefined> =>
   qProjectById.fetch(params);
