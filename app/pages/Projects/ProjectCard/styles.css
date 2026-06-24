@@ -106,14 +106,11 @@
     .ProjectCard-img {
       pointer-events: unset;
       cursor: pointer;
-      height: clamp(46rem, calc(33.542rem + 25.955vw), 64.688rem);
-      /* min: 736px, max: 1035px */
-      /* viewPort: 768-1920 */
+      height: fit-content;
 
-      @media (max-width: 1440px) {
-        height: clamp(22.438rem, calc(-0.046rem + 95.929vw), 46rem);
-        /* min: 359px, max: 736px */
-        /* viewPort: 375-768 */
+      img {
+        height: auto;
+        object-fit: contain;
       }
     }
     .ProjectCard_footer {

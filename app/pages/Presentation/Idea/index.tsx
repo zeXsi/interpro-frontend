@@ -2,8 +2,9 @@ import './styles.css';
 
 import useMWImage from 'shared/components/popups/useMWImage';
 import Text from 'shared/components/Text';
-import PresentationImage from '../PresentationImage';
 import useIsPdfExport from '../useIsPdfExport';
+import GalleryImage from 'shared/components/GalleryImage';
+import PresentationImage from '../PresentationImage';
 
 export default function Idea({ data, id }: any) {
   const { Popup, showWithData } = useMWImage();
@@ -47,14 +48,19 @@ export default function Idea({ data, id }: any) {
 
         {images.length > 0 && (
           <div className={`Idea__content-slides ${layout}`}>
-            {images.map((item: any) => (
-              <PresentationImage
-                key={item.id}
-                src={item.full}
-                alt="Идея и концепция"
-                onClick={isPdfExport ? undefined : () => openAllImages(item.full)}
-              />
-            ))}
+            {images.map((item: any) =>
+              isPdfExport ? (
+                <PresentationImage key={item.id} src={item.full} alt="Идея и концепция" />
+              ) : (
+                <GalleryImage
+                  key={item.id}
+                  wrapperClassName="Idea__gallery-image"
+                  src={item.full}
+                  alt="Идея и концепция"
+                  onClick={() => openAllImages(item.full)}
+                />
+              )
+            )}
           </div>
         )}
       </div>

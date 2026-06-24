@@ -22,9 +22,10 @@ import { getProjectsById } from 'api/projects/projects.api';
 import { Project } from 'api/projects/projects.types';
 import StartPage from 'shared/components/StartPage';
 import { decodeUnicodeEscapes } from 'shared/utils/decodeUnicodeEscapes';
+import GalleryImage from 'shared/components/GalleryImage';
 
-export async function clientLoader({ params }: Route.LoaderArgs) {
-  const project = await getProjectsById({ id: params.slug });
+export async function loader({ params }: Route.LoaderArgs) {
+  const project = await getProjectsById({ slug: params.slug });
 
   if (!project) {
     throw new Response('Not found', { status: 404 });
@@ -33,7 +34,7 @@ export async function clientLoader({ params }: Route.LoaderArgs) {
   return project;
 }
 export function meta({ data }: Route.MetaArgs) {
-  const project = data as Awaited<ReturnType<typeof clientLoader>> | undefined;
+  const project = data as Awaited<ReturnType<typeof loader>> | undefined;
 
   const title = project?.payload?.seo?.title;
   const description =
@@ -265,7 +266,8 @@ function ImgWithText({
             return isVideo ? (
               <VideoPlayer key={index} url={src} />
             ) : (
-              <img
+              <GalleryImage
+                wrapperClassName="ImgWithText-galleryImage"
                 className="ImgWithText-img"
                 src={src}
                 alt={`Изображение проекта: детали стенда`}
@@ -329,7 +331,12 @@ function Scheme3D({
           </div>
         </div>
         <div className="Scheme3D_container">
-          <img src={src} alt="3D визуализация" onClick={() => toOpenImg?.([0, [src]])} />
+          <GalleryImage
+            wrapperClassName="Scheme3D-galleryImage"
+            src={src}
+            alt="3D визуализация"
+            onClick={() => toOpenImg?.([0, [src]])}
+          />
         </div>
       </div>
     )
@@ -390,7 +397,8 @@ function SwiperScheme({
           {imgs.map((src, index) => {
             return (
               <SwiperSlide className="SwiperScheme_swiper-item" key={index}>
-                <img
+                <GalleryImage
+                  wrapperClassName="SwiperScheme-galleryImage"
                   src={src}
                   alt={`Чертёж проекта — слайд ${index + 1}`}
                   onClick={() => toOpenImg?.([index, imgs as any])}

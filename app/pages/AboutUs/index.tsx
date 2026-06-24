@@ -26,6 +26,7 @@ import { getFaqSchema, getFeedbackReviewSchemas } from 'shared/seo/schemas';
 import { sgFaqs } from 'api/faq/faq.api';
 import { sgFeedbacks } from 'api/feedbacks/feedbacks.api';
 import { useSignalValue } from 'shared/utils/_stm/react/react';
+import { getOpenGraphMeta } from 'shared/seo/meta';
 
 
 export function meta() {
@@ -33,14 +34,7 @@ export function meta() {
   const description =
     "Узнайте больше о компании Interpro: наша миссия, ценности, команда и опыт реализации успешных проектов для бизнеса.";
 
-  return [
-    { title },
-
-    { name: "description", content: description },
-
-    { property: "og:title", content: title },
-    { property: "og:description", content: description },
-  ];
+  return getOpenGraphMeta({ title, description, pathname: '/about-us' });
 }
 
 

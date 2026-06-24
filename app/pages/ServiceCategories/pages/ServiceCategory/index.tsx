@@ -27,6 +27,7 @@ import FAQSection from 'shared/sections/FAQSection';
 
 import JsonLd from 'shared/seo/JsonLd';
 import { getFaqSchema, getReviewSchemas } from 'shared/seo/schemas';
+import { getOpenGraphMeta } from 'shared/seo/meta';
 
 export async function loader({ params }: Route.LoaderArgs) {
   const data = await getServiceCategoriesById({ slug: params.slug });
@@ -38,7 +39,7 @@ export async function loader({ params }: Route.LoaderArgs) {
   return data;
 }
 
-export function meta({ loaderData }: Route.MetaArgs) {
+export function meta({ loaderData, location }: Route.MetaArgs) {
   const titlePart = loaderData?.name || '';
   const description =
     loaderData?.description ||
@@ -46,13 +47,12 @@ export function meta({ loaderData }: Route.MetaArgs) {
 
   const title = `Interpro: категория услуги ${titlePart}`;
 
-  return [
-    { title },
-    { name: 'description', content: description },
-
-    { property: 'og:title', content: title },
-    { property: 'og:description', content: description },
-  ];
+  return getOpenGraphMeta({
+    title,
+    description,
+    pathname: location.pathname,
+    image: loaderData?.payload?.cover,
+  });
 }
 
 export default function ServiceCategoryPage({ loaderData: data, params }: Route.ComponentProps) {

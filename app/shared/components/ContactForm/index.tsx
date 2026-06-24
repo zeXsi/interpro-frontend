@@ -266,6 +266,8 @@ export default function ContactForm({
       }
 
       if (!response.ok) {
+        const ym = typeof window !== 'undefined' ? (window as any).ym : undefined;
+        ym?.(99631636, 'reachGoal', 'request_form_false');
         refSend.current?.toggleAttribute('disabled', false);
         return;
       }

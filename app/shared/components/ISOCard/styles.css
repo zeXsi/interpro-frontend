@@ -57,8 +57,12 @@
   .ISOCard_img {
     grid-column: span 2;
 
-    img {
-      object-fit: contain;
+    .GalleryImage {
+      height: 100%;
+
+      img {
+        object-fit: contain;
+      }
     }
   }
 

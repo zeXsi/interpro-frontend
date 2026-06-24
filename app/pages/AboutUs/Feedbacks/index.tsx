@@ -7,20 +7,14 @@ import JsonLd from 'shared/seo/JsonLd';
 import { getFeedbackReviewSchemas } from 'shared/seo/schemas';
 import { sgFeedbacks } from 'api/feedbacks/feedbacks.api';
 import { useSignalValue } from 'shared/utils/_stm/react/react';
+import { getOpenGraphMeta } from 'shared/seo/meta';
 
 export function meta() {
   const title = 'Interpro: отзывы';
   const description =
     'Отзывы клиентов о компании Interpro: реальный опыт сотрудничества, впечатления о качестве услуг и результатах совместных проектов.';
 
-  return [
-    { title },
-
-    { name: 'description', content: description },
-
-    { property: 'og:title', content: title },
-    { property: 'og:description', content: description },
-  ];
+  return getOpenGraphMeta({ title, description, pathname: '/about-us/feedbacks' });
 }
 
 export default function Feedbacks() {

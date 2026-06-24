@@ -8,6 +8,7 @@ import ContactForm from 'shared/components/ContactForm';
 import Article from 'shared/components/Article';
 import ExampleProjects from 'shared/components/ExampleProjects';
 import useMWImage, { WithDataMWImage } from 'shared/components/popups/useMWImage';
+import GalleryImage from 'shared/components/GalleryImage';
 
 import { useLayoutEffect } from 'react';
 import { useLocation } from 'react-router';
@@ -29,6 +30,7 @@ import InfoList from 'shared/components/InfoList';
 
 import JsonLd from 'shared/seo/JsonLd';
 import { getArticleSchema } from 'shared/seo/schemas';
+import { getOpenGraphMeta } from 'shared/seo/meta';
 
 export type ArticleData = {
   slug: 'news' | 'blog';
@@ -77,18 +79,18 @@ export async function _loader(_url: string): Promise<ArticleData> {
   }
 }
 
-export function _meta(data: ArticleData) {
+export function _meta(data: ArticleData, pathname: string) {
   const title = `Interpro: ${data.article?.payload?.title ?? ''}`;
   const description =
     data.slug === 'blog' ? 'Читайте статью на нашем сайте' : 'Читайте новость на нашем сайте';
 
-  return [
-    { title },
-    { name: 'description', content: description },
-
-    { property: 'og:title', content: title },
-    { property: 'og:description', content: description },
-  ];
+  return getOpenGraphMeta({
+    title,
+    description,
+    pathname,
+    image: data.article?.payload?.cover?.url,
+    type: 'article',
+  });
 }
 
 export default function FeedArticle({ data }: { data: ArticleData }) {
@@ -355,9 +357,9 @@ export function Block({
           {imageUrls.length > 0 && (
             <div key="imgs" className={`Block_imgs ${clImgIsSeconds}`}>
               {imageUrls.map((src, index) => (
-                <img
+                <GalleryImage
                   key={index}
-                  className="Block_imgs-item"
+                  wrapperClassName="Block_imgs-item"
                   src={src}
                   onClick={() => onOpenImg?.([index, imageUrls])}
                 />
