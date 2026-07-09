@@ -252,7 +252,10 @@ export default function App() {
             <AdBanner />
             <form.Popup />
             <BTNContact />
-            <RouteGuard isValidRoutes={['/', '/privacy']} isInverted={true}>
+            <RouteGuard
+              isValidRoutes={['/', '/privacy', '/museum-spaces', '/office-renovation']}
+              isInverted={true}
+            >
               <NavigationTracker />
             </RouteGuard>
             <ParallaxFooter PreElement={Outlet} Element={FooterC} />
