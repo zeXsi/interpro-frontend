@@ -12,7 +12,7 @@ import FAQSection from 'shared/sections/FAQSection';
 import { lenisManager } from 'shared/utils/lenis';
 import { decodeUnicodeEscapes } from 'shared/utils/decodeUnicodeEscapes';
 import { getOpenGraphMeta } from 'shared/seo/meta';
-import useEvent from '@qtpy/use-event';
+import { useStickyStepCycle } from 'shared/hooks/useStickyStepCycle';
 
 import {
   BoxIcon,
@@ -258,29 +258,15 @@ function WhyFasterSection() {
 }
 
 function CycleSection() {
-  const refSection = useRef<HTMLDivElement | null>(null);
+  const refSection = useRef<HTMLElement | null>(null);
   const [activeIndex, setActiveIndex] = useState(0);
   const activeStep = cycleSteps[activeIndex];
 
-  useEvent(
-    'scroll',
-    () => {
-      const section = refSection.current;
-      if (!section || typeof window === 'undefined') return;
-
-      const rect = section.getBoundingClientRect();
-      const progress = Math.min(
-        Math.max((window.innerHeight * 0.5 - rect.top) / (window.innerHeight * 0.95), 0),
-        1
-      );
-      setActiveIndex(Math.min(cycleSteps.length - 1, Math.floor(progress * cycleSteps.length)));
-    },
-    {}
-  );
+  useStickyStepCycle(refSection, cycleSteps.length, setActiveIndex);
 
   return (
-    <section className="OfficeRenovation-cycleWrap">
-      <div className="OfficeRenovation-cycle" ref={refSection}>
+    <section className="OfficeRenovation-cycleWrap" ref={refSection}>
+      <div className="OfficeRenovation-cycle">
         <div className="OfficeRenovation-cycleLeft">
           <div className="OfficeRenovation-cycleIntro">
             <h2>Полный цикл ремонта офисного пространства</h2>

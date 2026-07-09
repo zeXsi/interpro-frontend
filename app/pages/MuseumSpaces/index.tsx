@@ -16,6 +16,7 @@ import { decodeUnicodeEscapes } from 'shared/utils/decodeUnicodeEscapes';
 import useEvent from '@qtpy/use-event';
 import useRefMap from '@qtpy/use-ref-map';
 import { useDebouncedUpdate } from 'shared/hooks/useDebouncedUpdate';
+import { useStickyStepCycle } from 'shared/hooks/useStickyStepCycle';
 
 import type { Route } from './+types';
 
@@ -392,34 +393,15 @@ function MuseumRequestForm() {
 }
 
 function MuseumCycleSection() {
-  const refSection = useRef<HTMLDivElement | null>(null);
+  const refSection = useRef<HTMLElement | null>(null);
   const [activeIndex, setActiveIndex] = useState(0);
   const activeStep = cycleSteps[activeIndex];
 
-  useEvent(
-    'scroll',
-    () => {
-      const section = refSection.current;
-      if (!section || typeof window === 'undefined') return;
-
-      const rect = section.getBoundingClientRect();
-      const progress = Math.min(
-        Math.max((window.innerHeight * 0.5 - rect.top) / (window.innerHeight * 0.95), 0),
-        1
-      );
-      const nextIndex = Math.min(
-        cycleSteps.length - 1,
-        Math.floor(progress * cycleSteps.length)
-      );
-
-      setActiveIndex(nextIndex);
-    },
-    {}
-  );
+  useStickyStepCycle(refSection, cycleSteps.length, setActiveIndex);
 
   return (
-    <section className="MuseumSpaces-cycleWrap">
-      <div className="MuseumSpaces-cycle" ref={refSection}>
+    <section className="MuseumSpaces-cycleWrap" ref={refSection}>
+      <div className="MuseumSpaces-cycle">
         <div className="MuseumSpaces-cycleLeft">
           <div className="MuseumSpaces-cycleIntro">
             <h2>Полный цикл создания музейного пространства</h2>
