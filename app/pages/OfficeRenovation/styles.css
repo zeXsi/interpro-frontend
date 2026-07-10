@@ -187,6 +187,10 @@
   padding: 40px;
 }
 
+.OfficeRenovation-cycleRightWrap {
+  min-width: 0;
+}
+
 .OfficeRenovation-cycleIntro {
   display: flex;
   flex-direction: column;
@@ -216,6 +220,7 @@
 
 .OfficeRenovation-cycleRight {
   background: #f5f5f5;
+  height: 100%;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -322,6 +327,10 @@
   gap: 179px;
 }
 
+.OfficeRenovation-mobileProjectList {
+  display: none;
+}
+
 .OfficeRenovation-projectCard {
   display: grid;
   grid-template-columns: repeat(5, 1fr);
@@ -422,6 +431,39 @@
   }
 }
 
+@media (max-width: 1000px) {
+  .OfficeRenovation-projectList {
+    display: none;
+  }
+
+  .OfficeRenovation-mobileProjectList {
+    display: flex;
+    flex-direction: column;
+    gap: 64px;
+  }
+
+  .OfficeRenovation-mobileProjectCard {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+
+    h3 {
+      font-family: var(--font-family);
+      font-weight: 500;
+      font-size: 64px;
+      line-height: 110%;
+      letter-spacing: -0.04em;
+      color: #111;
+    }
+
+    .OfficeRenovation-projectImage {
+      width: 100%;
+      height: auto;
+      aspect-ratio: 1;
+    }
+  }
+}
+
 .OfficeRenovation-competencies {
   padding-bottom: 216px;
   display: grid;
@@ -443,8 +485,12 @@
   }
 }
 
-.OfficeRenovation-competenceCards {
+.OfficeRenovation-competenceScroll {
   grid-column: 2 / 5;
+  width: 100%;
+}
+
+.OfficeRenovation-competenceCards {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 20px;
@@ -458,20 +504,13 @@
   background: #f5f5f5;
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
+  gap: 16px;
 
   svg {
     width: 126px;
     height: 126px;
     flex-shrink: 0;
   }
-}
-
-.OfficeRenovation-competenceText {
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
-
   h3 {
     font-family: var(--font-family);
     font-weight: 500;
@@ -490,6 +529,44 @@
     letter-spacing: -0.04em;
     color: #000;
     opacity: 0.6;
+    margin-top: auto;
+  }
+}
+
+@media (max-width: 1000px) {
+  .OfficeRenovation-competencies {
+    padding-left: 0;
+    padding-right: 0;
+
+    h2 {
+      margin-left: var(--px);
+      margin-right: var(--px);
+    }
+  }
+
+  .OfficeRenovation-competenceScroll {
+    width: 100%;
+    padding-left: var(--px);
+  }
+
+  .OfficeRenovation-competenceCards {
+    display: flex;
+    gap: 8px;
+    padding-right: var(--px);
+    scrollbar-width: none;
+
+    &::-webkit-scrollbar {
+      display: none;
+    }
+  }
+
+  .OfficeRenovation-competenceCard {
+    width: 312px;
+    min-width: 312px;
+
+    p {
+      margin-top: auto;
+    }
   }
 }
 
@@ -838,5 +915,688 @@
         stroke: #fff;
       }
     }
+  }
+}
+
+@media (max-width: 768px) {
+  .OfficeRenovation-intro {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+    padding-top: 52px;
+
+    .OfficeRenovation-introLeft {
+      display: contents;
+    }
+
+    .OfficeRenovation-introTitle {
+      order: 1;
+      max-width: none;
+      font-size: 32px;
+      line-height: 120%;
+    }
+
+    .OfficeRenovation-introText {
+      order: 2;
+      max-width: 359px;
+      font-size: 14px;
+      line-height: 136%;
+      letter-spacing: -0.02em;
+    }
+  }
+
+  .OfficeRenovation-orderButton {
+    order: 3;
+    gap: 8px;
+
+    span {
+      font-size: 18px;
+    }
+
+    svg {
+      width: 24px;
+      height: 24px;
+    }
+  }
+
+  .OfficeRenovation-why {
+    padding-top: 64px;
+    padding-bottom: 64px;
+    display: flex;
+    flex-direction: column;
+    gap: 32px;
+
+    h2 {
+      position: static;
+      font-size: 32px;
+      line-height: 120%;
+    }
+  }
+
+  .OfficeRenovation-whyCards {
+    width: 100%;
+  }
+
+  .OfficeRenovation-whyCard {
+    gap: 12px;
+    padding: 32px 0;
+
+    h3 {
+      font-size: 24px;
+    }
+
+    p {
+      font-size: 14px;
+      line-height: 136%;
+    }
+  }
+
+  .OfficeRenovation-cycleWrap {
+    height: auto;
+    padding-bottom: 64px;
+  }
+
+  .OfficeRenovation-cycle {
+    position: relative;
+    height: auto;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .OfficeRenovation-cycleLeft {
+    height: 380px;
+    padding: 24px 8px;
+    background: #f5f5f5;
+  }
+
+  .OfficeRenovation-cycleIntro {
+    gap: 16px;
+
+    h2 {
+      font-size: 48px;
+      line-height: 86%;
+    }
+
+    p {
+      font-size: 14px;
+      line-height: 126%;
+    }
+  }
+
+  .OfficeRenovation-cycleRight {
+    position: sticky;
+    top: 0;
+    height: 100svh;
+    padding: 24px;
+    justify-content: flex-start;
+    background: #ebebeb;
+  }
+
+  .OfficeRenovation-cycleRightWrap {
+    height: calc(100svh + 30svh * 5 + 20svh);
+  }
+
+  .OfficeRenovation-cycleContent {
+    gap: 48px;
+    margin: auto 0;
+  }
+
+  .OfficeRenovation-cycleText {
+    gap: 8px;
+    width: auto;
+
+    h3 {
+      font-weight: 500;
+      font-size: 28px;
+    }
+
+    p {
+      font-size: 14px;
+    }
+  }
+
+  .OfficeRenovation-projects {
+    padding-bottom: 64px;
+    gap: 32px;
+
+    .OfficeRenovation-sectionTitle {
+      font-size: 32px;
+      line-height: 120%;
+    }
+  }
+
+  .OfficeRenovation-projectList {
+    gap: 64px;
+  }
+
+  .OfficeRenovation-projectCard {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+  }
+
+  .OfficeRenovation-projectInfo {
+    gap: 24px;
+  }
+
+  .OfficeRenovation-projectText {
+    gap: 12px;
+
+    h3 {
+      font-weight: 500;
+      font-size: 64px;
+      line-height: 110%;
+      color: #111;
+    }
+
+    p {
+      font-size: 14px;
+      line-height: 136%;
+      letter-spacing: -0.02em;
+    }
+  }
+
+  .OfficeRenovation-projectMeta {
+    gap: 8px;
+  }
+
+  .OfficeRenovation-projectMetaItem {
+    gap: 8px;
+
+    span {
+      font-size: 12px;
+    }
+
+    p {
+      font-size: 20px;
+    }
+  }
+
+  .OfficeRenovation-projectLink {
+    display: none;
+  }
+
+  .OfficeRenovation-projectImage {
+    width: 100%;
+    height: auto;
+    aspect-ratio: 1;
+  }
+
+  .OfficeRenovation-competencies {
+    padding-bottom: 64px;
+    padding-left: 0;
+    padding-right: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 32px;
+
+    h2 {
+      max-width: 312px;
+      align-self: center;
+      margin-left: var(--px);
+      margin-right: var(--px);
+      font-size: 32px;
+      line-height: 120%;
+    }
+  }
+
+  .OfficeRenovation-competenceCards {
+    display: flex;
+    gap: 8px;
+    padding-right: var(--px);
+    scrollbar-width: none;
+  }
+
+  .OfficeRenovation-competenceScroll {
+    width: 100%;
+    padding-left: var(--px);
+  }
+
+  .OfficeRenovation-competenceCard {
+    width: 312px;
+    min-width: 312px;
+    height: 434px;
+    padding: 24px;
+    gap: 8px;
+
+    svg {
+      width: 60px;
+      height: 60px;
+    }
+
+    h3 {
+      font-size: 24px;
+      line-height: 110%;
+      letter-spacing: -0.02em;
+    }
+
+    p {
+      font-size: 18px;
+      line-height: 136%;
+      letter-spacing: -0.02em;
+    }
+  }
+
+  .OfficeRenovation-faqWrap {
+    padding-bottom: 64px;
+  }
+
+  .OfficeRenovation-request {
+    padding-bottom: 64px;
+    gap: 44px;
+  }
+
+  .OfficeRenovation-requestHead {
+    gap: 16px;
+
+    span {
+      font-size: 14px;
+    }
+
+    h2 {
+      font-size: 48px;
+      line-height: 100%;
+    }
+
+    p {
+      font-size: 14px;
+      line-height: 136%;
+      letter-spacing: -0.02em;
+    }
+  }
+
+  .OfficeRenovation-requestForm {
+    display: flex;
+    flex-direction: column;
+    gap: 48px;
+  }
+
+  .OfficeRenovation-requestLeft,
+  .OfficeRenovation-requestRight {
+    gap: 48px;
+  }
+
+  .OfficeRenovation-areaField,
+  .OfficeRenovation-dropdown {
+    margin-bottom: 0;
+  }
+
+  .OfficeRenovation-field {
+    span,
+    input,
+    textarea {
+      font-size: 14px;
+      letter-spacing: -0.04em;
+    }
+
+    span {
+      transform: translateY(8px);
+    }
+
+    input,
+    textarea {
+      padding: 18px 0 8px;
+    }
+
+    textarea {
+      height: 120px;
+    }
+  }
+
+  .OfficeRenovation-fieldProject textarea {
+    padding-top: 84px;
+  }
+
+  .OfficeRenovation-dropdown > button span,
+  .OfficeRenovation-dropdownMenu button {
+    font-size: 14px;
+    letter-spacing: -0.04em;
+  }
+
+  .OfficeRenovation-dropdownMenu {
+    padding: 36px 16px;
+  }
+
+  .OfficeRenovation-requestFooter {
+    gap: 16px;
+    margin-top: -4px;
+  }
+
+  .OfficeRenovation-submit.ButtonArrow {
+    .Button {
+      font-size: 18px;
+    }
+
+    svg {
+      width: 24px;
+      height: 24px;
+    }
+  }
+
+  .OfficeRenovation-checkbox {
+    --checkboxSize: 24px;
+    gap: 8px;
+
+    .OfficeRenovation-checkboxText {
+      font-size: 14px;
+      font-weight: 400;
+    }
+  }
+}
+
+@media (max-width: 1000px) {
+  .OfficeRenovation-why h2 br {
+    display: none;
+  }
+
+  .OfficeRenovation-projectText p {
+    display: none;
+  }
+
+  .OfficeRenovation-projectMeta {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .OfficeRenovation-projectMetaItem.isType {
+    display: none;
+  }
+}
+
+@media (min-width: 541px) and (max-width: 1000px) {
+  .OfficeRenovation-intro {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+    padding-top: 32px;
+
+    .OfficeRenovation-introLeft {
+      display: contents;
+    }
+
+    .OfficeRenovation-introTitle {
+      order: 1;
+      max-width: none;
+      font-size: 48px;
+      line-height: 120%;
+    }
+
+    .OfficeRenovation-introText {
+      order: 2;
+      max-width: 736px;
+      font-size: 18px;
+      line-height: 136%;
+      letter-spacing: -0.02em;
+    }
+  }
+
+  .OfficeRenovation-orderButton {
+    order: 3;
+    gap: 8px;
+
+    span {
+      font-size: 24px;
+    }
+
+    svg {
+      width: 32px;
+      height: 32px;
+    }
+  }
+
+  .OfficeRenovation-why {
+    padding-top: 124px;
+    padding-bottom: 124px;
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    column-gap: 20px;
+    row-gap: 24px;
+
+    h2 {
+      grid-column: 1 / -1;
+      position: static;
+      font-weight: 500;
+      font-size: 20px;
+      line-height: 120%;
+      letter-spacing: -0.04em;
+      text-transform: uppercase;
+      opacity: 0.5;
+    }
+  }
+
+  .OfficeRenovation-whyCards {
+    grid-column: 1 / 2;
+  }
+
+  .OfficeRenovation-whyCard {
+    gap: 8px;
+    padding: 24px 0;
+
+    &:first-child {
+      padding-top: 0;
+    }
+
+    h3 {
+      font-size: 32px;
+    }
+
+    p {
+      font-size: 18px;
+      line-height: 126%;
+    }
+  }
+
+  .OfficeRenovation-cycleWrap {
+    height: auto;
+    padding-bottom: 124px;
+  }
+
+  .OfficeRenovation-cycle {
+    position: relative;
+    height: auto;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .OfficeRenovation-cycleLeft {
+    height: 464px;
+    padding: 40px 16px;
+    background: #f5f5f5;
+  }
+
+  .OfficeRenovation-cycleIntro {
+    gap: 16px;
+
+    h2 {
+      font-size: 64px;
+      line-height: 86%;
+    }
+
+    p {
+      font-size: 18px;
+    }
+  }
+
+  .OfficeRenovation-cycleRightWrap {
+    height: calc(100svh + 30svh * 5 + 20svh);
+  }
+
+  .OfficeRenovation-cycleRight {
+    position: sticky;
+    top: 0;
+    height: 100svh;
+    padding: 40px 40px 40px 135px;
+    justify-content: flex-start;
+    background: #ebebeb;
+  }
+
+  .OfficeRenovation-cycleContent {
+    gap: 64px;
+    margin: auto 0;
+  }
+
+  .OfficeRenovation-cycleText {
+    gap: 8px;
+    width: auto;
+
+    h3 {
+      font-weight: 500;
+      font-size: 48px;
+    }
+
+    p {
+      font-size: 18px;
+    }
+  }
+
+  .OfficeRenovation-projects {
+    padding-bottom: 124px;
+    gap: 40px;
+
+    .OfficeRenovation-sectionTitle {
+      font-size: 48px;
+      line-height: 120%;
+    }
+  }
+
+  .OfficeRenovation-projectList {
+    gap: 64px;
+  }
+
+  .OfficeRenovation-projectCard {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+  }
+
+  .OfficeRenovation-projectInfo {
+    gap: 24px;
+  }
+
+  .OfficeRenovation-projectText h3 {
+    font-weight: 500;
+    font-size: 64px;
+    line-height: 120%;
+  }
+
+  .OfficeRenovation-projectMetaItem {
+    gap: 4px;
+
+    span {
+      font-size: 14px;
+    }
+
+    p {
+      font-size: 20px;
+    }
+  }
+
+  .OfficeRenovation-projectLink {
+    display: none;
+  }
+
+  .OfficeRenovation-projectImage {
+    width: 100%;
+    height: 414px;
+  }
+
+  .OfficeRenovation-competencies {
+    padding-top: 64px;
+    padding-bottom: 124px;
+    display: flex;
+    flex-direction: column;
+    gap: 44px;
+
+    h2 {
+      max-width: 600px;
+      align-self: center;
+      font-size: 48px;
+      line-height: 120%;
+    }
+  }
+
+  .OfficeRenovation-competenceCard {
+    width: 312px;
+    min-width: 312px;
+    height: 461px;
+    padding: 24px;
+    border-radius: 4px;
+    gap: 8px;
+
+    h3 {
+      font-size: 32px;
+    }
+  }
+}
+
+@media (max-width: 540px) {
+  .OfficeRenovation-intro {
+    padding-top: 24px;
+  }
+
+  .OfficeRenovation-why {
+    padding-top: 96px;
+    padding-bottom: 96px;
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    column-gap: 8px;
+    row-gap: 16px;
+
+    h2 {
+      grid-column: 1 / -1;
+      position: static;
+      font-weight: 500;
+      font-size: 14px;
+      line-height: 120%;
+      letter-spacing: -0.03em;
+      text-transform: uppercase;
+      opacity: 0.5;
+    }
+  }
+
+  .OfficeRenovation-whyCards {
+    grid-column: 1 / -1;
+  }
+
+  .OfficeRenovation-whyCard {
+    gap: 8px;
+    padding: 24px 0;
+
+    &:first-child {
+      padding-top: 0;
+    }
+
+    h3 {
+      font-size: 24px;
+    }
+
+    p {
+      font-size: 14px;
+      line-height: 126%;
+    }
+  }
+
+  .OfficeRenovation-cycleWrap,
+  .OfficeRenovation-competencies,
+  .OfficeRenovation-faqWrap,
+  .OfficeRenovation-request {
+    padding-bottom: 96px;
+  }
+}
+
+@media (max-width: 1000px) {
+  .OfficeRenovation-projectMeta {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .OfficeRenovation-projectMeta .OfficeRenovation-projectMetaItem.isType {
+    display: none;
+  }
+
+  .OfficeRenovation-projectMeta .OfficeRenovation-projectMetaItem:not(.isType):first-child {
+    grid-column: 1;
+  }
+
+  .OfficeRenovation-projectMeta .OfficeRenovation-projectMetaItem.isYear {
+    grid-column: 2;
   }
 }

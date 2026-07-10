@@ -107,6 +107,8 @@ export function useStickyStepCycle(
     };
 
     const handleScroll = () => {
+      if (lockRef.current) return;
+
       updateActiveIndex();
       clearSnapTimer();
       snapTimerRef.current = window.setTimeout(snapToNearestStep, SNAP_IDLE_MS);

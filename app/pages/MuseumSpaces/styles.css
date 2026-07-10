@@ -91,51 +91,103 @@
   padding-top: 216px;
   display: flex;
   flex-direction: column;
-  gap: 48px;
+  gap: 50px;
+}
 
-  .MuseumSpaces-createCards {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    column-gap: 20px;
-    row-gap: 96px;
+.MuseumSpaces-createHead {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.MuseumSpaces-createTitle {
+  font-family: var(--font-family);
+  font-weight: 500;
+  font-size: 18px;
+  line-height: 120%;
+  letter-spacing: -0.02em;
+  text-transform: uppercase;
+  color: #000;
+  opacity: 0.6;
+}
+
+.MuseumSpaces-createControls {
+  display: flex;
+  gap: 8px;
+
+  button {
+    width: 48px;
+    height: 48px;
+    border-radius: 100px;
+    background: #f5f5f5;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+
+    svg {
+      width: 32px;
+      height: 32px;
+    }
+
+    &:disabled {
+      pointer-events: none;
+      cursor: default;
+    }
+  }
+}
+
+.MuseumSpaces-createScroll {
+  width: 100%;
+  padding-left: var(--px);
+}
+
+.MuseumSpaces-createCards {
+  display: grid;
+  grid-template-columns: repeat(6, 352px);
+  gap: 20px;
+  width: max-content;
+  padding-right: var(--px);
+}
+
+.MuseumSpaces-createCard {
+  width: 352px;
+  height: 297px;
+  padding: 32px;
+  background: #f5f5f5;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+
+  svg {
+    width: 48px;
+    height: 48px;
+    flex-shrink: 0;
+  }
+}
+
+.MuseumSpaces-createCardText {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+
+  h3 {
+    font-family: var(--font-family);
+    font-weight: 400;
+    font-size: 32px;
+    line-height: 120%;
+    letter-spacing: -0.04em;
+    color: #000;
   }
 
-  .MuseumSpaces-createCard {
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
-
-    img {
-      width: 100%;
-      height: 480px;
-      object-fit: cover;
-    }
-  }
-
-  .MuseumSpaces-createCardText {
-    display: flex;
-    flex-direction: column;
-    gap: 4px;
-
-    h3 {
-      font-family: var(--font-family);
-      font-weight: 400;
-      font-size: 36px;
-      line-height: 120%;
-      letter-spacing: -0.04em;
-      color: #000;
-    }
-
-    p {
-      font-family: var(--font-family);
-      font-weight: 400;
-      font-size: 18px;
-      line-height: 126%;
-      letter-spacing: -0.02em;
-      color: #000;
-      opacity: 0.6;
-      max-width: 520px;
-    }
+  p {
+    font-family: var(--font-family);
+    font-weight: 400;
+    font-size: 18px;
+    line-height: 126%;
+    letter-spacing: -0.02em;
+    color: #000;
+    opacity: 0.6;
   }
 }
 
@@ -304,6 +356,20 @@
   }
 }
 
+.MuseumSpaces-mobileProjectList {
+  display: none;
+}
+
+@media (max-width: 1000px) {
+  .MuseumSpaces-projectMetaItem.isType {
+    display: none;
+  }
+
+  .MuseumSpaces-mobileProjectMeta {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
 .MuseumSpaces-cycleWrap {
   width: 100%;
   height: calc(100vh + 30vh * 5 + 20vh);
@@ -331,6 +397,10 @@
   align-items: center;
   justify-content: flex-start;
   padding: 40px;
+}
+
+.MuseumSpaces-cycleRightWrap {
+  min-width: 0;
 }
 
 .MuseumSpaces-cycleIntro {
@@ -362,6 +432,7 @@
 
 .MuseumSpaces-cycleRight {
   background: #f5f5f5;
+  height: 100%;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -478,8 +549,12 @@
   }
 }
 
-.MuseumSpaces-competenceCards {
+.MuseumSpaces-competenceScroll {
   grid-column: 2 / 5;
+  width: 100%;
+}
+
+.MuseumSpaces-competenceCards {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 20px;
@@ -493,20 +568,13 @@
   background: #f5f5f5;
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
+  gap: 16px;
 
   svg {
     width: 126px;
     height: 126px;
     flex-shrink: 0;
   }
-}
-
-.MuseumSpaces-competenceText {
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
-
   h3 {
     font-family: var(--font-family);
     font-weight: 500;
@@ -525,6 +593,44 @@
     letter-spacing: -0.04em;
     color: #000;
     opacity: 0.6;
+    margin-top: auto;
+  }
+}
+
+@media (max-width: 1000px) {
+  .MuseumSpaces-competencies {
+    padding-left: 0;
+    padding-right: 0;
+
+    h2 {
+      margin-left: var(--px);
+      margin-right: var(--px);
+    }
+  }
+
+  .MuseumSpaces-competenceScroll {
+    width: 100%;
+    padding-left: var(--px);
+  }
+
+  .MuseumSpaces-competenceCards {
+    display: flex;
+    gap: 8px;
+    padding-right: var(--px);
+    scrollbar-width: none;
+
+    &::-webkit-scrollbar {
+      display: none;
+    }
+  }
+
+  .MuseumSpaces-competenceCard {
+    width: 312px;
+    min-width: 312px;
+
+    p {
+      margin-top: auto;
+    }
   }
 }
 
@@ -832,6 +938,8 @@
     display: flex;
     justify-content: center;
     align-items: center;
+    width: var(--checkboxSize);
+    height: var(--checkboxSize);
     min-width: var(--checkboxSize);
     min-height: var(--checkboxSize);
     border: 1px solid rgba(0, 0, 0, 0.3);
@@ -869,5 +977,718 @@
         stroke: #fff;
       }
     }
+  }
+}
+
+@media (max-width: 768px) {
+  .MuseumSpaces-intro {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+    padding-top: 24px;
+
+    .MuseumSpaces-introLeft {
+      display: contents;
+    }
+
+    .MuseumSpaces-introTitle {
+      order: 1;
+      max-width: none;
+      font-size: 32px;
+      line-height: 120%;
+    }
+
+    .MuseumSpaces-introText {
+      order: 2;
+      max-width: 359px;
+      font-size: 14px;
+      line-height: 136%;
+      letter-spacing: -0.02em;
+    }
+  }
+
+  .MuseumSpaces-orderButton {
+    order: 3;
+    gap: 8px;
+
+    span {
+      font-size: 18px;
+    }
+
+    svg {
+      width: 24px;
+      height: 24px;
+    }
+  }
+
+  .MuseumSpaces-create {
+    padding-top: 96px;
+    gap: 24px;
+  }
+
+  .MuseumSpaces-createControls {
+    display: none;
+  }
+
+  .MuseumSpaces-createCards {
+    grid-template-columns: repeat(6, 227px);
+    gap: 8px;
+  }
+
+  .MuseumSpaces-createCard {
+    width: 227px;
+    height: auto;
+    padding: 16px;
+    gap: 16px;
+
+    svg {
+      width: 32px;
+      height: 32px;
+    }
+  }
+
+  .MuseumSpaces-createCardText {
+    gap: 8px;
+
+    h3 {
+      font-size: 20px;
+    }
+
+    p {
+      font-size: 14px;
+      line-height: 126%;
+    }
+  }
+
+  .MuseumSpaces-projects {
+    padding-top: 96px;
+    padding-bottom: 96px;
+    gap: 32px;
+
+    .MuseumSpaces-sectionTitle {
+      font-size: 32px;
+      line-height: 120%;
+    }
+
+    .MuseumSpaces-projectsBoard {
+      display: none;
+    }
+  }
+
+  .MuseumSpaces-mobileProjectList {
+    display: flex;
+    flex-direction: column;
+    gap: 64px;
+  }
+
+  .MuseumSpaces-mobileProjectCard {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+  }
+
+  .MuseumSpaces-mobileProjectText {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+
+    h3 {
+      font-family: var(--font-family);
+      font-weight: 500;
+      font-size: 64px;
+      line-height: 110%;
+      letter-spacing: -0.04em;
+      color: #111;
+    }
+
+    p {
+      font-family: var(--font-family);
+      font-weight: 400;
+      font-size: 14px;
+      line-height: 136%;
+      letter-spacing: -0.02em;
+      color: #000;
+      opacity: 0.5;
+    }
+  }
+
+  .MuseumSpaces-mobileProjectMeta {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 8px;
+
+    .MuseumSpaces-projectMetaItem {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+
+      span {
+        font-family: var(--font-family);
+        font-weight: 500;
+        font-size: 12px;
+        line-height: 100%;
+        text-transform: uppercase;
+        color: #000;
+        opacity: 0.5;
+      }
+
+      p {
+        font-family: var(--font-family);
+        font-weight: 400;
+        font-size: 20px;
+        line-height: 110%;
+        letter-spacing: -0.04em;
+        color: #000;
+      }
+    }
+  }
+
+  .MuseumSpaces-mobileProjectCard .MuseumSpaces-projectImage {
+    width: 100%;
+    height: auto;
+    aspect-ratio: 1;
+    overflow: hidden;
+  }
+
+  .MuseumSpaces-cycleWrap {
+    height: auto;
+    padding-bottom: 96px;
+  }
+
+  .MuseumSpaces-cycle {
+    position: relative;
+    height: auto;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .MuseumSpaces-cycleLeft {
+    height: 380px;
+    padding: 24px 8px;
+    background: #f5f5f5;
+  }
+
+  .MuseumSpaces-cycleIntro {
+    gap: 16px;
+
+    h2 {
+      font-size: 48px;
+      line-height: 86%;
+    }
+
+    p {
+      font-size: 14px;
+      line-height: 126%;
+    }
+  }
+
+  .MuseumSpaces-cycleRight {
+    position: sticky;
+    top: 0;
+    height: 100svh;
+    padding: 24px;
+    justify-content: flex-start;
+    background: #ebebeb;
+  }
+
+  .MuseumSpaces-cycleRightWrap {
+    height: calc(100svh + 30svh * 5 + 20svh);
+  }
+
+  .MuseumSpaces-cycleContent {
+    gap: 48px;
+    margin: auto 0;
+  }
+
+  .MuseumSpaces-cycleNumbers {
+    gap: 16px;
+  }
+
+  .MuseumSpaces-cycleText {
+    gap: 8px;
+    width: auto;
+
+    h3 {
+      font-weight: 500;
+      font-size: 28px;
+    }
+
+    p {
+      font-size: 14px;
+    }
+  }
+
+  .MuseumSpaces-competencies {
+    padding-bottom: 96px;
+    display: flex;
+    flex-direction: column;
+    gap: 32px;
+
+    h2 {
+      max-width: 312px;
+      align-self: center;
+      font-size: 32px;
+      line-height: 120%;
+    }
+  }
+
+  .MuseumSpaces-competenceCards {
+    display: flex;
+    gap: 8px;
+    padding-right: var(--px);
+    scrollbar-width: none;
+  }
+
+  .MuseumSpaces-competenceCard {
+    width: 312px;
+    min-width: 312px;
+    height: 434px;
+    padding: 24px;
+    gap: 8px;
+
+    svg {
+      width: 60px;
+      height: 60px;
+    }
+
+    h3 {
+      font-size: 24px;
+      line-height: 110%;
+      letter-spacing: -0.02em;
+    }
+
+    p {
+      font-size: 18px;
+      line-height: 136%;
+      letter-spacing: -0.02em;
+    }
+  }
+
+  .MuseumSpaces-faqWrap {
+    padding-bottom: 96px;
+  }
+
+  .MuseumSpaces-request {
+    padding-bottom: 96px;
+    gap: 44px;
+  }
+
+  .MuseumSpaces-requestHead {
+    gap: 16px;
+
+    span {
+      font-size: 14px;
+    }
+
+    h2 {
+      font-size: 48px;
+      line-height: 100%;
+    }
+
+    p {
+      font-size: 14px;
+      line-height: 136%;
+      letter-spacing: -0.02em;
+    }
+  }
+
+  .MuseumSpaces-requestForm {
+    display: flex;
+    flex-direction: column;
+    gap: 48px;
+  }
+
+  .MuseumSpaces-requestLeft,
+  .MuseumSpaces-requestRight {
+    gap: 48px;
+  }
+
+  .MuseumSpaces-field {
+    span,
+    input,
+    textarea {
+      font-size: 14px;
+      letter-spacing: -0.04em;
+    }
+
+    span {
+      transform: translateY(8px);
+    }
+
+    input,
+    textarea {
+      padding: 18px 0 8px;
+    }
+
+    textarea {
+      height: 120px;
+    }
+  }
+
+  .MuseumSpaces-fieldProject textarea {
+    padding-top: 84px;
+  }
+
+  .MuseumSpaces-dropdown > button span,
+  .MuseumSpaces-dropdownMenu button {
+    font-size: 14px;
+    letter-spacing: -0.04em;
+  }
+
+  .MuseumSpaces-dropdownMenu {
+    padding: 36px 16px;
+  }
+
+  .MuseumSpaces-requestFooter {
+    gap: 16px;
+    margin-top: -4px;
+  }
+
+  .MuseumSpaces-submit.ButtonArrow {
+    .Button {
+      font-size: 18px;
+    }
+
+    svg {
+      width: 24px;
+      height: 24px;
+    }
+  }
+
+  .MuseumSpaces-checkbox {
+    --checkboxSize: 24px;
+    gap: 8px;
+
+    .MuseumSpaces-checkboxText {
+      font-size: 14px;
+      font-weight: 400;
+    }
+  }
+}
+
+@media (min-width: 541px) and (max-width: 1000px) {
+  .MuseumSpaces-hero {
+    height: 100svh;
+  }
+
+  .MuseumSpaces-intro {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+    padding-top: 32px;
+
+    .MuseumSpaces-introLeft {
+      display: contents;
+    }
+
+    .MuseumSpaces-introTitle {
+      order: 1;
+      max-width: none;
+      font-size: 48px;
+      line-height: 120%;
+    }
+
+    .MuseumSpaces-introText {
+      order: 2;
+      max-width: 736px;
+      font-size: 18px;
+      line-height: 136%;
+      letter-spacing: -0.02em;
+      color: #0c0c0c;
+    }
+  }
+
+  .MuseumSpaces-orderButton {
+    order: 3;
+    gap: 8px;
+
+    span {
+      font-size: 24px;
+    }
+
+    svg {
+      width: 32px;
+      height: 32px;
+    }
+  }
+
+  .MuseumSpaces-create {
+    padding-top: 124px;
+    gap: 24px;
+  }
+
+  .MuseumSpaces-createTitle {
+    font-size: 20px;
+    letter-spacing: -0.04em;
+    opacity: 0.5;
+  }
+
+  .MuseumSpaces-createControls {
+    display: none;
+  }
+
+  .MuseumSpaces-createCards {
+    grid-template-columns: repeat(6, 282px);
+    gap: 8px;
+  }
+
+  .MuseumSpaces-createCard {
+    width: 282px;
+    height: auto;
+    padding: 16px 16px 28px;
+    gap: 16px;
+
+    svg {
+      width: 32px;
+      height: 32px;
+    }
+  }
+
+  .MuseumSpaces-createCardText {
+    gap: 8px;
+
+    h3 {
+      font-size: 28px;
+    }
+
+    p {
+      font-size: 18px;
+      line-height: 126%;
+    }
+  }
+
+  .MuseumSpaces-projects {
+    padding-top: 124px;
+    padding-bottom: 124px;
+    gap: 40px;
+
+    .MuseumSpaces-sectionTitle {
+      font-size: 48px;
+      line-height: 120%;
+    }
+
+    .MuseumSpaces-projectsBoard {
+      display: none;
+    }
+  }
+
+  .MuseumSpaces-mobileProjectList {
+    display: flex;
+    flex-direction: column;
+    gap: 64px;
+  }
+
+  .MuseumSpaces-mobileProjectCard {
+    gap: 24px;
+  }
+
+  .MuseumSpaces-mobileProjectText h3 {
+    font-size: 64px;
+    line-height: 120%;
+    color: #000;
+  }
+
+  .MuseumSpaces-mobileProjectMeta {
+    gap: 8px;
+
+    .MuseumSpaces-projectMetaItem {
+      gap: 4px;
+
+      span {
+        font-size: 14px;
+      }
+
+      p {
+        font-size: 20px;
+      }
+    }
+  }
+
+  .MuseumSpaces-mobileProjectCard .MuseumSpaces-projectImage {
+    width: 100%;
+    height: 414px;
+  }
+
+  .MuseumSpaces-cycleWrap {
+    height: auto;
+    padding-bottom: 124px;
+  }
+
+  .MuseumSpaces-cycle {
+    position: relative;
+    height: auto;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .MuseumSpaces-cycleLeft {
+    height: 464px;
+    padding: 40px 16px;
+    background: #f5f5f5;
+  }
+
+  .MuseumSpaces-cycleIntro {
+    gap: 16px;
+
+    h2 {
+      font-size: 64px;
+      line-height: 86%;
+    }
+
+    p {
+      font-size: 18px;
+      line-height: 126%;
+    }
+  }
+
+  .MuseumSpaces-cycleRightWrap {
+    height: calc(100svh + 30svh * 5 + 20svh);
+  }
+
+  .MuseumSpaces-cycleRight {
+    position: sticky;
+    top: 0;
+    height: 100svh;
+    padding: 40px 40px 40px 135px;
+    justify-content: flex-start;
+    background: #ebebeb;
+  }
+
+  .MuseumSpaces-cycleContent {
+    gap: 64px;
+    margin: auto 0;
+  }
+
+  .MuseumSpaces-cycleText {
+    gap: 8px;
+    width: auto;
+
+    h3 {
+      font-weight: 500;
+      font-size: 48px;
+    }
+
+    p {
+      font-size: 18px;
+    }
+  }
+
+  .MuseumSpaces-competencies {
+    padding-top: 64px;
+    padding-bottom: 124px;
+    display: flex;
+    flex-direction: column;
+    gap: 44px;
+
+    h2 {
+      max-width: 600px;
+      align-self: center;
+      font-size: 48px;
+      line-height: 120%;
+    }
+  }
+
+  .MuseumSpaces-competenceCard {
+    width: 312px;
+    min-width: 312px;
+    height: 461px;
+    padding: 24px;
+    border-radius: 4px;
+    gap: 8px;
+
+    svg {
+      width: 60px;
+      height: 60px;
+    }
+
+    h3 {
+      font-size: 32px;
+      line-height: 110%;
+      letter-spacing: -0.02em;
+      color: #0c0c0c;
+    }
+
+    p {
+      font-size: 18px;
+      line-height: 136%;
+      letter-spacing: -0.02em;
+      color: #0c0c0c;
+    }
+  }
+
+  .MuseumSpaces-faqWrap {
+    padding-bottom: 64px;
+  }
+
+  .MuseumSpaces-request {
+    padding-bottom: 124px;
+    gap: 64px;
+  }
+
+  .MuseumSpaces-requestHead {
+    gap: 16px;
+
+    h2 {
+      font-size: 64px;
+    }
+
+    p {
+      font-size: 18px;
+      line-height: 136%;
+      letter-spacing: -0.02em;
+    }
+  }
+
+  .MuseumSpaces-requestForm {
+    display: flex;
+    flex-direction: column;
+    gap: 48px;
+  }
+
+  .MuseumSpaces-requestLeft,
+  .MuseumSpaces-requestRight {
+    gap: 48px;
+  }
+
+  .MuseumSpaces-field {
+    span,
+    input,
+    textarea {
+      font-size: 18px;
+      letter-spacing: -0.04em;
+    }
+
+    input,
+    textarea {
+      padding: 22px 0 12px;
+    }
+  }
+
+  .MuseumSpaces-dropdown > button span,
+  .MuseumSpaces-dropdownMenu button {
+    font-size: 18px;
+    letter-spacing: -0.04em;
+  }
+
+  .MuseumSpaces-dropdownMenu {
+    padding: 36px 16px;
+  }
+}
+
+@media (max-width: 1000px) {
+  .MuseumSpaces-mobileProjectMeta {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .MuseumSpaces-mobileProjectMeta .MuseumSpaces-projectMetaItem.isType {
+    display: none;
+  }
+
+  .MuseumSpaces-mobileProjectMeta .MuseumSpaces-projectMetaItem:not(.isType):first-child {
+    grid-column: 1;
+  }
+
+  .MuseumSpaces-mobileProjectMeta .MuseumSpaces-projectMetaItem.isYear {
+    grid-column: 2;
   }
 }

@@ -2,9 +2,18 @@ import './styles.css';
 
 import ArrowIcon from 'assets/icons/arrow.svg?react';
 import CheckmarkIcon from 'assets/icons/checkmark.svg?react';
+import { sendLead } from 'api/form';
 import { getProjects } from 'api/projects/projects.api';
 import type { Project } from 'api/projects/projects.types';
-import { useEffect, useLayoutEffect, useRef, useState, type CSSProperties, type RefObject } from 'react';
+import {
+  useEffect,
+  useLayoutEffect,
+  useRef,
+  useState,
+  type CSSProperties,
+  type FormEvent,
+  type RefObject,
+} from 'react';
 import { getOpenGraphMeta } from 'shared/seo/meta';
 import StartPage from 'shared/components/StartPage';
 import Link from 'shared/components/Link';
@@ -132,33 +141,27 @@ const projectTerms = ['до 1 месяца', '1-3 месяца', 'от 3 мес�
 const creationCards = [
   {
     title: 'Корпоративный музей',
-    description: 'История компании, технологии или достижения в формате живой экспозиции.',
-    image: 'https://api.interpro.pro/wp-content/uploads/2025/09/casarte-002-1.jpg.webp',
+    description: 'История бренда, предприятия или организации в виде постоянной экспозиции',
   },
   {
     title: 'Центр посетителей',
-    description: 'Пространство для демонстрации продукта, производства или бренда.',
-    image: 'https://api.interpro.pro/wp-content/uploads/2025/08/1-29.webp',
+    description: 'Пространство для демонстрации технологий, продуктов и достижений клиентам и партнёрам.',
   },
   {
     title: 'Образовательная среда',
-    description: 'Интерактивные зоны, классы и экспозиции для обучения через опыт.',
-    image: 'https://api.interpro.pro/wp-content/uploads/2025/08/dsc8088-kopia.jpg.webp',
+    description: 'Экспозиции для учебных центров, университетов и научных институтов',
   },
   {
     title: 'Арт-выставка',
-    description: 'Временные и постоянные экспозиции с продуманной драматургией маршрута.',
-    image: 'https://api.interpro.pro/wp-content/uploads/2025/08/dsc9934-kopia.jpg.webp',
+    description: 'Временные и постоянные выставки современного искусства и авторских проектов',
   },
   {
     title: 'Иммерсивное шоу',
-    description: 'Сценарные пространства, где свет, звук и медиа работают на впечатление.',
-    image: 'https://api.interpro.pro/wp-content/uploads/2025/09/002-10.jpg.webp',
+    description: 'Пространства для фантазии, сказочных и событийных иммерсивных форматов',
   },
   {
     title: 'Брендовое пространство',
-    description: 'Среда, которая раскрывает ценности бренда через архитектуру и контент.',
-    image: 'https://api.interpro.pro/wp-content/uploads/2025/08/01.jpg.webp',
+    description: 'Интерьер как медиа — для шоурумов, флагманских точек и флоатинг-форматов',
   },
 ];
 
@@ -179,6 +182,11 @@ export function meta() {
 
 export default function MuseumSpaces({ loaderData }: Route.ComponentProps) {
   const selectedProjects = getSelectedProjects(loaderData.projects);
+  const creationScrollRef = useRef<HTMLDivElement>(null);
+  const [creationScrollState, setCreationScrollState] = useState({
+    canScrollLeft: false,
+    canScrollRight: false,
+  });
 
   const scrollToContactForm = () => {
     if (typeof document === 'undefined') return;
@@ -198,6 +206,39 @@ export default function MuseumSpaces({ loaderData }: Route.ComponentProps) {
 
     window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
   };
+
+  const scrollCreationCards = (direction: 'left' | 'right') => {
+    creationScrollRef.current?.scrollBy({
+      left: direction === 'left' ? -372 : 372,
+      behavior: 'smooth',
+    });
+  };
+
+  const updateCreationScrollState = () => {
+    const element = creationScrollRef.current;
+    if (!element) return;
+
+    const maxScrollLeft = element.scrollWidth - element.clientWidth;
+
+    setCreationScrollState({
+      canScrollLeft: element.scrollLeft > 0,
+      canScrollRight: element.scrollLeft < maxScrollLeft - 1,
+    });
+  };
+
+  useEffect(() => {
+    const element = creationScrollRef.current;
+    if (!element) return;
+
+    updateCreationScrollState();
+    element.addEventListener('scroll', updateCreationScrollState, { passive: true });
+    window.addEventListener('resize', updateCreationScrollState);
+
+    return () => {
+      element.removeEventListener('scroll', updateCreationScrollState);
+      window.removeEventListener('resize', updateCreationScrollState);
+    };
+  }, []);
 
   return (
     <StartPage>
@@ -221,7 +262,7 @@ export default function MuseumSpaces({ loaderData }: Route.ComponentProps) {
               Проектируем и создаём музейные пространства под ключ
             </h1>
             <button className="MuseumSpaces-orderButton" type="button" onClick={scrollToContactForm}>
-              <span>заказать звонок</span>
+              <span>обсудить проект</span>
               <ArrowIcon />
             </button>
           </div>
@@ -231,18 +272,40 @@ export default function MuseumSpaces({ loaderData }: Route.ComponentProps) {
           </p>
         </section>
 
-        <section className="MuseumSpaces-create px">
-          <h2 className="MuseumSpaces-sectionTitle">Что мы создаём</h2>
-          <div className="MuseumSpaces-createCards">
-            {creationCards.map((card) => (
+        <section className="MuseumSpaces-create">
+          <div className="MuseumSpaces-createHead px">
+            <h2 className="MuseumSpaces-createTitle">( Что мы создаём )</h2>
+            <div className="MuseumSpaces-createControls">
+              <button
+                type="button"
+                aria-label="Предыдущие карточки"
+                disabled={!creationScrollState.canScrollLeft}
+                onClick={() => scrollCreationCards('left')}
+              >
+                <CreationArrowIcon direction="left" />
+              </button>
+              <button
+                type="button"
+                aria-label="Следующие карточки"
+                disabled={!creationScrollState.canScrollRight}
+                onClick={() => scrollCreationCards('right')}
+              >
+                <CreationArrowIcon direction="right" />
+              </button>
+            </div>
+          </div>
+          <div className="MuseumSpaces-createScroll horizon-scroll" ref={creationScrollRef}>
+            <div className="MuseumSpaces-createCards">
+              {creationCards.map((card, index) => (
               <article className="MuseumSpaces-createCard" key={card.title}>
-                <img src={card.image} alt={card.title} loading="lazy" />
+                <CreationCardIcon index={index} />
                 <div className="MuseumSpaces-createCardText">
                   <h3>{card.title}</h3>
                   <p>{card.description}</p>
                 </div>
               </article>
-            ))}
+              ))}
+            </div>
           </div>
         </section>
 
@@ -265,20 +328,45 @@ export default function MuseumSpaces({ loaderData }: Route.ComponentProps) {
   );
 }
 
+function CreationCardIcon({ index }: { index: number }) {
+  switch (index) {
+    case 0:
+      return <svg width="48" height="48" viewBox="0 0 48 48" fill="none" aria-hidden="true"><path d="M3.359 12.952h41.27L23.994 3 3.36 12.952ZM45 15.14H3v3.38h42v-3.38ZM45 41.617H3v3.378h42v-3.378ZM13.329 20.617H6.664v18.991h6.665V20.617ZM27.384 20.617h-6.665v18.991h6.665V20.617ZM41.345 20.617H34.68v18.991h6.665V20.617Z" fill="black" /></svg>;
+    case 1:
+      return <svg width="48" height="48" viewBox="0 0 44 44" fill="none" aria-hidden="true"><path fillRule="evenodd" clipRule="evenodd" d="M5.861 27.807c10.812-1.495 21.572-1.491 32.282 0v11.352h-3.572v-5.387a1.97 1.97 0 0 0-3.938 0v5.387h-3.128v-5.387a1.97 1.97 0 0 0-3.938 0v5.387h-3.128v-5.387a1.97 1.97 0 0 0-3.938 0v5.387h-3.128v-5.387a1.97 1.97 0 0 0-3.938 0v5.387H5.863V27.807ZM3.906 40.408h36.19v1.842H3.907v-1.842ZM5.861 2.862c5.568-.77 11.124-1.143 16.665-1.119l1.883 11.249c-1.323-.026-2.648-.031-3.972-.013V8.827a1.97 1.97 0 0 0-3.938 0v4.269c-1.043.048-2.086.112-3.128.187V8.827a1.97 1.97 0 0 0-3.938 0v4.811c-1.191.127-2.382.271-3.572.435V2.863ZM5.861 15.334c10.812-1.495 21.572-1.491 32.282 0v11.21c-1.208-.166-2.417-.313-3.626-.443v-4.76a1.97 1.97 0 0 0-3.938 0v4.407a77.45 77.45 0 0 0-3.128-.186v-4.22a1.97 1.97 0 0 0-3.938 0v4.106c-1.043-.013-2.085-.012-3.128.002v-4.109a1.97 1.97 0 0 0-3.938 0v4.229c-1.043.049-2.086.113-3.128.19v-4.419a1.97 1.97 0 0 0-3.938 0v4.774a75.848 75.848 0 0 0-3.52.429V15.334Z" fill="black" /></svg>;
+    case 2:
+      return <svg width="48" height="48" viewBox="0 0 48 48" fill="none" aria-hidden="true"><path d="M27.18 11.19V5.952A.95.95 0 0 0 26.237 5h-7.551a.95.95 0 0 0-.944.952v5.238h9.438ZM17.742 13.095V32.62h9.438V13.095h-9.438Zm2.36 15.238a.95.95 0 0 1 .944-.952h2.36a.95.95 0 1 1 0 1.905h-2.36a.95.95 0 0 1-.944-.952ZM17.742 34.524h9.438v3.81a.95.95 0 0 1-.944.952h-7.551a.95.95 0 0 1-.944-.952v-3.81ZM15.854 34.524v3.81a.95.95 0 0 1-.944.952H9.247a.95.95 0 0 1-.944-.952v-3.81h7.551ZM15.854 32.62v-4.762H8.303v4.762h7.551ZM15.854 25.952V12.143a.95.95 0 0 0-.944-.952H9.247a.95.95 0 0 0-.944.952v13.81h7.551ZM39.142 21.745l.816 4.674-7.437 1.322-.817-4.672 7.438-1.324ZM40.286 28.295l-7.437 1.322 1.437 8.226a.95.95 0 0 0 1.095.774l5.576-.993a.95.95 0 0 0 .766-1.102l-1.437-8.227ZM38.814 19.869l-7.438 1.324-1.597-9.143a.95.95 0 0 1 .767-1.102l5.575-.993a.95.95 0 0 1 1.095.774l1.598 9.14ZM5.944 41.19a.95.95 0 0 0-.944.953V43a.95.95 0 0 0 .944.952h37.112A.95.95 0 0 0 44 43v-.857a.95.95 0 0 0-.944-.952H5.944Z" fill="black" /></svg>;
+    case 3:
+      return <svg width="48" height="48" viewBox="0 0 48 48" fill="none" aria-hidden="true"><path d="M9.835 17.32a6.39 6.39 0 0 1 11.082.003l4.824 8.283 3.343-5.758a6.39 6.39 0 0 1 11.081 0l4.085 7.027V5.732A2.74 2.74 0 0 0 41.5 3H5.75A2.74 2.74 0 0 0 3 5.732v23.335l4.835-11.747ZM26.375 7.439a3.781 3.781 0 1 1 0 7.562 3.781 3.781 0 0 1 0-7.562Zm0 5.463a1.719 1.719 0 1 0 0-3.438 1.719 1.719 0 0 0 0 3.438ZM43.357 29.436l-4.978-8.564a4.47 4.47 0 0 0-7.509 0l-3.941 6.788 2.84 4.876c.095.162.123.338.122.513H41.5a2.74 2.74 0 0 0 2.75-2.732v-.369a1 1 0 0 0-.893-.512ZM24.85 28.18a2.114 2.114 0 0 1-.054-.107l-5.666-9.728a4.47 4.47 0 0 0-7.508-.002L3.976 31.486a1.087 1.087 0 0 1-.47.401 2.744 2.744 0 0 0 2.244 1.162h21.936L24.85 28.18ZM17.3 35.098l-2.296 9.123a1.033 1.033 0 0 1-2.008-.492l2.173-8.631H17.3ZM33.498 44.973a1.03 1.03 0 0 1-1.252-.752l-2.296-9.123h2.131l2.173 8.631a1.03 1.03 0 0 1-.756 1.244ZM31.875 39.537h-16.5a1.025 1.025 0 1 1 0-2.05h16.5a1.025 1.025 0 1 1 0 2.05Z" fill="black" /></svg>;
+    case 4:
+      return <svg width="48" height="48" viewBox="0 0 48 48" fill="none" aria-hidden="true"><path fillRule="evenodd" clipRule="evenodd" d="M33.53 17.52S21.73 16.756 20.059 3.75C18.387 16.755 6.59 17.52 6.59 17.52s11.798.763 13.47 13.77c1.67-13.007 13.47-13.77 13.47-13.77ZM19.38 35.495s-7.501-.486-8.565-8.755c-1.062 8.269-8.565 8.755-8.565 8.755s7.501.486 8.565 8.755c1.063-8.269 8.565-8.755 8.565-8.755ZM45 29.989s-7.503-.486-8.565-8.755c-1.063 8.269-8.565 8.755-8.565 8.755s7.501.486 8.565 8.755C37.497 30.475 45 29.989 45 29.989Z" fill="black" /></svg>;
+    default:
+      return <svg width="48" height="48" viewBox="0 0 48 48" fill="none" aria-hidden="true"><path d="M24 27.749 42.772 35.298l.152.051H43L24 43 5 35.349h.127l.101-.051L24 27.75ZM24 30.452l-12.185 4.897L24 40.246l12.185-4.897L24 30.452ZM23.367 5v21.423l.025.153v.05l-5.725 2.296V18.797c0-.454-.112-.9-.327-1.3a2.742 2.742 0 0 0-2.16-1.42 2.744 2.744 0 0 0-1.313.22 5.733 5.733 0 0 0-3.775 5.381l-.025.46v9.844L5 34.023V12.396L23.367 5ZM24.633 5 43 12.396v21.627l-18.392-7.396.025-.102V5ZM29.7 14.946v7.651l7.6 3.188v-7.651l-7.6-3.188ZM15.133 21.96c.71 0 1.267.56 1.267 1.275 0 .714-.557 1.275-1.267 1.275s-1.266-.561-1.266-1.275c0-.714.557-1.275 1.266-1.275Z" fill="black" /><path d="M24 30.452 11.815 35.349 24 40.246l12.185-4.897L24 30.452Z" fill="black" /></svg>;
+  }
+}
+
+function CreationArrowIcon({ direction }: { direction: 'left' | 'right' }) {
+  const path = direction === 'left'
+    ? 'M13.164 8.288a1.091 1.091 0 0 0-1.543 0L4.68 15.23a1.091 1.091 0 0 0 0 1.543l6.942 6.943a1.091 1.091 0 0 0 1.543-1.543l-5.08-5.08h20.638V14.91H8.083l5.08-5.08a1.091 1.091 0 0 0 0-1.543Z'
+    : 'M19.918 8.288a1.091 1.091 0 0 1 1.543 0l6.942 6.943a1.091 1.091 0 0 1 0 1.543l-6.942 6.943a1.091 1.091 0 0 1-1.543-1.543l5.08-5.08H4.36V14.91h20.639l-5.08-5.08a1.091 1.091 0 0 1 0-1.543Z';
+
+  return <svg width="32" height="32" viewBox="0 0 32 32" fill="none" aria-hidden="true"><path opacity="0.5" d={path} fill="black" /></svg>;
+}
+
 function MuseumCompetenciesSection() {
   return (
     <section className="MuseumSpaces-competencies px">
       <h2>Компетенции, подтверждённые опытом</h2>
-      <div className="MuseumSpaces-competenceCards">
-        {competenceCards.map(({ title, description, Icon }) => (
-          <article className="MuseumSpaces-competenceCard" key={title}>
-            <Icon />
-            <div className="MuseumSpaces-competenceText">
+      <div className="MuseumSpaces-competenceScroll horizon-scroll">
+        <div className="MuseumSpaces-competenceCards">
+          {competenceCards.map(({ title, description, Icon }) => (
+            <article className="MuseumSpaces-competenceCard" key={title}>
+              <Icon />
               <h3>{title}</h3>
               <p>{description}</p>
-            </div>
-          </article>
-        ))}
+            </article>
+          ))}
+        </div>
       </div>
     </section>
   );
@@ -311,6 +399,22 @@ function MuseumRequestForm() {
     setIsOpen(false);
   };
 
+  const submitRequest = async (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+
+    const formData = new FormData(event.currentTarget);
+
+    await sendLead({
+      name: String(formData.get('name') ?? ''),
+      company: String(formData.get('company') ?? ''),
+      phone: String(formData.get('phone') ?? ''),
+      email: String(formData.get('email') ?? ''),
+      consent: isAgreementChecked,
+      extraInfo: String(formData.get('project') ?? ''),
+      terms: selectedTerm,
+    });
+  };
+
   return (
     <section className="MuseumSpaces-request px" id="ContactForm">
       <div className="MuseumSpaces-requestHead">
@@ -322,7 +426,7 @@ function MuseumRequestForm() {
         </h2>
         <p>Расскажите о задаче — мы свяжемся и предложим решение</p>
       </div>
-      <form className="MuseumSpaces-requestForm">
+      <form className="MuseumSpaces-requestForm" onSubmit={submitRequest}>
         <div className="MuseumSpaces-requestLeft">
           <label className="MuseumSpaces-field">
             <span>Ваше имя*</span>
@@ -393,14 +497,14 @@ function MuseumRequestForm() {
 }
 
 function MuseumCycleSection() {
-  const refSection = useRef<HTMLElement | null>(null);
+  const refCycleSteps = useRef<HTMLDivElement | null>(null);
   const [activeIndex, setActiveIndex] = useState(0);
   const activeStep = cycleSteps[activeIndex];
 
-  useStickyStepCycle(refSection, cycleSteps.length, setActiveIndex);
+  useStickyStepCycle(refCycleSteps, cycleSteps.length, setActiveIndex);
 
   return (
-    <section className="MuseumSpaces-cycleWrap" ref={refSection}>
+    <section className="MuseumSpaces-cycleWrap">
       <div className="MuseumSpaces-cycle">
         <div className="MuseumSpaces-cycleLeft">
           <div className="MuseumSpaces-cycleIntro">
@@ -412,31 +516,33 @@ function MuseumCycleSection() {
             </p>
           </div>
         </div>
-        <div className="MuseumSpaces-cycleRight">
-          <div className="MuseumSpaces-cycleContent">
-            <div className="MuseumSpaces-cycleStepper">
-              <div
-                className="MuseumSpaces-cycleLine"
-                style={
-                  {
-                    '--activeStep': activeIndex,
-                    '--stepsCount': cycleSteps.length,
-                  } as CSSProperties
-                }
-              >
-                <span />
+        <div className="MuseumSpaces-cycleRightWrap" ref={refCycleSteps}>
+          <div className="MuseumSpaces-cycleRight">
+            <div className="MuseumSpaces-cycleContent">
+              <div className="MuseumSpaces-cycleStepper">
+                <div
+                  className="MuseumSpaces-cycleLine"
+                  style={
+                    {
+                      '--activeStep': activeIndex,
+                      '--stepsCount': cycleSteps.length,
+                    } as CSSProperties
+                  }
+                >
+                  <span />
+                </div>
+                <div className="MuseumSpaces-cycleNumbers">
+                  {cycleSteps.map((_, index) => (
+                    <span className={activeIndex === index ? 'active' : ''} key={index}>
+                      {String(index + 1).padStart(2, '0')}
+                    </span>
+                  ))}
+                </div>
               </div>
-              <div className="MuseumSpaces-cycleNumbers">
-                {cycleSteps.map((_, index) => (
-                  <span className={activeIndex === index ? 'active' : ''} key={index}>
-                    {String(index + 1).padStart(2, '0')}
-                  </span>
-                ))}
+              <div className="MuseumSpaces-cycleText" key={activeStep.title}>
+                <h3>{activeStep.title}</h3>
+                <p>{activeStep.description}</p>
               </div>
-            </div>
-            <div className="MuseumSpaces-cycleText" key={activeStep.title}>
-              <h3>{activeStep.title}</h3>
-              <p>{activeStep.description}</p>
             </div>
           </div>
         </div>
@@ -447,14 +553,42 @@ function MuseumCycleSection() {
 
 function MuseumProjectsList({ projects }: { projects: Project[] }) {
   return (
-    <div className="MuseumSpaces-projectsBoard">
-      <MuseumProjectInfos projects={projects} />
-      <div className="MuseumSpaces-projectImages">
+    <>
+      <div className="MuseumSpaces-projectsBoard">
+        <MuseumProjectInfos projects={projects} />
+        <div className="MuseumSpaces-projectImages">
+          {projects.map((project) => (
+            <MuseumProjectImage project={project} key={project.slug} />
+          ))}
+        </div>
+      </div>
+      <div className="MuseumSpaces-mobileProjectList">
         {projects.map((project) => (
-          <MuseumProjectImage project={project} key={project.slug} />
+          <MuseumProjectMobileCard project={project} key={project.slug} />
         ))}
       </div>
-    </div>
+    </>
+  );
+}
+
+function MuseumProjectMobileCard({ project }: { project: Project }) {
+  const title = cleanText(project.payload.title);
+  const exhibition = toFormatNames(project.payload.meta.exhibition);
+  const typeStand = toFormatNames(project.payload.meta.type_tax);
+  const year = project.payload.meta.year?.name ?? '';
+
+  return (
+    <article className="MuseumSpaces-mobileProjectCard">
+      <div className="MuseumSpaces-mobileProjectText">
+        <h3>{title}</h3>
+      </div>
+      <div className="MuseumSpaces-mobileProjectMeta">
+        <ProjectMetaItem title="выставка" value={exhibition} />
+        <ProjectMetaItem title="Тип стенда" value={typeStand} />
+        <ProjectMetaItem title="Год" value={year} />
+      </div>
+      <MuseumProjectImage project={project} />
+    </article>
   );
 }
 
@@ -577,7 +711,9 @@ function ProjectMetaItem({ title, value }: { title: string; value?: string | num
   if (!value) return null;
 
   return (
-    <div className="MuseumSpaces-projectMetaItem">
+    <div
+      className={`MuseumSpaces-projectMetaItem ${title === 'Тип стенда' ? 'isType' : ''} ${title === 'Год' ? 'isYear' : ''}`}
+    >
       <span>{title}</span>
       <p>{value}</p>
     </div>

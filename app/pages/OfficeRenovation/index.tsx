@@ -2,9 +2,10 @@ import './styles.css';
 
 import ArrowIcon from 'assets/icons/arrow.svg?react';
 import CheckmarkIcon from 'assets/icons/checkmark.svg?react';
+import { sendLead } from 'api/form';
 import { getProjects } from 'api/projects/projects.api';
 import type { Project } from 'api/projects/projects.types';
-import { useEffect, useRef, useState, type CSSProperties } from 'react';
+import { useEffect, useRef, useState, type CSSProperties, type FormEvent } from 'react';
 import Button from 'shared/components/Button';
 import Link from 'shared/components/Link';
 import StartPage from 'shared/components/StartPage';
@@ -258,14 +259,14 @@ function WhyFasterSection() {
 }
 
 function CycleSection() {
-  const refSection = useRef<HTMLElement | null>(null);
+  const refCycleSteps = useRef<HTMLDivElement | null>(null);
   const [activeIndex, setActiveIndex] = useState(0);
   const activeStep = cycleSteps[activeIndex];
 
-  useStickyStepCycle(refSection, cycleSteps.length, setActiveIndex);
+  useStickyStepCycle(refCycleSteps, cycleSteps.length, setActiveIndex);
 
   return (
-    <section className="OfficeRenovation-cycleWrap" ref={refSection}>
+    <section className="OfficeRenovation-cycleWrap">
       <div className="OfficeRenovation-cycle">
         <div className="OfficeRenovation-cycleLeft">
           <div className="OfficeRenovation-cycleIntro">
@@ -276,31 +277,33 @@ function CycleSection() {
             </p>
           </div>
         </div>
-        <div className="OfficeRenovation-cycleRight">
-          <div className="OfficeRenovation-cycleContent">
-            <div className="OfficeRenovation-cycleStepper">
-              <div
-                className="OfficeRenovation-cycleLine"
-                style={
-                  {
-                    '--activeStep': activeIndex,
-                    '--stepsCount': cycleSteps.length,
-                  } as CSSProperties
-                }
-              >
-                <span />
+        <div className="OfficeRenovation-cycleRightWrap" ref={refCycleSteps}>
+          <div className="OfficeRenovation-cycleRight">
+            <div className="OfficeRenovation-cycleContent">
+              <div className="OfficeRenovation-cycleStepper">
+                <div
+                  className="OfficeRenovation-cycleLine"
+                  style={
+                    {
+                      '--activeStep': activeIndex,
+                      '--stepsCount': cycleSteps.length,
+                    } as CSSProperties
+                  }
+                >
+                  <span />
+                </div>
+                <div className="OfficeRenovation-cycleNumbers">
+                  {cycleSteps.map((_, index) => (
+                    <span className={activeIndex === index ? 'active' : ''} key={index}>
+                      {String(index + 1).padStart(2, '0')}
+                    </span>
+                  ))}
+                </div>
               </div>
-              <div className="OfficeRenovation-cycleNumbers">
-                {cycleSteps.map((_, index) => (
-                  <span className={activeIndex === index ? 'active' : ''} key={index}>
-                    {String(index + 1).padStart(2, '0')}
-                  </span>
-                ))}
+              <div className="OfficeRenovation-cycleText" key={activeStep.title}>
+                <h3>{activeStep.title}</h3>
+                <p>{activeStep.description}</p>
               </div>
-            </div>
-            <div className="OfficeRenovation-cycleText" key={activeStep.title}>
-              <h3>{activeStep.title}</h3>
-              <p>{activeStep.description}</p>
             </div>
           </div>
         </div>
@@ -331,20 +334,56 @@ function ProjectsSection({ projects }: { projects: OfficeProject[] }) {
               </Link>
             </div>
             <Link to={project.href} slug={project.title}>
-              <div className="OfficeRenovation-projectImage">
-                <img src={project.cover} alt={`Проект ${project.title}`} loading="lazy" />
-              </div>
+              <OfficeProjectImage project={project} />
             </Link>
           </article>
+        ))}
+      </div>
+      <div className="OfficeRenovation-mobileProjectList">
+        {projects.map((project) => (
+          <OfficeProjectMobileCard project={project} key={project.title} />
         ))}
       </div>
     </section>
   );
 }
 
+function OfficeProjectMobileCard({ project }: { project: OfficeProject }) {
+  return (
+    <article className="OfficeRenovation-mobileProjectCard">
+      <h3>{project.title}</h3>
+      <div className="OfficeRenovation-projectMeta">
+        <ProjectMetaItem title="выставка" value={project.exhibition} />
+        <ProjectMetaItem title="Тип стенда" value={project.type} />
+        <ProjectMetaItem title="Год" value={project.year} />
+      </div>
+      <Link to={project.href} slug={project.title}>
+        <OfficeProjectImage project={project} />
+      </Link>
+    </article>
+  );
+}
+
+function OfficeProjectImage({ project }: { project: OfficeProject }) {
+  return (
+    <div className="OfficeRenovation-projectImage">
+      <img
+        src={project.cover}
+        alt={`Проект ${project.title}`}
+        loading="lazy"
+        onError={(event) => {
+          event.currentTarget.src = '/images/office-renovation/rzd-project.png';
+        }}
+      />
+    </div>
+  );
+}
+
 function ProjectMetaItem({ title, value }: { title: string; value: string }) {
   return (
-    <div className="OfficeRenovation-projectMetaItem">
+    <div
+      className={`OfficeRenovation-projectMetaItem ${title === 'Тип стенда' ? 'isType' : ''} ${title === 'Год' ? 'isYear' : ''}`}
+    >
       <span>{title}</span>
       <p>{value}</p>
     </div>
@@ -355,16 +394,16 @@ function CompetenciesSection() {
   return (
     <section className="OfficeRenovation-competencies px">
       <h2>Компетенции, подтверждённые опытом</h2>
-      <div className="OfficeRenovation-competenceCards">
-        {competenceCards.map(({ title, description, Icon }) => (
-          <article className="OfficeRenovation-competenceCard" key={title}>
-            <Icon />
-            <div className="OfficeRenovation-competenceText">
+      <div className="OfficeRenovation-competenceScroll horizon-scroll">
+        <div className="OfficeRenovation-competenceCards">
+          {competenceCards.map(({ title, description, Icon }) => (
+            <article className="OfficeRenovation-competenceCard" key={title}>
+              <Icon />
               <h3>{title}</h3>
               <p>{description}</p>
-            </div>
-          </article>
-        ))}
+            </article>
+          ))}
+        </div>
       </div>
     </section>
   );
@@ -395,6 +434,24 @@ function RequestForm() {
     setIsOpen(false);
   };
 
+  const submitRequest = async (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+
+    const formData = new FormData(event.currentTarget);
+    const area = Number.parseInt(String(formData.get('area') ?? ''), 10);
+
+    await sendLead({
+      name: String(formData.get('name') ?? ''),
+      company: String(formData.get('company') ?? ''),
+      phone: String(formData.get('phone') ?? ''),
+      email: String(formData.get('email') ?? ''),
+      consent: isAgreementChecked,
+      extraInfo: String(formData.get('project') ?? ''),
+      terms: selectedTerm,
+      ...(Number.isFinite(area) ? { area } : {}),
+    });
+  };
+
   return (
     <section className="OfficeRenovation-request px" id="ContactForm">
       <div className="OfficeRenovation-requestHead">
@@ -406,7 +463,7 @@ function RequestForm() {
         </h2>
         <p>Расскажите о задаче — мы свяжемся и предложим решение</p>
       </div>
-      <form className="OfficeRenovation-requestForm">
+      <form className="OfficeRenovation-requestForm" onSubmit={submitRequest}>
         <div className="OfficeRenovation-requestLeft">
           <Field label="Ваше имя*" name="name" />
           <Field label="Название компании*" name="company" />
@@ -499,18 +556,18 @@ function ChevronIcon() {
 }
 
 function getOfficeProjects(projects: Project[]): OfficeProject[] {
+  const imperiaKlimata = projects.find((project) => project.slug === 'imperia-klimata');
   const lidlab = projects.find((project) => project.slug === 'lidlab');
 
   return [
-    {
-      title: 'РЖД',
-      description:
-        'Чёткая геометрия, продуманная навигация и визуальный акцент на движении. Всё собрано под ключ — от концепта до монтажа.',
-      exhibition: 'Transrussia',
-      type: 'Интерактивный',
-      year: '2025',
+    projectToOfficeCard(imperiaKlimata) ?? {
+      title: 'Империя Климата',
+      description: '',
+      exhibition: '',
+      type: '',
+      year: '',
       cover: '/images/office-renovation/rzd-project.png',
-      href: '/projects',
+      href: '/projects/imperia-klimata',
     },
     projectToOfficeCard(lidlab) ?? {
       title: 'Лидлаб',
@@ -535,7 +592,7 @@ function projectToOfficeCard(project?: Project): OfficeProject | null {
     exhibition: project.payload.meta.exhibition?.map(({ name }) => name).join(', ') || 'Диагнополис',
     type: project.payload.meta.type_tax?.map(({ name }) => name).join(', ') || 'Офисный',
     year: project.payload.meta.year?.name ?? '2024',
-    cover: project.payload.cover,
+    cover: project.payload.cover || 'https://api.interpro.pro/wp-content/uploads/2025/09/006-5.jpg.webp',
     href: `/projects/${project.slug}`,
   };
 }
