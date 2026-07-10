@@ -82,8 +82,8 @@ const cycleSteps = [
 ];
 
 const CYCLE_NUMBER_FONT_SIZE = 14;
-const CYCLE_NUMBER_LINE_HEIGHT = 1;
-const CYCLE_NUMBERS_GAP = 16;
+const CYCLE_NUMBER_LINE_HEIGHT = 0.85;
+const CYCLE_NUMBERS_GAP = 18;
 const CYCLE_LINE_MARKER_HEIGHT = 4;
 
 function getCycleLineOffset(activeIndex: number, stepsCount: number) {

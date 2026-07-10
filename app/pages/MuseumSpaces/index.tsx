@@ -70,8 +70,8 @@ const cycleSteps = [
 ];
 
 const CYCLE_NUMBER_FONT_SIZE = 14;
-const CYCLE_NUMBER_LINE_HEIGHT = 1;
-const CYCLE_NUMBERS_GAP = 16;
+const CYCLE_NUMBER_LINE_HEIGHT = 0.85;
+const CYCLE_NUMBERS_GAP = 18;
 const CYCLE_LINE_MARKER_HEIGHT = 4;
 
 function getCycleLineOffset(activeIndex: number, stepsCount: number) {
@@ -81,8 +81,8 @@ function getCycleLineOffset(activeIndex: number, stepsCount: number) {
   const numberHeight = CYCLE_NUMBER_FONT_SIZE * CYCLE_NUMBER_LINE_HEIGHT;
   const stepHeight = numberHeight + CYCLE_NUMBERS_GAP;
   const markerCenterOffset = (numberHeight - CYCLE_LINE_MARKER_HEIGHT) / 2;
-
-  return `${activeIndex * stepHeight + markerCenterOffset}px`;
+  console.log(activeIndex * stepHeight + markerCenterOffset)
+  return `${Math.floor(activeIndex * stepHeight + markerCenterOffset)}px`;
 }
 
 const competenceCards = [
@@ -571,7 +571,7 @@ function MuseumCycleSection() {
   const [activeIndex, setActiveIndex] = useState(0);
   const activeStep = cycleSteps[activeIndex];
   const cycleLineOffset = getCycleLineOffset(activeIndex, cycleSteps.length);
-
+  console.log(cycleLineOffset)
   useStickyStepCycle(refCycleWrap, cycleSteps.length, setActiveIndex);
 
   return (

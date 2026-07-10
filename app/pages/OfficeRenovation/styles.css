@@ -233,9 +233,9 @@
   align-items: stretch;
   gap: 8px;
   --cycleNumberFontSize: 14px;
-  --cycleNumberLineHeight: 1;
+  --cycleNumberLineHeight: 0.85;
   --cycleNumberHeight: calc(var(--cycleNumberFontSize) * var(--cycleNumberLineHeight));
-  --cycleNumbersGap: 16px;
+  --cycleNumbersGap: 18px;
   --cycleLineMarkerHeight: 4px;
 }
 
