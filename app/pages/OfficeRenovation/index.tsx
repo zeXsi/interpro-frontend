@@ -5,7 +5,7 @@ import CheckmarkIcon from 'assets/icons/checkmark.svg?react';
 import { sendLead } from 'api/form';
 import { getProjects } from 'api/projects/projects.api';
 import type { Project } from 'api/projects/projects.types';
-import { useEffect, useRef, useState, type CSSProperties, type FormEvent } from 'react';
+import { useEffect, useRef, useState, type FormEvent } from 'react';
 import Button from 'shared/components/Button';
 import Link from 'shared/components/Link';
 import StartPage from 'shared/components/StartPage';
@@ -80,6 +80,22 @@ const cycleSteps = [
     description: 'Проверяем готовность, устраняем замечания и передаём офис к работе',
   },
 ];
+
+const CYCLE_NUMBER_FONT_SIZE = 14;
+const CYCLE_NUMBER_LINE_HEIGHT = 1;
+const CYCLE_NUMBERS_GAP = 16;
+const CYCLE_LINE_MARKER_HEIGHT = 4;
+
+function getCycleLineOffset(activeIndex: number, stepsCount: number) {
+  if (activeIndex === 0) return '0px';
+  if (activeIndex === stepsCount - 1) return `calc(100% - ${CYCLE_LINE_MARKER_HEIGHT}px)`;
+
+  const numberHeight = CYCLE_NUMBER_FONT_SIZE * CYCLE_NUMBER_LINE_HEIGHT;
+  const stepHeight = numberHeight + CYCLE_NUMBERS_GAP;
+  const markerCenterOffset = (numberHeight - CYCLE_LINE_MARKER_HEIGHT) / 2;
+
+  return `${activeIndex * stepHeight + markerCenterOffset}px`;
+}
 
 const competenceCards = [
   {
@@ -176,7 +192,7 @@ export async function loader() {
 
 export function meta() {
   return getOpenGraphMeta({
-    title: 'Interpro: ремонт офисов под ключ',
+    title: 'Interpro: Ремонт офисов под ключ',
     description:
       'Ремонт офисов под ключ без задержек и скрытых расходов: проектирование, производство, стройка и комплектация.',
   });
@@ -274,6 +290,7 @@ function CycleSection() {
   const refCycleWrap = useRef<HTMLElement | null>(null);
   const [activeIndex, setActiveIndex] = useState(0);
   const activeStep = cycleSteps[activeIndex];
+  const cycleLineOffset = getCycleLineOffset(activeIndex, cycleSteps.length);
 
   useStickyStepCycle(refCycleWrap, cycleSteps.length, setActiveIndex);
 
@@ -295,14 +312,8 @@ function CycleSection() {
               <div className="OfficeRenovation-cycleStepper">
                 <div
                   className="OfficeRenovation-cycleLine"
-                  style={
-                    {
-                      '--activeStep': activeIndex,
-                      '--stepsCount': cycleSteps.length,
-                    } as CSSProperties
-                  }
                 >
-                  <span />
+                  <span style={{ top: cycleLineOffset }} />
                 </div>
                 <div className="OfficeRenovation-cycleNumbers">
                   {cycleSteps.map((_, index) => (

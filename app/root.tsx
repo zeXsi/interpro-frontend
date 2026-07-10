@@ -3,6 +3,7 @@ import {
   Links,
   Meta,
   Outlet,
+  redirect,
   Scripts,
   ScrollRestoration,
   useLoaderData,
@@ -199,6 +200,12 @@ export const links: Route.LinksFunction = () => [
 
 export async function loader(args: Route.LoaderArgs) {
   const url = new URL(args.request.url);
+  const normalizedPathname = url.pathname.replace(/\/{2,}/g, '/');
+
+  if (normalizedPathname !== url.pathname) {
+    throw redirect(`${normalizedPathname}${url.search}`, { status: 301 });
+  }
+
   const isPresentationRoute = url.pathname.startsWith('/presentation');
 
   if (isPresentationRoute) {

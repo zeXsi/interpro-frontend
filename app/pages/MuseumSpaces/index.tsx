@@ -10,7 +10,6 @@ import {
   useLayoutEffect,
   useRef,
   useState,
-  type CSSProperties,
   type FormEvent,
   type RefObject,
 } from 'react';
@@ -69,6 +68,22 @@ const cycleSteps = [
     description: 'Сопровождение, обновление экспозиции и техническое обслуживание',
   },
 ];
+
+const CYCLE_NUMBER_FONT_SIZE = 14;
+const CYCLE_NUMBER_LINE_HEIGHT = 1;
+const CYCLE_NUMBERS_GAP = 16;
+const CYCLE_LINE_MARKER_HEIGHT = 4;
+
+function getCycleLineOffset(activeIndex: number, stepsCount: number) {
+  if (activeIndex === 0) return '0px';
+  if (activeIndex === stepsCount - 1) return `calc(100% - ${CYCLE_LINE_MARKER_HEIGHT}px)`;
+
+  const numberHeight = CYCLE_NUMBER_FONT_SIZE * CYCLE_NUMBER_LINE_HEIGHT;
+  const stepHeight = numberHeight + CYCLE_NUMBERS_GAP;
+  const markerCenterOffset = (numberHeight - CYCLE_LINE_MARKER_HEIGHT) / 2;
+
+  return `${activeIndex * stepHeight + markerCenterOffset}px`;
+}
 
 const competenceCards = [
   {
@@ -180,7 +195,7 @@ export async function loader() {
 
 export function meta() {
   return getOpenGraphMeta({
-    title: 'Interpro: музейные пространства',
+    title: 'Interpro: Музейные пространства',
     description:
       'Проектируем и создаём музейные пространства под ключ: от концепции до монтажа собственными силами.',
   });
@@ -261,17 +276,30 @@ export default function MuseumSpaces({ loaderData }: Route.ComponentProps) {
 
 function CreationSection() {
   const swiperRef = useRef<SwiperInstance | null>(null);
-  const [navigation, setNavigation] = useState({ isBeginning: true, isEnd: false });
+  const [navigation, setNavigation] = useState({ isBeginning: true, isEnd: true });
   const [pagePadding, setPagePadding] = useState(0);
 
   const updateNavigation = (swiper: SwiperInstance) => {
-    setNavigation({ isBeginning: swiper.isBeginning, isEnd: swiper.isEnd });
+    const hasOverflow = Math.abs(swiper.maxTranslate() - swiper.minTranslate()) > 1;
+
+    setNavigation({
+      isBeginning: !hasOverflow || swiper.isBeginning,
+      isEnd: !hasOverflow || swiper.isEnd,
+    });
   };
 
   useLayoutEffect(() => {
     const updatePagePadding = () => {
       const head = document.querySelector<HTMLElement>('.MuseumSpaces-createHead');
       setPagePadding(head ? Number.parseFloat(window.getComputedStyle(head).paddingLeft) : 0);
+
+      requestAnimationFrame(() => {
+        const swiper = swiperRef.current;
+        if (!swiper) return;
+
+        swiper.update();
+        updateNavigation(swiper);
+      });
     };
 
     updatePagePadding();
@@ -535,6 +563,7 @@ function MuseumCycleSection() {
   const refCycleWrap = useRef<HTMLElement | null>(null);
   const [activeIndex, setActiveIndex] = useState(0);
   const activeStep = cycleSteps[activeIndex];
+  const cycleLineOffset = getCycleLineOffset(activeIndex, cycleSteps.length);
 
   useStickyStepCycle(refCycleWrap, cycleSteps.length, setActiveIndex);
 
@@ -555,16 +584,8 @@ function MuseumCycleSection() {
           <div className="MuseumSpaces-cycleRight">
             <div className="MuseumSpaces-cycleContent">
               <div className="MuseumSpaces-cycleStepper">
-                <div
-                  className="MuseumSpaces-cycleLine"
-                  style={
-                    {
-                      '--activeStep': activeIndex,
-                      '--stepsCount': cycleSteps.length,
-                    } as CSSProperties
-                  }
-                >
-                  <span />
+                <div className="MuseumSpaces-cycleLine">
+                  <span style={{ top: cycleLineOffset }} />
                 </div>
                 <div className="MuseumSpaces-cycleNumbers">
                   {cycleSteps.map((_, index) => (

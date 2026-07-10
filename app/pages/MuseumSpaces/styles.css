@@ -453,6 +453,11 @@
   display: flex;
   align-items: stretch;
   gap: 8px;
+  --cycleNumberFontSize: 14px;
+  --cycleNumberLineHeight: 1;
+  --cycleNumberHeight: calc(var(--cycleNumberFontSize) * var(--cycleNumberLineHeight));
+  --cycleNumbersGap: 16px;
+  --cycleLineMarkerHeight: 4px;
 }
 
 .MuseumSpaces-cycleLine {
@@ -472,11 +477,8 @@
   span {
     position: absolute;
     left: 0;
-    top: calc(
-      var(--activeStep) * ((100% - 4px) / (var(--stepsCount) - 1))
-    );
     width: 7px;
-    height: 4px;
+    height: var(--cycleLineMarkerHeight);
     background: #000;
   }
 }
@@ -484,13 +486,13 @@
 .MuseumSpaces-cycleNumbers {
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: var(--cycleNumbersGap);
 
   span {
     font-family: var(--font-family);
     font-weight: 400;
-    font-size: 14px;
-    line-height: 92%;
+    font-size: var(--cycleNumberFontSize);
+    line-height: var(--cycleNumberLineHeight);
     letter-spacing: -0.04em;
     color: #000;
     opacity: 0.3;
