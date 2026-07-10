@@ -280,7 +280,14 @@ function CreationSection() {
   const [pagePadding, setPagePadding] = useState(0);
 
   const updateNavigation = (swiper: SwiperInstance) => {
-    const hasOverflow = Math.abs(swiper.maxTranslate() - swiper.minTranslate()) > 1;
+    const slides = Array.from(swiper.slides);
+    const firstSlide = slides.at(0);
+    const lastSlide = slides.at(-1);
+    const slidesWidth =
+      firstSlide && lastSlide
+        ? lastSlide.offsetLeft + lastSlide.offsetWidth - firstSlide.offsetLeft
+        : 0;
+    const hasOverflow = slidesWidth > swiper.el.clientWidth + 1;
 
     setNavigation({
       isBeginning: !hasOverflow || swiper.isBeginning,
