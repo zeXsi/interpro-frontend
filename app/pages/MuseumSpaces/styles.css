@@ -59,25 +59,20 @@
 }
 
 .MuseumSpaces-orderButton {
-  display: flex;
-  align-items: center;
   gap: 8px;
-  cursor: pointer;
 
-  span {
+  .Button {
     font-family: var(--font-family);
     font-weight: 500;
     font-size: 24px;
     line-height: 120%;
     letter-spacing: -0.04em;
     text-transform: uppercase;
-    text-decoration: underline;
-    text-decoration-skip-ink: none;
     text-align: center;
     color: #000;
   }
 
-  svg {
+  .ButtonArrow-icon {
     width: 32px;
     height: 32px;
 
@@ -134,20 +129,28 @@
       pointer-events: none;
       cursor: default;
     }
+
+    &.swiper-button-disabled {
+      opacity: 0;
+    }
   }
 }
 
 .MuseumSpaces-createScroll {
   width: 100%;
-  padding-left: var(--px);
+  padding: 0;
+  box-sizing: border-box;
+
+  .swiper-wrapper {
+    width: 100%;
+    margin: 0;
+  }
 }
 
-.MuseumSpaces-createCards {
-  display: grid;
-  grid-template-columns: repeat(6, 352px);
-  gap: 20px;
-  width: max-content;
-  padding-right: var(--px);
+.MuseumSpaces-createScroll .MuseumSpaces-createSlide {
+  width: 352px;
+  height: auto;
+  flex-shrink: 0;
 }
 
 .MuseumSpaces-createCard {
@@ -372,7 +375,8 @@
 
 .MuseumSpaces-cycleWrap {
   width: 100%;
-  height: calc(100vh + 30vh * 5 + 20vh);
+  /* 150vh reaches the sixth step; the final 30vh keeps it visible before release. */
+  height: 280vh;
   padding-bottom: 216px;
 }
 
@@ -555,10 +559,15 @@
 }
 
 .MuseumSpaces-competenceCards {
+  grid-column: 2 / 5;
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 20px;
   width: 100%;
+}
+
+.MuseumSpaces-competencies > .MuseumSpaces-competenceSwiper {
+  display: none;
 }
 
 .MuseumSpaces-competenceCard {
@@ -1011,7 +1020,7 @@
     order: 3;
     gap: 8px;
 
-    span {
+    .Button {
       font-size: 18px;
     }
 
@@ -1030,9 +1039,8 @@
     display: none;
   }
 
-  .MuseumSpaces-createCards {
-    grid-template-columns: repeat(6, 227px);
-    gap: 8px;
+  .MuseumSpaces-createScroll .MuseumSpaces-createSlide {
+    width: 227px;
   }
 
   .MuseumSpaces-createCard {
@@ -1192,7 +1200,7 @@
   }
 
   .MuseumSpaces-cycleRightWrap {
-    height: calc(100svh + 30svh * 5 + 20svh);
+    height: 280svh;
   }
 
   .MuseumSpaces-cycleContent {
@@ -1233,11 +1241,16 @@
   }
 
   .MuseumSpaces-competenceCards {
-    display: flex;
-    gap: 8px;
-    padding-right: var(--px);
-    scrollbar-width: none;
+    display: none;
   }
+
+  .MuseumSpaces-competenceSwiper {
+    display: block;
+    width: calc(100% + var(--px));
+    padding-right: var(--px);
+  }
+
+  .MuseumSpaces-competenceSlide { width: 312px; }
 
   .MuseumSpaces-competenceCard {
     width: 312px;
@@ -1402,7 +1415,7 @@
     order: 3;
     gap: 8px;
 
-    span {
+    .Button {
       font-size: 24px;
     }
 
@@ -1427,9 +1440,8 @@
     display: none;
   }
 
-  .MuseumSpaces-createCards {
-    grid-template-columns: repeat(6, 282px);
-    gap: 8px;
+  .MuseumSpaces-createScroll .MuseumSpaces-createSlide {
+    width: 282px;
   }
 
   .MuseumSpaces-createCard {
@@ -1542,7 +1554,7 @@
   }
 
   .MuseumSpaces-cycleRightWrap {
-    height: calc(100svh + 30svh * 5 + 20svh);
+    height: 280svh;
   }
 
   .MuseumSpaces-cycleRight {
@@ -1690,5 +1702,188 @@
 
   .MuseumSpaces-mobileProjectMeta .MuseumSpaces-projectMetaItem.isYear {
     grid-column: 2;
+  }
+}
+
+@media (max-width: 1000px) {
+  .MuseumSpaces-competencies > .MuseumSpaces-competenceCards {
+    display: none;
+  }
+
+  .MuseumSpaces-competencies > .MuseumSpaces-competenceSwiper {
+    display: block;
+    width: 100%;
+    padding: 0 var(--px);
+    box-sizing: border-box;
+  }
+
+  .MuseumSpaces-competenceSwiper .MuseumSpaces-competenceSlide {
+    width: 312px;
+    height: auto;
+  }
+}
+
+/* Fluid type: desktop/tablet interpolation from 768px to 1920px. */
+.MuseumSpaces-intro .MuseumSpaces-introTitle,
+.MuseumSpaces-projects .MuseumSpaces-sectionTitle,
+.MuseumSpaces-competencies > h2 {
+  font-size: clamp(3rem, calc(1.417rem + 3.299vw), 5.375rem); /* min: 48px, max: 86px */
+}
+
+.MuseumSpaces-intro .MuseumSpaces-introText,
+.MuseumSpaces-cycleIntro p,
+.MuseumSpaces-cycleText p,
+.MuseumSpaces-competenceCard p,
+.MuseumSpaces-requestHead p,
+.MuseumSpaces-field > span,
+.MuseumSpaces-field input,
+.MuseumSpaces-field textarea,
+.MuseumSpaces-dropdown > button span,
+.MuseumSpaces-dropdownMenu button {
+  font-size: clamp(1.125rem, calc(0.875rem + 0.521vw), 1.5rem); /* min: 18px, max: 24px */
+}
+
+.MuseumSpaces-createTitle,
+.MuseumSpaces-requestHead > span,
+.MuseumSpaces-checkbox .MuseumSpaces-checkboxText {
+  font-size: 18px;
+}
+
+.MuseumSpaces-createCardText h3 {
+  font-size: clamp(1.75rem, calc(1.583rem + 0.347vw), 2rem); /* min: 28px, max: 32px */
+}
+
+.MuseumSpaces-createCardText p {
+  font-size: 18px;
+}
+
+.MuseumSpaces-cycleIntro h2 {
+  font-size: clamp(4rem, calc(2rem + 4.167vw), 7rem); /* min: 64px, max: 112px */
+}
+
+.MuseumSpaces-cycleText h3 {
+  font-size: clamp(3rem, calc(2.333rem + 1.389vw), 4rem); /* min: 48px, max: 64px */
+}
+
+.MuseumSpaces-competenceCard h3 {
+  font-size: 32px;
+}
+
+.MuseumSpaces-requestHead h2 {
+  font-size: clamp(4rem, calc(2.667rem + 2.778vw), 6rem); /* min: 64px, max: 96px */
+}
+
+.MuseumSpaces-submit.ButtonArrow .Button {
+  font-size: clamp(1.5rem, calc(0.5rem + 2.083vw), 3rem); /* min: 24px, max: 48px */
+}
+
+.MuseumSpaces-orderButton.ButtonArrow,
+.MuseumSpaces-submit.ButtonArrow,
+.MuseumSpaces-orderButton.ButtonArrow .Button,
+.MuseumSpaces-submit.ButtonArrow .Button {
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.MuseumSpaces-fieldProject textarea {
+  height: 181px;
+  max-height: 181px;
+  padding-top: 52px;
+  overflow-y: auto;
+  box-sizing: border-box;
+}
+
+.MuseumSpaces-fieldProject > span {
+  z-index: 1;
+  padding-right: 8px;
+  background: #fff;
+}
+
+@media (max-width: 768px) {
+  .MuseumSpaces-intro .MuseumSpaces-introTitle,
+  .MuseumSpaces-projects .MuseumSpaces-sectionTitle,
+  .MuseumSpaces-competencies > h2 {
+    font-size: clamp(2rem, calc(1.046rem + 4.071vw), 3rem); /* min: 32px, max: 48px */
+  }
+
+  .MuseumSpaces-intro .MuseumSpaces-introText,
+  .MuseumSpaces-cycleIntro p,
+  .MuseumSpaces-cycleText p,
+  .MuseumSpaces-requestHead p,
+  .MuseumSpaces-field > span,
+  .MuseumSpaces-field input,
+  .MuseumSpaces-field textarea,
+  .MuseumSpaces-dropdown > button span,
+  .MuseumSpaces-dropdownMenu button,
+  .MuseumSpaces-checkbox .MuseumSpaces-checkboxText {
+    font-size: clamp(0.875rem, calc(0.636rem + 1.018vw), 1.125rem); /* min: 14px, max: 18px */
+  }
+
+  .MuseumSpaces-orderButton.ButtonArrow .Button {
+    font-size: clamp(1.125rem, calc(0.767rem + 1.527vw), 1.5rem); /* min: 18px, max: 24px */
+  }
+
+  .MuseumSpaces-createCardText h3 {
+    font-size: clamp(1.25rem, calc(0.773rem + 2.036vw), 1.75rem); /* min: 20px, max: 28px */
+  }
+
+  .MuseumSpaces-createCardText p,
+  .MuseumSpaces-createTitle,
+  .MuseumSpaces-requestHead > span {
+    font-size: clamp(0.875rem, calc(0.636rem + 1.018vw), 1.125rem); /* min: 14px, max: 18px */
+  }
+
+  .MuseumSpaces-cycleIntro h2,
+  .MuseumSpaces-requestHead h2 {
+    font-size: clamp(3rem, calc(2.046rem + 4.071vw), 4rem); /* min: 48px, max: 64px */
+  }
+
+  .MuseumSpaces-cycleText h3 {
+    font-size: clamp(1.75rem, calc(0.557rem + 5.089vw), 3rem); /* min: 28px, max: 48px */
+  }
+
+  .MuseumSpaces-competenceCard h3 {
+    font-size: clamp(1.5rem, calc(1.023rem + 2.036vw), 2rem); /* min: 24px, max: 32px */
+  }
+
+  .MuseumSpaces-competenceCard p {
+    font-size: 18px;
+  }
+
+  .MuseumSpaces-submit.ButtonArrow .Button {
+    font-size: clamp(1.125rem, calc(0.767rem + 1.527vw), 1.5rem); /* min: 18px, max: 24px */
+  }
+
+  .MuseumSpaces-fieldProject textarea {
+    height: 120px;
+    max-height: 120px;
+    padding-top: 36px;
+  }
+}
+
+.MuseumSpaces-cycleWrap {
+  padding-bottom: 0;
+  margin-bottom: clamp(7.75rem, calc(3.917rem + 7.986vw), 13.5rem); /* min: 124px, max: 216px */
+}
+
+.MuseumSpaces-faqWrap .FAQSection .FAQSection-left .FAQSection-title {
+  font-size: clamp(3rem, calc(2.333rem + 1.389vw), 4rem); /* min: 48px, max: 64px */
+}
+
+.MuseumSpaces-faqWrap .FAQSection .Accordion .Accordion_header-title {
+  font-size: clamp(1.5rem, calc(1.167rem + 0.694vw), 2rem); /* min: 24px, max: 32px */
+}
+
+@media (max-width: 768px) {
+  .MuseumSpaces-cycleWrap {
+    margin-bottom: clamp(6rem, calc(4.33rem + 7.125vw), 7.75rem); /* min: 96px, max: 124px */
+  }
+
+  .MuseumSpaces-faqWrap .FAQSection .FAQSection-left .FAQSection-title {
+    font-size: clamp(2rem, calc(1.046rem + 4.071vw), 3rem); /* min: 32px, max: 48px */
+  }
+
+  .MuseumSpaces-faqWrap .FAQSection .Accordion .Accordion_header-title {
+    font-size: clamp(1.25rem, calc(1.011rem + 1.018vw), 1.5rem); /* min: 20px, max: 24px */
   }
 }

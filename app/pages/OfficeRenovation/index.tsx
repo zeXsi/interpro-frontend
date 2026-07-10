@@ -14,6 +14,10 @@ import { lenisManager } from 'shared/utils/lenis';
 import { decodeUnicodeEscapes } from 'shared/utils/decodeUnicodeEscapes';
 import { getOpenGraphMeta } from 'shared/seo/meta';
 import { useStickyStepCycle } from 'shared/hooks/useStickyStepCycle';
+import ContactForm from 'shared/components/ContactForm';
+import ProjectShowcase, { type ShowcaseProject } from 'shared/components/ProjectShowcase';
+import { Swiper, SwiperSlide } from 'swiper/react';
+import 'swiper/css';
 
 import {
   BoxIcon,
@@ -211,10 +215,14 @@ export default function OfficeRenovation({ loaderData }: Route.ComponentProps) {
             <h1 className="OfficeRenovation-introTitle">
               Ремонт офиса под ключ — в срок, без задержек и скрытых расходов
             </h1>
-            <button className="OfficeRenovation-orderButton" type="button" onClick={scrollToContactForm}>
-              <span>заказать звонок</span>
-              <ArrowIcon />
-            </button>
+            <Button.Arrow
+              className="OfficeRenovation-orderButton"
+              direction="right"
+              variant="link"
+              onClick={scrollToContactForm}
+            >
+              Обсудить стоимость
+            </Button.Arrow>
           </div>
           <p className="OfficeRenovation-introText">
             Проектируем и делаем ремонт офисных помещений собственными силами. Собственное
@@ -232,7 +240,11 @@ export default function OfficeRenovation({ loaderData }: Route.ComponentProps) {
           <FAQSection items={faqItems} />
         </section>
 
-        <RequestForm />
+        <ContactForm
+          type="service-landing"
+          landingPrefix="OfficeRenovation"
+          includeArea
+        />
       </main>
     </StartPage>
   );
@@ -259,14 +271,14 @@ function WhyFasterSection() {
 }
 
 function CycleSection() {
-  const refCycleSteps = useRef<HTMLDivElement | null>(null);
+  const refCycleWrap = useRef<HTMLElement | null>(null);
   const [activeIndex, setActiveIndex] = useState(0);
   const activeStep = cycleSteps[activeIndex];
 
-  useStickyStepCycle(refCycleSteps, cycleSteps.length, setActiveIndex);
+  useStickyStepCycle(refCycleWrap, cycleSteps.length, setActiveIndex);
 
   return (
-    <section className="OfficeRenovation-cycleWrap">
+    <section className="OfficeRenovation-cycleWrap" ref={refCycleWrap}>
       <div className="OfficeRenovation-cycle">
         <div className="OfficeRenovation-cycleLeft">
           <div className="OfficeRenovation-cycleIntro">
@@ -277,7 +289,7 @@ function CycleSection() {
             </p>
           </div>
         </div>
-        <div className="OfficeRenovation-cycleRightWrap" ref={refCycleSteps}>
+        <div className="OfficeRenovation-cycleRightWrap" data-cycle-scroll-track>
           <div className="OfficeRenovation-cycleRight">
             <div className="OfficeRenovation-cycleContent">
               <div className="OfficeRenovation-cycleStepper">
@@ -316,34 +328,7 @@ function ProjectsSection({ projects }: { projects: OfficeProject[] }) {
   return (
     <section className="OfficeRenovation-projects px">
       <h2 className="OfficeRenovation-sectionTitle">Наши проекты</h2>
-      <div className="OfficeRenovation-projectList">
-        {projects.map((project) => (
-          <article className="OfficeRenovation-projectCard" key={project.title}>
-            <div className="OfficeRenovation-projectInfo">
-              <div className="OfficeRenovation-projectText">
-                <h3>{project.title}</h3>
-                <p>{project.description}</p>
-              </div>
-              <div className="OfficeRenovation-projectMeta">
-                <ProjectMetaItem title="выставка" value={project.exhibition} />
-                <ProjectMetaItem title="Тип стенда" value={project.type} />
-                <ProjectMetaItem title="Год" value={project.year} />
-              </div>
-              <Link to={project.href} slug={project.title}>
-                <span className="OfficeRenovation-projectLink">Смотреть проект</span>
-              </Link>
-            </div>
-            <Link to={project.href} slug={project.title}>
-              <OfficeProjectImage project={project} />
-            </Link>
-          </article>
-        ))}
-      </div>
-      <div className="OfficeRenovation-mobileProjectList">
-        {projects.map((project) => (
-          <OfficeProjectMobileCard project={project} key={project.title} />
-        ))}
-      </div>
+      <ProjectShowcase projects={toOfficeShowcaseProjects(projects)} />
     </section>
   );
 }
@@ -394,17 +379,31 @@ function CompetenciesSection() {
   return (
     <section className="OfficeRenovation-competencies px">
       <h2>Компетенции, подтверждённые опытом</h2>
-      <div className="OfficeRenovation-competenceScroll horizon-scroll">
-        <div className="OfficeRenovation-competenceCards">
-          {competenceCards.map(({ title, description, Icon }) => (
-            <article className="OfficeRenovation-competenceCard" key={title}>
+      <div className="OfficeRenovation-competenceCards">
+        {competenceCards.map(({ title, description, Icon }) => (
+          <article className="OfficeRenovation-competenceCard" key={title}>
+            <Icon />
+            <h3>{title}</h3>
+            <p>{description}</p>
+          </article>
+        ))}
+      </div>
+      <Swiper
+        className="OfficeRenovation-competenceSwiper"
+        slidesPerView="auto"
+        spaceBetween={8}
+        resistanceRatio={0}
+      >
+        {competenceCards.map(({ title, description, Icon }) => (
+          <SwiperSlide className="OfficeRenovation-competenceSlide" key={title}>
+            <article className="OfficeRenovation-competenceCard">
               <Icon />
               <h3>{title}</h3>
               <p>{description}</p>
             </article>
-          ))}
-        </div>
-      </div>
+          </SwiperSlide>
+        ))}
+      </Swiper>
     </section>
   );
 }
@@ -580,6 +579,20 @@ function getOfficeProjects(projects: Project[]): OfficeProject[] {
       href: '/projects/lidlab',
     },
   ];
+}
+
+function toOfficeShowcaseProjects(projects: OfficeProject[]): ShowcaseProject[] {
+  return projects.map((project, index) => ({
+    id: index + 1,
+    slug: project.href.split('/').filter(Boolean).at(-1) ?? project.title,
+    title: project.title,
+    description: project.description,
+    image: project.cover,
+    typeStand: project.type,
+    year: project.year,
+    nameExhibition: project.exhibition,
+    link: project.href,
+  }));
 }
 
 function projectToOfficeCard(project?: Project): OfficeProject | null {

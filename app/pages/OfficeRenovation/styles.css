@@ -59,25 +59,20 @@
 }
 
 .OfficeRenovation-orderButton {
-  display: flex;
-  align-items: center;
   gap: 8px;
-  cursor: pointer;
 
-  span {
+  .Button {
     font-family: var(--font-family);
     font-weight: 500;
     font-size: 24px;
     line-height: 120%;
     letter-spacing: -0.04em;
     text-transform: uppercase;
-    text-decoration: underline;
-    text-decoration-skip-ink: none;
     text-align: center;
     color: #000;
   }
 
-  svg {
+  .ButtonArrow-icon {
     width: 32px;
     height: 32px;
 
@@ -160,7 +155,7 @@
 
 .OfficeRenovation-cycleWrap {
   width: 100%;
-  height: calc(100vh + 30vh * 5 + 20vh);
+  height: 280vh;
   padding-bottom: 216px;
 }
 
@@ -491,10 +486,15 @@
 }
 
 .OfficeRenovation-competenceCards {
+  grid-column: 2 / 5;
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 20px;
   width: 100%;
+}
+
+.OfficeRenovation-competencies > .OfficeRenovation-competenceSwiper {
+  display: none;
 }
 
 .OfficeRenovation-competenceCard {
@@ -567,6 +567,22 @@
     p {
       margin-top: auto;
     }
+  }
+}
+
+@media (max-width: 1000px) {
+  .OfficeRenovation-competenceCards {
+    display: none;
+  }
+
+  .OfficeRenovation-competenceSwiper {
+    display: block;
+    width: calc(100% + var(--px));
+    padding-right: var(--px);
+  }
+
+  .OfficeRenovation-competenceSlide {
+    width: 312px;
   }
 }
 
@@ -949,7 +965,7 @@
     order: 3;
     gap: 8px;
 
-    span {
+    .Button {
       font-size: 18px;
     }
 
@@ -1033,7 +1049,7 @@
   }
 
   .OfficeRenovation-cycleRightWrap {
-    height: calc(100svh + 30svh * 5 + 20svh);
+    height: 280svh;
   }
 
   .OfficeRenovation-cycleContent {
@@ -1333,7 +1349,7 @@
     order: 3;
     gap: 8px;
 
-    span {
+    .Button {
       font-size: 24px;
     }
 
@@ -1417,7 +1433,7 @@
   }
 
   .OfficeRenovation-cycleRightWrap {
-    height: calc(100svh + 30svh * 5 + 20svh);
+    height: 280svh;
   }
 
   .OfficeRenovation-cycleRight {
@@ -1598,5 +1614,194 @@
 
   .OfficeRenovation-projectMeta .OfficeRenovation-projectMetaItem.isYear {
     grid-column: 2;
+  }
+}
+
+@media (max-width: 1000px) {
+  .OfficeRenovation-competencies > .OfficeRenovation-competenceCards {
+    display: none;
+  }
+
+  .OfficeRenovation-competencies > .OfficeRenovation-competenceSwiper {
+    display: block;
+    width: 100%;
+    padding: 0 var(--px);
+    box-sizing: border-box;
+  }
+
+  .OfficeRenovation-competenceSwiper .OfficeRenovation-competenceSlide {
+    width: 312px;
+    height: auto;
+  }
+}
+
+/* Fluid type: desktop/tablet interpolation from 768px to 1920px. */
+.OfficeRenovation-intro .OfficeRenovation-introTitle,
+.OfficeRenovation-projects .OfficeRenovation-sectionTitle,
+.OfficeRenovation-competencies > h2 {
+  font-size: clamp(3rem, calc(1.417rem + 3.299vw), 5.375rem); /* min: 48px, max: 86px */
+}
+
+.OfficeRenovation-intro .OfficeRenovation-introText,
+.OfficeRenovation-cycleIntro p,
+.OfficeRenovation-cycleText p,
+.OfficeRenovation-competenceCard p,
+.OfficeRenovation-requestHead p,
+.OfficeRenovation-field > span,
+.OfficeRenovation-field input,
+.OfficeRenovation-field textarea,
+.OfficeRenovation-dropdown > button span,
+.OfficeRenovation-dropdownMenu button {
+  font-size: clamp(1.125rem, calc(0.875rem + 0.521vw), 1.5rem); /* min: 18px, max: 24px */
+}
+
+.OfficeRenovation-requestHead > span,
+.OfficeRenovation-checkbox .OfficeRenovation-checkboxText {
+  font-size: 18px;
+}
+
+.OfficeRenovation-why > h2 {
+  font-size: clamp(1.25rem, calc(-0.583rem + 3.819vw), 4rem); /* min: 20px, max: 64px */
+}
+
+.OfficeRenovation-whyCard h3 {
+  font-size: clamp(2rem, calc(1.833rem + 0.347vw), 2.25rem); /* min: 32px, max: 36px */
+}
+
+.OfficeRenovation-whyCard p {
+  font-size: 18px;
+}
+
+.OfficeRenovation-cycleIntro h2 {
+  font-size: clamp(4rem, calc(2rem + 4.167vw), 7rem); /* min: 64px, max: 112px */
+}
+
+.OfficeRenovation-cycleText h3 {
+  font-size: clamp(3rem, calc(2.333rem + 1.389vw), 4rem); /* min: 48px, max: 64px */
+}
+
+.OfficeRenovation-competenceCard h3 {
+  font-size: 32px;
+}
+
+.OfficeRenovation-requestHead h2 {
+  font-size: clamp(4rem, calc(2.667rem + 2.778vw), 6rem); /* min: 64px, max: 96px */
+}
+
+.OfficeRenovation-submit.ButtonArrow .Button {
+  font-size: clamp(1.5rem, calc(0.5rem + 2.083vw), 3rem); /* min: 24px, max: 48px */
+}
+
+.OfficeRenovation-orderButton.ButtonArrow,
+.OfficeRenovation-submit.ButtonArrow,
+.OfficeRenovation-orderButton.ButtonArrow .Button,
+.OfficeRenovation-submit.ButtonArrow .Button {
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.OfficeRenovation-fieldProject textarea {
+  height: 181px;
+  max-height: 181px;
+  padding-top: 52px;
+  overflow-y: auto;
+  box-sizing: border-box;
+}
+
+.OfficeRenovation-fieldProject > span {
+  z-index: 1;
+  padding-right: 8px;
+  background: #fff;
+}
+
+@media (max-width: 768px) {
+  .OfficeRenovation-intro .OfficeRenovation-introTitle,
+  .OfficeRenovation-projects .OfficeRenovation-sectionTitle,
+  .OfficeRenovation-competencies > h2 {
+    font-size: clamp(2rem, calc(1.046rem + 4.071vw), 3rem); /* min: 32px, max: 48px */
+  }
+
+  .OfficeRenovation-intro .OfficeRenovation-introText,
+  .OfficeRenovation-cycleIntro p,
+  .OfficeRenovation-cycleText p,
+  .OfficeRenovation-requestHead p,
+  .OfficeRenovation-field > span,
+  .OfficeRenovation-field input,
+  .OfficeRenovation-field textarea,
+  .OfficeRenovation-dropdown > button span,
+  .OfficeRenovation-dropdownMenu button,
+  .OfficeRenovation-checkbox .OfficeRenovation-checkboxText,
+  .OfficeRenovation-whyCard p {
+    font-size: clamp(0.875rem, calc(0.636rem + 1.018vw), 1.125rem); /* min: 14px, max: 18px */
+  }
+
+  .OfficeRenovation-orderButton.ButtonArrow .Button {
+    font-size: clamp(1.125rem, calc(0.767rem + 1.527vw), 1.5rem); /* min: 18px, max: 24px */
+  }
+
+  .OfficeRenovation-why > h2 {
+    font-size: clamp(0.875rem, calc(0.517rem + 1.527vw), 1.25rem); /* min: 14px, max: 20px */
+  }
+
+  .OfficeRenovation-whyCard h3 {
+    font-size: clamp(1.5rem, calc(1.023rem + 2.036vw), 2rem); /* min: 24px, max: 32px */
+  }
+
+  .OfficeRenovation-cycleIntro h2,
+  .OfficeRenovation-requestHead h2 {
+    font-size: clamp(3rem, calc(2.046rem + 4.071vw), 4rem); /* min: 48px, max: 64px */
+  }
+
+  .OfficeRenovation-cycleText h3 {
+    font-size: clamp(1.75rem, calc(0.557rem + 5.089vw), 3rem); /* min: 28px, max: 48px */
+  }
+
+  .OfficeRenovation-competenceCard h3 {
+    font-size: clamp(1.5rem, calc(1.023rem + 2.036vw), 2rem); /* min: 24px, max: 32px */
+  }
+
+  .OfficeRenovation-competenceCard p {
+    font-size: 18px;
+  }
+
+  .OfficeRenovation-requestHead > span {
+    font-size: clamp(0.875rem, calc(0.636rem + 1.018vw), 1.125rem); /* min: 14px, max: 18px */
+  }
+
+  .OfficeRenovation-submit.ButtonArrow .Button {
+    font-size: clamp(1.125rem, calc(0.767rem + 1.527vw), 1.5rem); /* min: 18px, max: 24px */
+  }
+
+  .OfficeRenovation-fieldProject textarea {
+    height: 120px;
+    max-height: 120px;
+    padding-top: 36px;
+  }
+}
+
+.OfficeRenovation-cycleWrap {
+  padding-bottom: 0;
+  margin-bottom: clamp(7.75rem, calc(3.917rem + 7.986vw), 13.5rem); /* min: 124px, max: 216px */
+}
+
+.OfficeRenovation-faqWrap .FAQSection .FAQSection-left .FAQSection-title {
+  font-size: clamp(3rem, calc(2.333rem + 1.389vw), 4rem); /* min: 48px, max: 64px */
+}
+
+.OfficeRenovation-faqWrap .FAQSection .Accordion .Accordion_header-title {
+  font-size: clamp(1.5rem, calc(1.167rem + 0.694vw), 2rem); /* min: 24px, max: 32px */
+}
+
+@media (max-width: 768px) {
+  .OfficeRenovation-cycleWrap {
+    margin-bottom: clamp(6rem, calc(4.33rem + 7.125vw), 7.75rem); /* min: 96px, max: 124px */
+  }
+
+  .OfficeRenovation-faqWrap .FAQSection .FAQSection-left .FAQSection-title {
+    font-size: clamp(2rem, calc(1.046rem + 4.071vw), 3rem); /* min: 32px, max: 48px */
+  }
+
+  .OfficeRenovation-faqWrap .FAQSection .Accordion .Accordion_header-title {
+    font-size: clamp(1.25rem, calc(1.011rem + 1.018vw), 1.5rem); /* min: 20px, max: 24px */
   }
 }

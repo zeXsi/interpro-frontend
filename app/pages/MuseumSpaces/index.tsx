@@ -26,6 +26,12 @@ import useEvent from '@qtpy/use-event';
 import useRefMap from '@qtpy/use-ref-map';
 import { useDebouncedUpdate } from 'shared/hooks/useDebouncedUpdate';
 import { useStickyStepCycle } from 'shared/hooks/useStickyStepCycle';
+import ContactForm from 'shared/components/ContactForm';
+import ProjectShowcase, { type ShowcaseProject } from 'shared/components/ProjectShowcase';
+import { Navigation } from 'swiper/modules';
+import { Swiper, SwiperSlide } from 'swiper/react';
+import type { Swiper as SwiperInstance } from 'swiper';
+import 'swiper/css';
 
 import type { Route } from './+types';
 
@@ -47,20 +53,20 @@ const cycleSteps = [
     description: 'Создаём архитектуру, навигацию и визуальную концепцию',
   },
   {
-    title: 'Проектирование',
-    description: 'Готовим чертежи, спецификации и инженерные решения для производства',
+    title: 'Производство',
+    description: 'Изготавливаем элементы экспозиции на собственном производстве',
   },
   {
-    title: 'Производство',
-    description: 'Изготавливаем конструкции, витрины, мебель и мультимедийные элементы',
+    title: 'Мультимедиа',
+    description: 'Интерактивные панели, видеоконтент, сенсорные решения, цифровые инсталляции',
   },
   {
     title: 'Монтаж',
-    description: 'Собираем пространство на площадке и подключаем все системы',
+    description: 'Полностью реализуем проект на объекте, включая демонтаж при необходимости',
   },
   {
-    title: 'Запуск',
-    description: 'Проверяем сценарии работы, сдаём проект и сопровождаем открытие',
+    title: 'Сервис',
+    description: 'Сопровождение, обновление экспозиции и техническое обслуживание',
   },
 ];
 
@@ -182,12 +188,6 @@ export function meta() {
 
 export default function MuseumSpaces({ loaderData }: Route.ComponentProps) {
   const selectedProjects = getSelectedProjects(loaderData.projects);
-  const creationScrollRef = useRef<HTMLDivElement>(null);
-  const [creationScrollState, setCreationScrollState] = useState({
-    canScrollLeft: false,
-    canScrollRight: false,
-  });
-
   const scrollToContactForm = () => {
     if (typeof document === 'undefined') return;
 
@@ -206,39 +206,6 @@ export default function MuseumSpaces({ loaderData }: Route.ComponentProps) {
 
     window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
   };
-
-  const scrollCreationCards = (direction: 'left' | 'right') => {
-    creationScrollRef.current?.scrollBy({
-      left: direction === 'left' ? -372 : 372,
-      behavior: 'smooth',
-    });
-  };
-
-  const updateCreationScrollState = () => {
-    const element = creationScrollRef.current;
-    if (!element) return;
-
-    const maxScrollLeft = element.scrollWidth - element.clientWidth;
-
-    setCreationScrollState({
-      canScrollLeft: element.scrollLeft > 0,
-      canScrollRight: element.scrollLeft < maxScrollLeft - 1,
-    });
-  };
-
-  useEffect(() => {
-    const element = creationScrollRef.current;
-    if (!element) return;
-
-    updateCreationScrollState();
-    element.addEventListener('scroll', updateCreationScrollState, { passive: true });
-    window.addEventListener('resize', updateCreationScrollState);
-
-    return () => {
-      element.removeEventListener('scroll', updateCreationScrollState);
-      window.removeEventListener('resize', updateCreationScrollState);
-    };
-  }, []);
 
   return (
     <StartPage>
@@ -261,10 +228,14 @@ export default function MuseumSpaces({ loaderData }: Route.ComponentProps) {
             <h1 className="MuseumSpaces-introTitle">
               Проектируем и создаём музейные пространства под ключ
             </h1>
-            <button className="MuseumSpaces-orderButton" type="button" onClick={scrollToContactForm}>
-              <span>обсудить проект</span>
-              <ArrowIcon />
-            </button>
+            <Button.Arrow
+              className="MuseumSpaces-orderButton"
+              direction="right"
+              variant="link"
+              onClick={scrollToContactForm}
+            >
+              Обсудить проект
+            </Button.Arrow>
           </div>
           <p className="MuseumSpaces-introText">
             Создаём пространства, в&nbsp;которых история, идеи и&nbsp;образы становятся частью
@@ -272,46 +243,11 @@ export default function MuseumSpaces({ loaderData }: Route.ComponentProps) {
           </p>
         </section>
 
-        <section className="MuseumSpaces-create">
-          <div className="MuseumSpaces-createHead px">
-            <h2 className="MuseumSpaces-createTitle">( Что мы создаём )</h2>
-            <div className="MuseumSpaces-createControls">
-              <button
-                type="button"
-                aria-label="Предыдущие карточки"
-                disabled={!creationScrollState.canScrollLeft}
-                onClick={() => scrollCreationCards('left')}
-              >
-                <CreationArrowIcon direction="left" />
-              </button>
-              <button
-                type="button"
-                aria-label="Следующие карточки"
-                disabled={!creationScrollState.canScrollRight}
-                onClick={() => scrollCreationCards('right')}
-              >
-                <CreationArrowIcon direction="right" />
-              </button>
-            </div>
-          </div>
-          <div className="MuseumSpaces-createScroll horizon-scroll" ref={creationScrollRef}>
-            <div className="MuseumSpaces-createCards">
-              {creationCards.map((card, index) => (
-              <article className="MuseumSpaces-createCard" key={card.title}>
-                <CreationCardIcon index={index} />
-                <div className="MuseumSpaces-createCardText">
-                  <h3>{card.title}</h3>
-                  <p>{card.description}</p>
-                </div>
-              </article>
-              ))}
-            </div>
-          </div>
-        </section>
+        <CreationSection />
 
         <section className="MuseumSpaces-projects px">
           <h2 className="MuseumSpaces-sectionTitle">Наши проекты</h2>
-          <MuseumProjectsList projects={selectedProjects} />
+          <ProjectShowcase projects={toShowcaseProjects(selectedProjects)} />
         </section>
 
         <MuseumCycleSection />
@@ -322,9 +258,93 @@ export default function MuseumSpaces({ loaderData }: Route.ComponentProps) {
           <FAQSection items={museumFaqItems} />
         </section>
 
-        <MuseumRequestForm />
+        <ContactForm type="service-landing" landingPrefix="MuseumSpaces" />
       </main>
     </StartPage>
+  );
+}
+
+function CreationSection() {
+  const swiperRef = useRef<SwiperInstance | null>(null);
+  const [navigation, setNavigation] = useState({ isBeginning: true, isEnd: false });
+  const [pagePadding, setPagePadding] = useState(0);
+
+  const updateNavigation = (swiper: SwiperInstance) => {
+    setNavigation({ isBeginning: swiper.isBeginning, isEnd: swiper.isEnd });
+  };
+
+  useLayoutEffect(() => {
+    const updatePagePadding = () => {
+      const head = document.querySelector<HTMLElement>('.MuseumSpaces-createHead');
+      setPagePadding(head ? Number.parseFloat(window.getComputedStyle(head).paddingLeft) : 0);
+    };
+
+    updatePagePadding();
+    window.addEventListener('resize', updatePagePadding);
+    return () => window.removeEventListener('resize', updatePagePadding);
+  }, []);
+
+  return (
+    <section className="MuseumSpaces-create">
+      <div className="MuseumSpaces-createHead px">
+        <h2 className="MuseumSpaces-createTitle">( Что мы создаём )</h2>
+        <div className="MuseumSpaces-createControls">
+          <button
+            className={navigation.isBeginning ? 'swiper-button-disabled' : ''}
+            type="button"
+            aria-label="Предыдущая карточка"
+            disabled={navigation.isBeginning}
+            onClick={() => swiperRef.current?.slidePrev()}
+          >
+            <CreationArrowIcon direction="left" />
+          </button>
+          <button
+            className={navigation.isEnd ? 'swiper-button-disabled' : ''}
+            type="button"
+            aria-label="Следующая карточка"
+            disabled={navigation.isEnd}
+            onClick={() => swiperRef.current?.slideNext()}
+          >
+            <CreationArrowIcon direction="right" />
+          </button>
+        </div>
+      </div>
+      <Swiper
+        className="MuseumSpaces-createScroll"
+        modules={[Navigation]}
+        slidesPerView="auto"
+        slidesPerGroup={1}
+        centeredSlides={false}
+        loop={false}
+        slidesOffsetBefore={pagePadding}
+        slidesOffsetAfter={pagePadding}
+        spaceBetween={20}
+        resistanceRatio={0}
+        onSwiper={(swiper) => {
+          swiperRef.current = swiper;
+          updateNavigation(swiper);
+        }}
+        onSlideChange={updateNavigation}
+        onReachBeginning={updateNavigation}
+        onReachEnd={updateNavigation}
+        onFromEdge={updateNavigation}
+        onTransitionEnd={updateNavigation}
+        onResize={updateNavigation}
+        breakpoints={{ 0: { spaceBetween: 8 }, 1001: { spaceBetween: 20 } }}
+      >
+        {creationCards.map((card, index) => (
+          <SwiperSlide className="MuseumSpaces-createSlide" key={card.title}>
+            <article className="MuseumSpaces-createCard">
+              <CreationCardIcon index={index} />
+              <div className="MuseumSpaces-createCardText">
+                <h3>{card.title}</h3>
+                <p>{card.description}</p>
+              </div>
+            </article>
+          </SwiperSlide>
+        ))}
+      </Swiper>
+    </section>
   );
 }
 
@@ -357,17 +377,31 @@ function MuseumCompetenciesSection() {
   return (
     <section className="MuseumSpaces-competencies px">
       <h2>Компетенции, подтверждённые опытом</h2>
-      <div className="MuseumSpaces-competenceScroll horizon-scroll">
-        <div className="MuseumSpaces-competenceCards">
-          {competenceCards.map(({ title, description, Icon }) => (
-            <article className="MuseumSpaces-competenceCard" key={title}>
+      <div className="MuseumSpaces-competenceCards">
+        {competenceCards.map(({ title, description, Icon }) => (
+          <article className="MuseumSpaces-competenceCard" key={title}>
+            <Icon />
+            <h3>{title}</h3>
+            <p>{description}</p>
+          </article>
+        ))}
+      </div>
+      <Swiper
+        className="MuseumSpaces-competenceSwiper"
+        slidesPerView="auto"
+        spaceBetween={8}
+        resistanceRatio={0}
+      >
+        {competenceCards.map(({ title, description, Icon }) => (
+          <SwiperSlide className="MuseumSpaces-competenceSlide" key={title}>
+            <article className="MuseumSpaces-competenceCard">
               <Icon />
               <h3>{title}</h3>
               <p>{description}</p>
             </article>
-          ))}
-        </div>
-      </div>
+          </SwiperSlide>
+        ))}
+      </Swiper>
     </section>
   );
 }
@@ -497,14 +531,14 @@ function MuseumRequestForm() {
 }
 
 function MuseumCycleSection() {
-  const refCycleSteps = useRef<HTMLDivElement | null>(null);
+  const refCycleWrap = useRef<HTMLElement | null>(null);
   const [activeIndex, setActiveIndex] = useState(0);
   const activeStep = cycleSteps[activeIndex];
 
-  useStickyStepCycle(refCycleSteps, cycleSteps.length, setActiveIndex);
+  useStickyStepCycle(refCycleWrap, cycleSteps.length, setActiveIndex);
 
   return (
-    <section className="MuseumSpaces-cycleWrap">
+    <section className="MuseumSpaces-cycleWrap" ref={refCycleWrap}>
       <div className="MuseumSpaces-cycle">
         <div className="MuseumSpaces-cycleLeft">
           <div className="MuseumSpaces-cycleIntro">
@@ -516,7 +550,7 @@ function MuseumCycleSection() {
             </p>
           </div>
         </div>
-        <div className="MuseumSpaces-cycleRightWrap" ref={refCycleSteps}>
+        <div className="MuseumSpaces-cycleRightWrap" data-cycle-scroll-track>
           <div className="MuseumSpaces-cycleRight">
             <div className="MuseumSpaces-cycleContent">
               <div className="MuseumSpaces-cycleStepper">
@@ -727,6 +761,20 @@ function getSelectedProjects(projects: Project[]) {
     .filter(Boolean) as Project[];
 
   return selected.length ? selected : projects.slice(0, 3);
+}
+
+function toShowcaseProjects(projects: Project[]): ShowcaseProject[] {
+  return projects.map((project) => ({
+    id: project.id,
+    slug: project.slug,
+    title: cleanText(project.payload.title),
+    description: toProjectDescription(project.payload.about),
+    image: project.payload.cover,
+    year: project.payload.meta.year?.name ?? '',
+    typeStand: toFormatNames(project.payload.meta.type_tax),
+    nameExhibition: toFormatNames(project.payload.meta.exhibition),
+    link: project.link,
+  }));
 }
 
 function cleanText(value = '') {

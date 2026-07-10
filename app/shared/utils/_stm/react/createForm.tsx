@@ -76,7 +76,9 @@ class Form<S extends FormShape> {
     useWatch(() => {
       if (!ref.current) return;
 
-      (ref.current as HTMLInputElement).value = String(sigs.value.v ?? '');
+      const value = sigs.value.v;
+      (ref.current as HTMLInputElement).value =
+        typeof value === 'number' && Number.isNaN(value) ? '' : String(value ?? '');
       label.v = sigs.title.v;
       message.v = sigs.errorMessage.v;
     });
@@ -92,7 +94,7 @@ class Form<S extends FormShape> {
           if (props.type === 'checkbox' || props.type === 'radio') {
             next = t.checked;
           } else if (props.type === 'number') {
-            next = Number(t.value);
+            next = t.value === '' ? NaN : Number(t.value);
           } else {
             next = t.value;
           }
