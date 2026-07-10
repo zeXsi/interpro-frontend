@@ -1805,3 +1805,44 @@
     font-size: clamp(1.25rem, calc(1.011rem + 1.018vw), 1.5rem); /* min: 20px, max: 24px */
   }
 }
+
+/* Textarea: заголовок находится вне прокручиваемой области */
+.OfficeRenovation-fieldProject {
+  height: 181px;
+  gap: 8px;
+}
+
+.OfficeRenovation-fieldProject > span {
+  position: static;
+  transform: none;
+  z-index: auto;
+
+  display: flex;
+  align-items: flex-end;
+  height: 36px;
+  flex-shrink: 0;
+
+  padding: 0;
+  background: transparent;
+}
+
+.OfficeRenovation-fieldProject textarea {
+  flex: 1 1 auto;
+  min-height: 0;
+  height: auto;
+  max-height: none;
+
+  padding: 0 0 12px;
+  overflow-y: auto;
+  box-sizing: border-box;
+}
+
+@media (max-width: 768px) {
+  .OfficeRenovation-fieldProject {
+    height: 120px;
+  }
+
+  .OfficeRenovation-fieldProject > span {
+    height: 28px;
+  }
+}

@@ -205,7 +205,7 @@ export default function OfficeRenovation({ loaderData }: Route.ComponentProps) {
         <section className="OfficeRenovation-hero">
           <img
             className="OfficeRenovation-heroImage"
-            src="/images/office-renovation/hero.png"
+            src="/images/office-renovation/hero-preview.png"
             alt="Ремонт офиса под ключ Interpro"
           />
         </section>

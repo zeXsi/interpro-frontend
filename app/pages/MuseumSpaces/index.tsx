@@ -211,15 +211,10 @@ export default function MuseumSpaces({ loaderData }: Route.ComponentProps) {
     <StartPage>
       <main className="MuseumSpaces">
         <section className="MuseumSpaces-hero">
-          <video
-            className="MuseumSpaces-heroVideo"
-            src="/videos/museum-spaces/hero.mp4"
-            autoPlay
-            muted
-            loop
-            playsInline
-            preload="metadata"
-            aria-label="Музейное пространство Interpro"
+          <img
+            className="MuseumSpaces-heroImage"
+            src="/images/museum-spaces/hero-preview.png"
+            alt="Музейное пространство Interpro"
           />
         </section>
 
@@ -376,7 +371,13 @@ function CreationArrowIcon({ direction }: { direction: 'left' | 'right' }) {
 function MuseumCompetenciesSection() {
   return (
     <section className="MuseumSpaces-competencies px">
-      <h2>Компетенции, подтверждённые опытом</h2>
+      <h2>
+        Компетенции,
+        <br />
+        подтверждённые
+        <br />
+        опытом
+      </h2>
       <div className="MuseumSpaces-competenceCards">
         {competenceCards.map(({ title, description, Icon }) => (
           <article className="MuseumSpaces-competenceCard" key={title}>

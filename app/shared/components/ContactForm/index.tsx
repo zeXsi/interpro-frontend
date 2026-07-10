@@ -566,7 +566,6 @@ function ServiceLandingInput({
   className?: string;
 }) {
   const field = form.useField(name);
-  useSignalValue(field.sg.value);
   const isSubmitted = useSignalValue(form.isSubmitted);
   const isError = !!isSubmitted && !form.validateField(name);
 
@@ -589,7 +588,6 @@ function ServiceLandingTextarea({
   prefix: 'MuseumSpaces' | 'OfficeRenovation';
 }) {
   const field = form.useField('project');
-  const value = useSignalValue(field.sg.value) ?? '';
 
   return (
     <label className={`${prefix}-field ${prefix}-fieldProject`}>
@@ -597,7 +595,6 @@ function ServiceLandingTextarea({
       <textarea
         name="project"
         placeholder=" "
-        value={value}
         onChange={(event) => form.updateField('project', event.target.value)}
       />
     </label>

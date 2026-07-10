@@ -18,7 +18,7 @@
   overflow: hidden;
 }
 
-.MuseumSpaces-heroVideo {
+.MuseumSpaces-heroImage {
   display: block;
   width: 100%;
   height: 100%;
@@ -1721,6 +1721,20 @@
     width: 312px;
     height: auto;
   }
+
+  .MuseumSpaces-createScroll .swiper-wrapper {
+    align-items: stretch;
+  }
+
+  .MuseumSpaces-createScroll .MuseumSpaces-createSlide {
+    display: flex;
+    height: auto;
+  }
+
+  .MuseumSpaces-createCard {
+    height: 100%;
+    box-sizing: border-box;
+  }
 }
 
 /* Fluid type: desktop/tablet interpolation from 768px to 1920px. */
@@ -1885,5 +1899,46 @@
 
   .MuseumSpaces-faqWrap .FAQSection .Accordion .Accordion_header-title {
     font-size: clamp(1.25rem, calc(1.011rem + 1.018vw), 1.5rem); /* min: 20px, max: 24px */
+  }
+}
+
+/* Textarea: заголовок находится вне прокручиваемой области */
+.MuseumSpaces-fieldProject {
+  height: 181px;
+  gap: 8px;
+}
+
+.MuseumSpaces-fieldProject > span {
+  position: static;
+  transform: none;
+  z-index: auto;
+
+  display: flex;
+  align-items: flex-end;
+  height: 36px;
+  flex-shrink: 0;
+
+  padding: 0;
+  background: transparent;
+}
+
+.MuseumSpaces-fieldProject textarea {
+  flex: 1 1 auto;
+  min-height: 0;
+  height: auto;
+  max-height: none;
+
+  padding: 0 0 12px;
+  overflow-y: auto;
+  box-sizing: border-box;
+}
+
+@media (max-width: 768px) {
+  .MuseumSpaces-fieldProject {
+    height: 120px;
+  }
+
+  .MuseumSpaces-fieldProject > span {
+    height: 28px;
   }
 }
