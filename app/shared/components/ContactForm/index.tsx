@@ -231,6 +231,23 @@ interface PropsContactForm {
   serviceName?: string;
 }
 
+const serviceLandingFormNames: Record<NonNullable<PropsContactForm['landingPrefix']>, string> = {
+  MuseumSpaces: 'Форма MuseumSpaces',
+  OfficeRenovation: 'Форма OfficeRenovation',
+};
+
+function getServiceLandingExtraInfo(
+  landingPrefix: PropsContactForm['landingPrefix'],
+  project: unknown
+) {
+  const formName = landingPrefix
+    ? serviceLandingFormNames[landingPrefix]
+    : 'Заявка со страницы услуги';
+  const projectText = typeof project === 'string' ? project.trim() : '';
+
+  return projectText ? `${formName}. ${projectText}` : formName;
+}
+
 export default function ContactForm({
   type = 'normal',
   className = '',
@@ -268,13 +285,13 @@ export default function ContactForm({
           ? 'Заявка на экскурсию'
           : type === 'popup'
             ? 'Заказать дизайн-проект'
-              : type === 'mini-normal'
-                ? serviceName
-                  ? `Услуга ${serviceName}`
-                  : undefined
-              : type === 'service-landing'
-                ? data.project || 'Заявка со страницы услуги'
-              : 'Основная заявка';
+               : type === 'mini-normal'
+                 ? serviceName
+                   ? `Услуга ${serviceName}`
+                   : undefined
+               : type === 'service-landing'
+                 ? getServiceLandingExtraInfo(landingPrefix, data.project)
+               : 'Основная заявка';
 
       let response: LeadResponse;
       if (type === 'excursion') {
