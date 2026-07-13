@@ -1,3 +1,0 @@
-[18484957ms] [ERROR] Failed to load resource: net::ERR_NAME_NOT_RESOLVED @ https://top-fwz1.mail.ru/js/code.js:0
-[18485076ms] [INFO] %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold @ http://127.0.0.1:5027/node_modules/.vite/deps/react-dom_client.js?v=83415f95:20102
-[19073020ms] [LOG] [vite] server connection lost. Polling for restart... @ http://127.0.0.1:5027/@vite/client:864
