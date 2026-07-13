@@ -227,24 +227,28 @@ export default function OfficeRenovation({ loaderData }: Route.ComponentProps) {
         </section>
 
         <section className="OfficeRenovation-intro OfficeRenovation-grid px">
-          <div className="OfficeRenovation-introLeft">
+          <div className="OfficeRenovation-introContent">
             <h1 className="OfficeRenovation-introTitle">
-              Ремонт офиса под ключ — в срок, без задержек и скрытых расходов
+              Ремонт офиса под ключ —
+              <br />
+              в срок, без задержек
+              <br />
+              и скрытых расходов
             </h1>
-            <Button.Arrow
-              className="OfficeRenovation-orderButton"
-              direction="right"
-              variant="link"
-              onClick={scrollToContactForm}
-            >
-              Обсудить стоимость
-            </Button.Arrow>
+            <p className="OfficeRenovation-introText">
+              Проектируем и делаем ремонт офисных помещений собственными силами. Собственное
+              производство, штатные специалисты и точный договор помогают сдать объект в срок и
+              сохранить бюджет.
+            </p>
           </div>
-          <p className="OfficeRenovation-introText">
-            Проектируем и делаем ремонт офисных помещений собственными силами. Собственное
-            производство, штатные специалисты и точный договор помогают сдать объект в срок и
-            сохранить бюджет.
-          </p>
+          <Button.Arrow
+            className="OfficeRenovation-orderButton"
+            direction="right"
+            variant="link"
+            onClick={scrollToContactForm}
+          >
+            Обсудить стоимость
+          </Button.Arrow>
         </section>
 
         <WhyFasterSection />
@@ -394,8 +398,10 @@ function CompetenciesSection() {
         {competenceCards.map(({ title, description, Icon }) => (
           <article className="OfficeRenovation-competenceCard" key={title}>
             <Icon />
-            <h3>{title}</h3>
-            <p>{description}</p>
+            <div className="OfficeRenovation-competenceText">
+              <h3>{title}</h3>
+              <p>{description}</p>
+            </div>
           </article>
         ))}
       </div>
@@ -409,8 +415,10 @@ function CompetenciesSection() {
           <SwiperSlide className="OfficeRenovation-competenceSlide" key={title}>
             <article className="OfficeRenovation-competenceCard">
               <Icon />
-              <h3>{title}</h3>
-              <p>{description}</p>
+              <div className="OfficeRenovation-competenceText">
+                <h3>{title}</h3>
+                <p>{description}</p>
+              </div>
             </article>
           </SwiperSlide>
         ))}

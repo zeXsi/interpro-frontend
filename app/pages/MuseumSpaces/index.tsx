@@ -234,23 +234,23 @@ export default function MuseumSpaces({ loaderData }: Route.ComponentProps) {
         </section>
 
         <section className="MuseumSpaces-intro MuseumSpaces-grid px">
-          <div className="MuseumSpaces-introLeft">
+          <div className="MuseumSpaces-introContent">
             <h1 className="MuseumSpaces-introTitle">
               Проектируем и создаём музейные пространства под ключ
             </h1>
-            <Button.Arrow
-              className="MuseumSpaces-orderButton"
-              direction="right"
-              variant="link"
-              onClick={scrollToContactForm}
-            >
-              Обсудить проект
-            </Button.Arrow>
+            <p className="MuseumSpaces-introText">
+              Создаём пространства, в&nbsp;которых история, идеи и&nbsp;образы становятся частью
+              живого опыта посетителя. От&nbsp;концепции до&nbsp;монтажа&nbsp;— собственными силами
+            </p>
           </div>
-          <p className="MuseumSpaces-introText">
-            Создаём пространства, в&nbsp;которых история, идеи и&nbsp;образы становятся частью
-            живого опыта посетителя. От&nbsp;концепции до&nbsp;монтажа&nbsp;— собственными силами
-          </p>
+          <Button.Arrow
+            className="MuseumSpaces-orderButton"
+            direction="right"
+            variant="link"
+            onClick={scrollToContactForm}
+          >
+            Обсудить проект
+          </Button.Arrow>
         </section>
 
         <CreationSection />
@@ -417,8 +417,10 @@ function MuseumCompetenciesSection() {
         {competenceCards.map(({ title, description, Icon }) => (
           <article className="MuseumSpaces-competenceCard" key={title}>
             <Icon />
-            <h3>{title}</h3>
-            <p>{description}</p>
+            <div className="MuseumSpaces-competenceText">
+              <h3>{title}</h3>
+              <p>{description}</p>
+            </div>
           </article>
         ))}
       </div>
@@ -432,8 +434,10 @@ function MuseumCompetenciesSection() {
           <SwiperSlide className="MuseumSpaces-competenceSlide" key={title}>
             <article className="MuseumSpaces-competenceCard">
               <Icon />
-              <h3>{title}</h3>
-              <p>{description}</p>
+              <div className="MuseumSpaces-competenceText">
+                <h3>{title}</h3>
+                <p>{description}</p>
+              </div>
             </article>
           </SwiperSlide>
         ))}

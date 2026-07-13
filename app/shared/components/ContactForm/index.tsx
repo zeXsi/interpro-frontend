@@ -532,18 +532,20 @@ function ServiceLandingForm({
               <LandingChevronIcon />
             </button>
             <div className={`${prefix}-dropdownMenu`}>
-              {projectTerms.map((term) => (
-                <button
-                  className={selectedTerm === term ? 'selected' : ''}
-                  type="button"
-                  onClick={() => {
-                    form.updateField('terms', term);
-                    setIsOpen(false);
-                  }}
-                  key={term}
-                >
-                  {term}
-                </button>
+              {projectTerms.map((term, index) => (
+                <React.Fragment key={term}>
+                  {index > 0 && <span className={`${prefix}-dropdownDivider`} />}
+                  <button
+                    className={selectedTerm === term ? 'selected' : ''}
+                    type="button"
+                    onClick={() => {
+                      form.updateField('terms', term);
+                      setIsOpen(false);
+                    }}
+                  >
+                    {term}
+                  </button>
+                </React.Fragment>
               ))}
             </div>
           </div>
