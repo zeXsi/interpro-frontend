@@ -1,9 +1,73 @@
-import { useEffect, type Dispatch, type RefObject, type SetStateAction } from 'react';
+import {
+  useEffect,
+  useLayoutEffect,
+  useRef,
+  type Dispatch,
+  type RefObject,
+  type SetStateAction,
+} from 'react';
 
 const STEP_VH = 0.45;
+const CYCLE_MARKER_OPTICAL_OFFSET = -1;
 
 function clamp(value: number, min: number, max: number) {
   return Math.min(Math.max(value, min), max);
+}
+
+export function useCycleLineMarker(activeIndex: number, stepsCount: number) {
+  const lineRef = useRef<HTMLDivElement | null>(null);
+  const markerRef = useRef<HTMLSpanElement | null>(null);
+  const numbersRef = useRef<HTMLDivElement | null>(null);
+
+  useLayoutEffect(() => {
+    const line = lineRef.current;
+    const marker = markerRef.current;
+    const numbers = numbersRef.current;
+    const activeNumber = numbers?.children.item(activeIndex);
+
+    if (!line || !marker || !numbers || !(activeNumber instanceof HTMLElement)) return;
+
+    const updateMarker = () => {
+      if (activeIndex === 0) {
+        marker.style.top = '0px';
+        return;
+      }
+
+      if (activeIndex === stepsCount - 1) {
+        marker.style.top = 'calc(100% - var(--cycleLineMarkerHeight))';
+        return;
+      }
+
+      const lineRect = line.getBoundingClientRect();
+      const markerRect = marker.getBoundingClientRect();
+      const numberRect = activeNumber.getBoundingClientRect();
+      const offset =
+        numberRect.top -
+        lineRect.top +
+        (numberRect.height - markerRect.height) / 2 +
+        CYCLE_MARKER_OPTICAL_OFFSET;
+
+      marker.style.top = `${offset}px`;
+    };
+
+    updateMarker();
+
+    const resizeObserver = new ResizeObserver(updateMarker);
+    resizeObserver.observe(line);
+    resizeObserver.observe(numbers);
+
+    let cancelled = false;
+    void document.fonts.ready.then(() => {
+      if (!cancelled) updateMarker();
+    });
+
+    return () => {
+      cancelled = true;
+      resizeObserver.disconnect();
+    };
+  }, [activeIndex, stepsCount]);
+
+  return { lineRef, markerRef, numbersRef };
 }
 
 export function useStickyStepCycle(

@@ -24,7 +24,7 @@ import { decodeUnicodeEscapes } from 'shared/utils/decodeUnicodeEscapes';
 import useEvent from '@qtpy/use-event';
 import useRefMap from '@qtpy/use-ref-map';
 import { useDebouncedUpdate } from 'shared/hooks/useDebouncedUpdate';
-import { useStickyStepCycle } from 'shared/hooks/useStickyStepCycle';
+import { useCycleLineMarker, useStickyStepCycle } from 'shared/hooks/useStickyStepCycle';
 import ContactForm from 'shared/components/ContactForm';
 import ProjectShowcase, { type ShowcaseProject } from 'shared/components/ProjectShowcase';
 import { Navigation } from 'swiper/modules';
@@ -68,22 +68,6 @@ const cycleSteps = [
     description: 'Сопровождение, обновление экспозиции и техническое обслуживание',
   },
 ];
-
-const CYCLE_NUMBER_FONT_SIZE = 14;
-const CYCLE_NUMBER_LINE_HEIGHT = 0.85;
-const CYCLE_NUMBERS_GAP = 18;
-const CYCLE_LINE_MARKER_HEIGHT = 4;
-
-function getCycleLineOffset(activeIndex: number, stepsCount: number) {
-  if (activeIndex === 0) return '0px';
-  if (activeIndex === stepsCount - 1) return `calc(100% - ${CYCLE_LINE_MARKER_HEIGHT}px)`;
-
-  const numberHeight = CYCLE_NUMBER_FONT_SIZE * CYCLE_NUMBER_LINE_HEIGHT;
-  const stepHeight = numberHeight + CYCLE_NUMBERS_GAP;
-  const markerCenterOffset = (numberHeight - CYCLE_LINE_MARKER_HEIGHT) / 2;
-
-  return `${Math.floor(activeIndex * stepHeight + markerCenterOffset)}px`;
-}
 
 const competenceCards = [
   {
@@ -574,7 +558,7 @@ function MuseumCycleSection() {
   const refCycleWrap = useRef<HTMLElement | null>(null);
   const [activeIndex, setActiveIndex] = useState(0);
   const activeStep = cycleSteps[activeIndex];
-  const cycleLineOffset = getCycleLineOffset(activeIndex, cycleSteps.length);
+  const { lineRef, markerRef, numbersRef } = useCycleLineMarker(activeIndex, cycleSteps.length);
 
   useStickyStepCycle(refCycleWrap, cycleSteps.length, setActiveIndex);
 
@@ -595,10 +579,10 @@ function MuseumCycleSection() {
           <div className="MuseumSpaces-cycleRight" data-cycle-sticky-panel>
             <div className="MuseumSpaces-cycleContent">
               <div className="MuseumSpaces-cycleStepper">
-                <div className="MuseumSpaces-cycleLine">
-                  <span style={{ top: cycleLineOffset }} />
+                <div className="MuseumSpaces-cycleLine" ref={lineRef}>
+                  <span ref={markerRef} />
                 </div>
-                <div className="MuseumSpaces-cycleNumbers">
+                <div className="MuseumSpaces-cycleNumbers" ref={numbersRef}>
                   {cycleSteps.map((_, index) => (
                     <span className={activeIndex === index ? 'active' : ''} key={index}>
                       {String(index + 1).padStart(2, '0')}

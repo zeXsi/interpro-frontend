@@ -13,7 +13,7 @@ import FAQSection from 'shared/sections/FAQSection';
 import { lenisManager } from 'shared/utils/lenis';
 import { decodeUnicodeEscapes } from 'shared/utils/decodeUnicodeEscapes';
 import { getOpenGraphMeta } from 'shared/seo/meta';
-import { useStickyStepCycle } from 'shared/hooks/useStickyStepCycle';
+import { useCycleLineMarker, useStickyStepCycle } from 'shared/hooks/useStickyStepCycle';
 import ContactForm from 'shared/components/ContactForm';
 import ProjectShowcase, { type ShowcaseProject } from 'shared/components/ProjectShowcase';
 import { Swiper, SwiperSlide } from 'swiper/react';
@@ -80,22 +80,6 @@ const cycleSteps = [
     description: 'Проверяем готовность, устраняем замечания и передаём офис к работе',
   },
 ];
-
-const CYCLE_NUMBER_FONT_SIZE = 14;
-const CYCLE_NUMBER_LINE_HEIGHT = 0.85;
-const CYCLE_NUMBERS_GAP = 18;
-const CYCLE_LINE_MARKER_HEIGHT = 4;
-
-function getCycleLineOffset(activeIndex: number, stepsCount: number) {
-  if (activeIndex === 0) return '0px';
-  if (activeIndex === stepsCount - 1) return `calc(100% - ${CYCLE_LINE_MARKER_HEIGHT}px)`;
-
-  const numberHeight = CYCLE_NUMBER_FONT_SIZE * CYCLE_NUMBER_LINE_HEIGHT;
-  const stepHeight = numberHeight + CYCLE_NUMBERS_GAP;
-  const markerCenterOffset = (numberHeight - CYCLE_LINE_MARKER_HEIGHT) / 2;
-
-  return `${activeIndex * stepHeight + markerCenterOffset}px`;
-}
 
 const competenceCards = [
   {
@@ -294,7 +278,7 @@ function CycleSection() {
   const refCycleWrap = useRef<HTMLElement | null>(null);
   const [activeIndex, setActiveIndex] = useState(0);
   const activeStep = cycleSteps[activeIndex];
-  const cycleLineOffset = getCycleLineOffset(activeIndex, cycleSteps.length);
+  const { lineRef, markerRef, numbersRef } = useCycleLineMarker(activeIndex, cycleSteps.length);
 
   useStickyStepCycle(refCycleWrap, cycleSteps.length, setActiveIndex);
 
@@ -316,10 +300,11 @@ function CycleSection() {
               <div className="OfficeRenovation-cycleStepper">
                 <div
                   className="OfficeRenovation-cycleLine"
+                  ref={lineRef}
                 >
-                  <span style={{ top: cycleLineOffset }} />
+                  <span ref={markerRef} />
                 </div>
-                <div className="OfficeRenovation-cycleNumbers">
+                <div className="OfficeRenovation-cycleNumbers" ref={numbersRef}>
                   {cycleSteps.map((_, index) => (
                     <span className={activeIndex === index ? 'active' : ''} key={index}>
                       {String(index + 1).padStart(2, '0')}

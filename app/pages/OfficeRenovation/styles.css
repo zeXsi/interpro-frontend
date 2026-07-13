@@ -256,6 +256,7 @@
   span {
     position: absolute;
     left: 0;
+    top: 0;
     width: 7px;
     height: var(--cycleLineMarkerHeight);
     background: #000;
