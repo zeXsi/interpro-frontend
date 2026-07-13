@@ -81,7 +81,7 @@ function getCycleLineOffset(activeIndex: number, stepsCount: number) {
   const numberHeight = CYCLE_NUMBER_FONT_SIZE * CYCLE_NUMBER_LINE_HEIGHT;
   const stepHeight = numberHeight + CYCLE_NUMBERS_GAP;
   const markerCenterOffset = (numberHeight - CYCLE_LINE_MARKER_HEIGHT) / 2;
-  console.log(activeIndex * stepHeight + markerCenterOffset)
+
   return `${Math.floor(activeIndex * stepHeight + markerCenterOffset)}px`;
 }
 
@@ -575,12 +575,12 @@ function MuseumCycleSection() {
   const [activeIndex, setActiveIndex] = useState(0);
   const activeStep = cycleSteps[activeIndex];
   const cycleLineOffset = getCycleLineOffset(activeIndex, cycleSteps.length);
-  console.log(cycleLineOffset)
+
   useStickyStepCycle(refCycleWrap, cycleSteps.length, setActiveIndex);
 
   return (
     <section className="MuseumSpaces-cycleWrap" ref={refCycleWrap}>
-      <div className="MuseumSpaces-cycle">
+      <div className="MuseumSpaces-cycle" data-cycle-sticky-panel>
         <div className="MuseumSpaces-cycleLeft">
           <div className="MuseumSpaces-cycleIntro">
             <h2>Полный цикл создания музейного пространства</h2>
@@ -592,7 +592,7 @@ function MuseumCycleSection() {
           </div>
         </div>
         <div className="MuseumSpaces-cycleRightWrap" data-cycle-scroll-track>
-          <div className="MuseumSpaces-cycleRight">
+          <div className="MuseumSpaces-cycleRight" data-cycle-sticky-panel>
             <div className="MuseumSpaces-cycleContent">
               <div className="MuseumSpaces-cycleStepper">
                 <div className="MuseumSpaces-cycleLine">

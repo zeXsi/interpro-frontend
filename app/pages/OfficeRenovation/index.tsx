@@ -252,8 +252,8 @@ export default function OfficeRenovation({ loaderData }: Route.ComponentProps) {
         </section>
 
         <WhyFasterSection />
-        <CycleSection />
         <ProjectsSection projects={selectedProjects} />
+        <CycleSection />
         <CompetenciesSection />
 
         <section className="OfficeRenovation-faqWrap">
@@ -300,7 +300,7 @@ function CycleSection() {
 
   return (
     <section className="OfficeRenovation-cycleWrap" ref={refCycleWrap}>
-      <div className="OfficeRenovation-cycle">
+      <div className="OfficeRenovation-cycle" data-cycle-sticky-panel>
         <div className="OfficeRenovation-cycleLeft">
           <div className="OfficeRenovation-cycleIntro">
             <h2>Полный цикл ремонта офисного пространства</h2>
@@ -311,7 +311,7 @@ function CycleSection() {
           </div>
         </div>
         <div className="OfficeRenovation-cycleRightWrap" data-cycle-scroll-track>
-          <div className="OfficeRenovation-cycleRight">
+          <div className="OfficeRenovation-cycleRight" data-cycle-sticky-panel>
             <div className="OfficeRenovation-cycleContent">
               <div className="OfficeRenovation-cycleStepper">
                 <div

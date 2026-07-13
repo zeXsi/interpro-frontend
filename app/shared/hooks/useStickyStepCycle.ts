@@ -1,6 +1,6 @@
 import { useEffect, type Dispatch, type RefObject, type SetStateAction } from 'react';
 
-const STEP_VH = 0.3;
+const STEP_VH = 0.45;
 
 function clamp(value: number, min: number, max: number) {
   return Math.min(Math.max(value, min), max);
@@ -20,10 +20,12 @@ export function useStickyStepCycle(
 
       const mobileTrack = section.querySelector<HTMLElement>('[data-cycle-scroll-track]');
       const track = window.innerWidth <= 1000 && mobileTrack ? mobileTrack : section;
+      const stickyPanel = track.querySelector<HTMLElement>('[data-cycle-sticky-panel]');
       const rect = track.getBoundingClientRect();
-      const stepDistance = window.innerHeight * STEP_VH;
+      const viewportHeight = stickyPanel?.getBoundingClientRect().height ?? window.innerHeight;
+      const stepDistance = viewportHeight * STEP_VH;
       // The step is derived only from the track's position relative to the viewport.
-      // 0, 30, 60, 90, 120 and 150vh select the six steps; 150–180vh holds the last.
+      // 0, 45, 90, 135, 180 and 225lvh select the six steps; 225-270lvh holds the last.
       const scrollInSection = -rect.top;
 
       return {
