@@ -1,3 +1,4 @@
+name: interpro
 services:
   frontend:
     build: ./
