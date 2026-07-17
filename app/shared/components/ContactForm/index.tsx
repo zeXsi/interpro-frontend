@@ -503,13 +503,7 @@ function ServiceLandingForm({
             name="nameCompany"
             label="Название компании*"
           />
-          <ServiceLandingInput
-            form={form}
-            prefix={prefix}
-            name="phone"
-            label="Номер телефона*"
-            type="tel"
-          />
+          <ServiceLandingPhoneInput form={form} prefix={prefix} />
           <ServiceLandingInput
             form={form}
             prefix={prefix}
@@ -593,8 +587,11 @@ function ServiceLandingInput({
   className?: string;
 }) {
   const field = form.useField(name);
+  const value = useSignalValue(field.sg.value);
   const isSubmitted = useSignalValue(form.isSubmitted);
-  const isError = !!isSubmitted && !form.validateField(name);
+  // Как в основной форме: ошибку показываем сразу при вводе, а не только после отправки
+  const isFilled = typeof value === 'number' ? Number.isFinite(value) : !!String(value ?? '').trim();
+  const isError = (isFilled || !!isSubmitted) && !form.validateField(name);
 
   return (
     <label className={`${prefix}-field ${className} ${isError ? 'error' : ''}`}>
@@ -603,6 +600,36 @@ function ServiceLandingInput({
       {isError && (
         <p className={`${prefix}-fieldError`}>{field.sg.errorMessage.v}</p>
       )}
+    </label>
+  );
+}
+
+function ServiceLandingPhoneInput({
+  form,
+  prefix,
+}: {
+  form: Form<any>;
+  prefix: 'MuseumSpaces' | 'OfficeRenovation';
+}) {
+  const field = form.useField('phone');
+  const digits = String(useSignalValue(field.sg.value) ?? '');
+  const isSubmitted = useSignalValue(form.isSubmitted);
+  const { formatted, handleChange, handleKeyDown } = usePhoneMask(field, digits);
+  const isError = (!!digits || !!isSubmitted) && !form.validateField('phone');
+
+  return (
+    <label className={`${prefix}-field ${isError ? 'error' : ''}`}>
+      <span>Номер телефона*</span>
+      <input
+        type="tel"
+        inputMode="tel"
+        autoComplete="tel"
+        placeholder=" "
+        value={formatted}
+        onChange={handleChange}
+        onKeyDown={handleKeyDown}
+      />
+      {isError && <p className={`${prefix}-fieldError`}>{field.sg.errorMessage.v}</p>}
     </label>
   );
 }
@@ -823,6 +850,37 @@ interface PhoneInputProps {
   form: Form<any>;
 }
 
+/** Общая логика маски +7 (XXX) XXX-XX-XX для основной формы и форм лендингов */
+function usePhoneMask(field: ReturnType<Form<any>['useField']>, digits: string) {
+  const formatted = formatPhoneDisplay(digits);
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    field.sg.value.v = normalizePhoneDigits(e.target.value);
+  };
+
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    const cursorPos = e.currentTarget.selectionStart ?? 0;
+    const charToDelete =
+      e.key === 'Backspace'
+        ? formatted[cursorPos - 1]
+        : e.key === 'Delete'
+          ? formatted[cursorPos]
+          : null;
+
+    if (charToDelete && !/\d/.test(charToDelete)) {
+      e.preventDefault();
+      const idx = getDigitIndexToRemove(formatted, cursorPos, e.key === 'Backspace');
+      if (idx >= 0) {
+        const arr = digits.split('');
+        arr.splice(idx, 1);
+        field.sg.value.v = arr.join('');
+      }
+    }
+  };
+
+  return { formatted, handleChange, handleKeyDown };
+}
+
 const PhoneInput = React.memo(({ form }: PhoneInputProps) => {
   const name = 'phone' as const;
   const field = form.useField(name);
@@ -847,34 +905,8 @@ const PhoneInput = React.memo(({ form }: PhoneInputProps) => {
     ref.current?.classList.toggle('noEmpty', !!val);
   });
 
-  const formatted = formatPhoneDisplay(String(digits));
   const errorMessage = useSignalValue(field.sg.errorMessage) ?? '';
-
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const newDigits = normalizePhoneDigits(e.target.value);
-    field.sg.value.v = newDigits;
-  };
-
-  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    const input = e.currentTarget;
-    const cursorPos = input.selectionStart ?? 0;
-    const charToDelete =
-      e.key === 'Backspace'
-        ? formatted[cursorPos - 1]
-        : e.key === 'Delete'
-          ? formatted[cursorPos]
-          : null;
-
-    if (charToDelete && !/\d/.test(charToDelete)) {
-      e.preventDefault();
-      const idx = getDigitIndexToRemove(formatted, cursorPos, e.key === 'Backspace');
-      if (idx >= 0) {
-        const arr = String(digits).split('');
-        arr.splice(idx, 1);
-        field.sg.value.v = arr.join('');
-      }
-    }
-  };
+  const { formatted, handleChange, handleKeyDown } = usePhoneMask(field, String(digits));
 
   return (
     <div className="Input" ref={ref}>
