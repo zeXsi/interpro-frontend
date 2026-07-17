@@ -6,6 +6,7 @@ import CheckmarkIcon from 'assets/icons/checkmark.svg?react';
 import React, { Activity, PropsWithChildren, useEffect, useId, useRef, useState } from 'react';
 
 import Form, { useForm, type FormConfig } from 'shared/utils/_stm/react/createForm';
+import { useLocation } from 'react-router';
 import { useNavigate } from '../NavigationTracker';
 import { sendExcursion, sendLead, sendLeadPopup, type LeadResponse } from 'api/form';
 import { useSignalValue, useWatch } from 'shared/utils/_stm/react/react';
@@ -236,16 +237,21 @@ const serviceLandingFormNames: Record<NonNullable<PropsContactForm['landingPrefi
   OfficeRenovation: 'Форма OfficeRenovation',
 };
 
-function getServiceLandingExtraInfo(
-  landingPrefix: PropsContactForm['landingPrefix'],
-  project: unknown
-) {
-  const formName = landingPrefix
-    ? serviceLandingFormNames[landingPrefix]
-    : 'Заявка со страницы услуги';
-  const projectText = typeof project === 'string' ? project.trim() : '';
+const popupFormName = 'Заказать дизайн-проект';
 
-  return projectText ? `${formName}. ${projectText}` : formName;
+/** Страницы, с которых в названии поп-апа дизайн-проекта указываем источник */
+const popupLandingPages: Record<string, NonNullable<PropsContactForm['landingPrefix']>> = {
+  '/museum-spaces': 'MuseumSpaces',
+  '/office-renovation': 'OfficeRenovation',
+};
+
+function getPopupExtraInfo(pathname: string) {
+  const landing = popupLandingPages[pathname.replace(/\/+$/, '')];
+  return landing ? `${popupFormName} со страницы ${landing}` : popupFormName;
+}
+
+function getServiceLandingExtraInfo(landingPrefix: PropsContactForm['landingPrefix']) {
+  return landingPrefix ? serviceLandingFormNames[landingPrefix] : 'Заявка со страницы услуги';
 }
 
 export default function ContactForm({
@@ -259,6 +265,7 @@ export default function ContactForm({
   landingPrefix,
 }: PropsContactForm) {
   const { goTo } = useNavigate();
+  const { pathname } = useLocation();
   useEffect(() => {
     saveUtmToStorage();
   }, []);
@@ -284,13 +291,13 @@ export default function ContactForm({
         type === 'excursion'
           ? 'Заявка на экскурсию'
           : type === 'popup'
-            ? 'Заказать дизайн-проект'
+            ? getPopupExtraInfo(pathname)
                : type === 'mini-normal'
                  ? serviceName
                    ? `Услуга ${serviceName}`
                    : undefined
                : type === 'service-landing'
-                 ? getServiceLandingExtraInfo(landingPrefix, data.project)
+                 ? getServiceLandingExtraInfo(landingPrefix)
                : 'Основная заявка';
 
       let response: LeadResponse;
@@ -329,6 +336,7 @@ export default function ContactForm({
           consent: data.consent,
           extraInfo: extraInfoByType,
           terms: data.terms || undefined,
+          project: data.project?.trim() || undefined,
           ...(includeArea && Number.isFinite(data.area) ? { area: data.area } : {}),
         });
       } else {
