@@ -136,7 +136,6 @@
           font-size: max(16px, 0.833vw);
           line-height: 120%;
           letter-spacing: -0.02em;
-          text-transform: uppercase;
           color: #fff;
           padding: unset;
         }

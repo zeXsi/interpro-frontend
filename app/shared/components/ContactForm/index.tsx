@@ -60,6 +60,13 @@ function getDigitIndexToRemove(
 const isValidRuPhone = (value: string) => /^7\d{10}$/.test(String(value ?? '').replace(/\D/g, ''));
 const phoneErrorMessage = 'Введите полный номер в формате +7 (XXX) XXX-XX-XX';
 
+// Имя: слова из букв, между ними пробел, дефис или апостроф («Данил Тест», «Анна-Мария», «O'Neil»)
+const nameLetters = 'A-Za-zА-Яа-яЁё';
+const nameRegex = new RegExp(`^[${nameLetters}]+(?:[ \\-'][${nameLetters}]+)*$`);
+const normalizeName = (value: string) => String(value ?? '').trim().replace(/\s+/g, ' ');
+const isValidName = (value: string) => nameRegex.test(normalizeName(value));
+const nameErrorMessage = 'Некорректные символы';
+
 type PubValues = {
   username: string;
   phone: string;
@@ -105,9 +112,9 @@ type ServiceLandingValues = {
 const publicConf: FormConfig<PubValues> = {
   username: {
     initialValue: '',
-    validate: (value) => /^[a-zA-Zа-яА-Я]+$/.test(value),
+    validate: isValidName,
     title: 'Ваше имя',
-    errorMessage: 'Некорректные символы',
+    errorMessage: nameErrorMessage,
   },
   phone: {
     initialValue: '',
@@ -143,9 +150,9 @@ const globalConf: FormConfig<GlobValues> = {
 const miniConf: FormConfig<MiniValues> = {
   username: {
     initialValue: '',
-    validate: (value) => /^[a-zA-Zа-яА-Я]+$/.test(value),
+    validate: isValidName,
     title: 'Ваше имя',
-    errorMessage: 'Некорректные символы',
+    errorMessage: nameErrorMessage,
   },
   phone: {
     initialValue: '',
@@ -287,6 +294,7 @@ export default function ContactForm({
   const submit = () => {
     form.onSubmit(async (data: any) => {
       refSend.current?.toggleAttribute('disabled', true);
+      const name = normalizeName(data.username);
       const extraInfoByType =
         type === 'excursion'
           ? 'Заявка на экскурсию'
@@ -303,7 +311,7 @@ export default function ContactForm({
       let response: LeadResponse;
       if (type === 'excursion') {
         response = await sendExcursion({
-          name: data.username,
+          name,
           phone: data.phone ?? '',
           email: data.email,
           company: data.nameCompany ?? '',
@@ -313,7 +321,7 @@ export default function ContactForm({
         });
       } else if (type === 'popup') {
         response = await sendLeadPopup({
-          name: data.username,
+          name,
           phone: data.phone ?? '',
           email: data.email,
           consent: data.ad,
@@ -321,7 +329,7 @@ export default function ContactForm({
         });
       } else if (type === 'mini-normal') {
         response = await sendLead({
-          name: data.username,
+          name,
           phone: data.phone,
           company: '',
           consent: data.ad,
@@ -329,7 +337,7 @@ export default function ContactForm({
         });
       } else if (type === 'service-landing') {
         response = await sendLead({
-          name: data.username,
+          name,
           phone: data.phone,
           company: data.nameCompany,
           email: data.email,
@@ -341,7 +349,7 @@ export default function ContactForm({
         });
       } else {
         response = await sendLead({
-          name: data.username,
+          name,
           phone: data.phone,
           company: data.nameCompany,
           consent: data.ad,
