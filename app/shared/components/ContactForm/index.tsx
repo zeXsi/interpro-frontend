@@ -3,7 +3,7 @@ import Button from '../Button';
 import Subtitle from '../Subtitle';
 
 import CheckmarkIcon from 'assets/icons/checkmark.svg?react';
-import React, { Activity, PropsWithChildren, useEffect, useId, useRef } from 'react';
+import React, { Activity, PropsWithChildren, useEffect, useId, useRef, useState } from 'react';
 
 import Form, { useForm, type FormConfig } from 'shared/utils/_stm/react/createForm';
 import { useNavigate } from '../NavigationTracker';
@@ -87,6 +87,18 @@ type ExcursionValues = {
   ad: boolean;
   nameCompany: string;
   namePost: string;
+};
+
+type ServiceLandingValues = {
+  username: string;
+  phone: string;
+  email: string;
+  nameCompany: string;
+  area: number;
+  terms: string;
+  project: string;
+  consent: boolean;
+  ad: boolean;
 };
 
 const publicConf: FormConfig<PubValues> = {
@@ -179,14 +191,61 @@ const excursionConf: FormConfig<ExcursionValues> = {
   },
 };
 
+const serviceLandingConf: FormConfig<ServiceLandingValues> = {
+  ...globalConf,
+  email: {
+    initialValue: '',
+    validate: vld(emailSchema),
+    title: 'Email',
+    errorMessage: 'Неправильно указана почта',
+  },
+  area: {
+    initialValue: NaN,
+    validate: () => true,
+    title: 'Площадь помещения, м²',
+    optional: true,
+  },
+  terms: {
+    initialValue: '',
+    validate: () => true,
+    title: 'Примерные сроки',
+    optional: true,
+  },
+  project: {
+    initialValue: '',
+    validate: () => true,
+    title: 'Кратко опишите проект',
+    optional: true,
+  },
+};
+
 interface PropsContactForm {
   className?: string;
   title?: React.ReactNode;
   subtitle?: string;
   onEnd?: () => void;
-  type?: 'popup' | 'normal' | 'excursion' | 'mini-normal';
+  type?: 'popup' | 'normal' | 'excursion' | 'mini-normal' | 'service-landing';
+  includeArea?: boolean;
+  landingPrefix?: 'MuseumSpaces' | 'OfficeRenovation';
   /** Название услуги для type="mini-normal" → extraInfo = "Услуга {serviceName}" */
   serviceName?: string;
+}
+
+const serviceLandingFormNames: Record<NonNullable<PropsContactForm['landingPrefix']>, string> = {
+  MuseumSpaces: 'Форма MuseumSpaces',
+  OfficeRenovation: 'Форма OfficeRenovation',
+};
+
+function getServiceLandingExtraInfo(
+  landingPrefix: PropsContactForm['landingPrefix'],
+  project: unknown
+) {
+  const formName = landingPrefix
+    ? serviceLandingFormNames[landingPrefix]
+    : 'Заявка со страницы услуги';
+  const projectText = typeof project === 'string' ? project.trim() : '';
+
+  return projectText ? `${formName}. ${projectText}` : formName;
 }
 
 export default function ContactForm({
@@ -196,6 +255,8 @@ export default function ContactForm({
   title,
   onEnd,
   serviceName,
+  includeArea = false,
+  landingPrefix,
 }: PropsContactForm) {
   const { goTo } = useNavigate();
   useEffect(() => {
@@ -209,6 +270,8 @@ export default function ContactForm({
         ? excursionConf
         : type === 'mini-normal'
           ? miniConf
+          : type === 'service-landing'
+            ? serviceLandingConf
           : (globalConf as any)
   );
 
@@ -222,11 +285,13 @@ export default function ContactForm({
           ? 'Заявка на экскурсию'
           : type === 'popup'
             ? 'Заказать дизайн-проект'
-            : type === 'mini-normal'
-              ? serviceName
-                ? `Услуга ${serviceName}`
-                : undefined
-              : 'Основная заявка';
+               : type === 'mini-normal'
+                 ? serviceName
+                   ? `Услуга ${serviceName}`
+                   : undefined
+               : type === 'service-landing'
+                 ? getServiceLandingExtraInfo(landingPrefix, data.project)
+               : 'Основная заявка';
 
       let response: LeadResponse;
       if (type === 'excursion') {
@@ -254,6 +319,17 @@ export default function ContactForm({
           company: '',
           consent: data.ad,
           extraInfo: extraInfoByType,
+        });
+      } else if (type === 'service-landing') {
+        response = await sendLead({
+          name: data.username,
+          phone: data.phone,
+          company: data.nameCompany,
+          email: data.email,
+          consent: data.consent,
+          extraInfo: extraInfoByType,
+          terms: data.terms || undefined,
+          ...(includeArea && Number.isFinite(data.area) ? { area: data.area } : {}),
         });
       } else {
         response = await sendLead({
@@ -295,6 +371,18 @@ export default function ContactForm({
     goTo?.(link);
   };
 
+  if (type === 'service-landing' && landingPrefix) {
+    return (
+      <ServiceLandingForm
+        form={form}
+        prefix={landingPrefix}
+        includeArea={includeArea}
+        submit={submit}
+        refSend={refSend}
+      />
+    );
+  }
+
   return (
     <div className={`ContactForm ${className} ${type}`} id="ContactForm">
       <Subtitle>( {!subtitle ? 'ЕСТЬ ИДЕИ?' : subtitle} )</Subtitle>
@@ -304,10 +392,24 @@ export default function ContactForm({
       </div>
       <div className="ContactForm_inner">
         <div className="ContactForm-form">
-          <Input form={form} name="username" />
-          <PhoneInput form={form} />
-          {(type === 'popup' || type === 'excursion') && <Input form={form} name="email" />}
-          {(type === 'normal' || type === 'excursion') && <Input form={form} name="nameCompany" />}
+          {type === 'service-landing' ? (
+            <>
+              <Input form={form} name="username" />
+              <Input form={form} name="nameCompany" />
+              <PhoneInput form={form} />
+              <Input form={form} name="email" />
+              {includeArea && <Input form={form} name="area" inputType="number" />}
+              <TermsSelect form={form} />
+              <ProjectTextarea form={form} />
+            </>
+          ) : (
+            <>
+              <Input form={form} name="username" />
+              <PhoneInput form={form} />
+              {(type === 'popup' || type === 'excursion') && <Input form={form} name="email" />}
+              {(type === 'normal' || type === 'excursion') && <Input form={form} name="nameCompany" />}
+            </>
+          )}
           {type === 'excursion' && <Input form={form} name="namePost" />}
         </div>
         <div className="ContactForm_footer">
@@ -332,6 +434,233 @@ export default function ContactForm({
         </div>
       </div>
     </div>
+  );
+}
+
+interface ServiceLandingFormProps {
+  form: Form<any>;
+  prefix: 'MuseumSpaces' | 'OfficeRenovation';
+  includeArea: boolean;
+  submit: () => void;
+  refSend: React.RefObject<HTMLSpanElement | null>;
+}
+
+function ServiceLandingForm({
+  form,
+  prefix,
+  includeArea,
+  submit,
+  refSend,
+}: ServiceLandingFormProps) {
+  const [isOpen, setIsOpen] = useState(false);
+  const termsField = form.useField('terms');
+  const selectedTerm = useSignalValue(termsField.sg.value) ?? '';
+  const dropdownRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (!isOpen) return;
+
+    const closeDropdown = (event: PointerEvent) => {
+      if (!dropdownRef.current?.contains(event.target as Node)) setIsOpen(false);
+    };
+
+    document.addEventListener('pointerdown', closeDropdown);
+    return () => document.removeEventListener('pointerdown', closeDropdown);
+  }, [isOpen]);
+
+  return (
+    <section className={`${prefix}-request px`} id="ContactForm">
+      <div className={`${prefix}-requestHead`}>
+        <span>( есть идеи? )</span>
+        <h2>
+          Обсудим
+          <br />
+          ваш проект
+        </h2>
+        <p>Расскажите о задаче — мы свяжемся и предложим решение</p>
+      </div>
+
+      <form
+        className={`${prefix}-requestForm`}
+        onSubmit={(event) => {
+          event.preventDefault();
+          submit();
+        }}
+      >
+        <div className={`${prefix}-requestLeft`}>
+          <ServiceLandingInput form={form} prefix={prefix} name="username" label="Ваше имя*" />
+          <ServiceLandingInput
+            form={form}
+            prefix={prefix}
+            name="nameCompany"
+            label="Название компании*"
+          />
+          <ServiceLandingInput
+            form={form}
+            prefix={prefix}
+            name="phone"
+            label="Номер телефона*"
+            type="tel"
+          />
+          <ServiceLandingInput
+            form={form}
+            prefix={prefix}
+            name="email"
+            label="Email*"
+            type="email"
+          />
+        </div>
+
+        <div className={`${prefix}-requestRight`}>
+          {includeArea && (
+            <ServiceLandingInput
+              className={`${prefix}-areaField`}
+              form={form}
+              prefix={prefix}
+              name="area"
+              label="Площадь помещения, м²"
+              type="number"
+            />
+          )}
+
+          <div
+            className={`${prefix}-dropdown ${isOpen ? 'active' : ''}`}
+            ref={dropdownRef}
+          >
+            <button type="button" onClick={() => setIsOpen((value) => !value)}>
+              <span>{selectedTerm || 'Примерные сроки'}</span>
+              <LandingChevronIcon />
+            </button>
+            <div className={`${prefix}-dropdownMenu`}>
+              {projectTerms.map((term, index) => (
+                <React.Fragment key={term}>
+                  {index > 0 && <span className={`${prefix}-dropdownDivider`} />}
+                  <button
+                    className={selectedTerm === term ? 'selected' : ''}
+                    type="button"
+                    onClick={() => {
+                      form.updateField('terms', term);
+                      setIsOpen(false);
+                    }}
+                  >
+                    {term}
+                  </button>
+                </React.Fragment>
+              ))}
+            </div>
+          </div>
+
+          <ServiceLandingTextarea form={form} prefix={prefix} />
+        </div>
+
+        <div className={`${prefix}-requestFooter`}>
+          <Button.Arrow
+            ref={refSend}
+            className={`${prefix}-submit`}
+            direction="right"
+            variant="link"
+          >
+            Отправить заявку
+          </Button.Arrow>
+          <ServiceLandingConsent form={form} prefix={prefix} />
+        </div>
+      </form>
+    </section>
+  );
+}
+
+function ServiceLandingInput({
+  form,
+  prefix,
+  name,
+  label,
+  type = 'text',
+  className = '',
+}: {
+  form: Form<any>;
+  prefix: 'MuseumSpaces' | 'OfficeRenovation';
+  name: 'username' | 'nameCompany' | 'phone' | 'email' | 'area';
+  label: string;
+  type?: React.HTMLInputTypeAttribute;
+  className?: string;
+}) {
+  const field = form.useField(name);
+  const isSubmitted = useSignalValue(form.isSubmitted);
+  const isError = !!isSubmitted && !form.validateField(name);
+
+  return (
+    <label className={`${prefix}-field ${className} ${isError ? 'error' : ''}`}>
+      <span>{label}</span>
+      <field.Input type={type} placeholder=" " />
+      {isError && (
+        <p className={`${prefix}-fieldError`}>{field.sg.errorMessage.v}</p>
+      )}
+    </label>
+  );
+}
+
+function ServiceLandingTextarea({
+  form,
+  prefix,
+}: {
+  form: Form<any>;
+  prefix: 'MuseumSpaces' | 'OfficeRenovation';
+}) {
+  const field = form.useField('project');
+
+  return (
+    <label className={`${prefix}-field ${prefix}-fieldProject`}>
+      <span>Кратко опишите проект</span>
+      <textarea
+        name="project"
+        placeholder=" "
+        onChange={(event) => form.updateField('project', event.target.value)}
+      />
+    </label>
+  );
+}
+
+function ServiceLandingConsent({
+  form,
+  prefix,
+}: {
+  form: Form<any>;
+  prefix: 'MuseumSpaces' | 'OfficeRenovation';
+}) {
+  const field = form.useField('consent');
+  const value = useSignalValue(field.sg.value);
+  const isSubmitted = useSignalValue(form.isSubmitted);
+  const isError = !!isSubmitted && !form.validateField('consent');
+
+  return (
+    <label className={`${prefix}-checkbox ${value ? 'active' : ''} ${isError ? 'error' : ''}`}>
+      <field.Input type="checkbox" />
+      <span className={`${prefix}-checkboxBox`} aria-hidden="true">
+        <CheckmarkIcon className={`${prefix}-checkboxIcon`} />
+      </span>
+      <span className={`${prefix}-checkboxText`}>
+        Отправляя данные, Вы соглашаетесь с политикой конфиденциальности и даёте согласие на
+        обработку персональных данных.
+      </span>
+      {isError && (
+        <p className={`${prefix}-checkboxError`}>{field.sg.errorMessage.v}</p>
+      )}
+    </label>
+  );
+}
+
+function LandingChevronIcon() {
+  return (
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+      <g opacity="0.5">
+        <path
+          fillRule="evenodd"
+          clipRule="evenodd"
+          d="M4 9L12 17L20 9L18 7L12 13L6 7L4 9Z"
+          fill="black"
+        />
+      </g>
+    </svg>
   );
 }
 
@@ -379,8 +708,9 @@ export const ConsentCheckbox = React.memo(
 );
 
 interface InputProps {
-  name: 'username' | 'phone' | 'nameCompany' | 'email' | 'namePost';
+  name: 'username' | 'phone' | 'nameCompany' | 'email' | 'namePost' | 'area';
   form: Form<any>;
+  inputType?: React.HTMLInputTypeAttribute;
 }
 
 const InputMessage = React.memo(
@@ -397,7 +727,7 @@ const InputMessage = React.memo(
   }
 );
 
-const Input = React.memo(({ name, form }: InputProps) => {
+const Input = React.memo(({ name, form, inputType = 'text' }: InputProps) => {
   const field = form.useField(name);
   const refInput = useRef<HTMLInputElement>(null);
   const _id = useId();
@@ -432,12 +762,54 @@ const Input = React.memo(({ name, form }: InputProps) => {
           className="Input-self"
           required={false}
           autoComplete="off"
+          type={inputType}
         />
       </div>
       <InputMessage field={field} form={form} />
     </div>
   );
 });
+
+const projectTerms = ['до 1 месяца', '1-3 месяца', 'от 3 месяцев', 'пока не определены'];
+
+function TermsSelect({ form }: { form: Form<any> }) {
+  const field = form.useField('terms');
+  const value = useSignalValue(field.sg.value) ?? '';
+
+  return (
+    <label className={`Input ContactForm-terms ${value ? 'noEmpty' : ''}`}>
+      <span className="Input-label">{field.sg.title.v}</span>
+      <select
+        className="Input-self"
+        value={value}
+        onChange={(event) => form.updateField('terms', event.target.value)}
+      >
+        <option value="" aria-label="Примерные сроки" />
+        {projectTerms.map((term) => (
+          <option key={term} value={term}>
+            {term}
+          </option>
+        ))}
+      </select>
+    </label>
+  );
+}
+
+function ProjectTextarea({ form }: { form: Form<any> }) {
+  const field = form.useField('project');
+  const value = useSignalValue(field.sg.value) ?? '';
+
+  return (
+    <label className={`Input ContactForm-project ${value ? 'noEmpty' : ''}`}>
+      <span className="Input-label">{field.sg.title.v}</span>
+      <textarea
+        className="Input-self"
+        value={value}
+        onChange={(event) => form.updateField('project', event.target.value)}
+      />
+    </label>
+  );
+}
 
 interface PhoneInputProps {
   form: Form<any>;

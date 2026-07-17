@@ -10,6 +10,8 @@ export default [
   route('/thankyou', './pages/ThankYouPage/index.tsx'),
   route('/faq', './pages/FAQPage/index.tsx'),
   route('/excursion', './pages/Excursion/index.tsx'),
+  route('/museum-spaces', './pages/MuseumSpaces/index.tsx'),
+  route('/office-renovation', './pages/OfficeRenovation/index.tsx'),
   route('/presentation/:name', './pages/Presentation/index.tsx'),
   route('/presentation/:name/print', './pages/Presentation/print.tsx'),
   route('/presentation/:name/pdf', './pages/Presentation/pdf.ts'),

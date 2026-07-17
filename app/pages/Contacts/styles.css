@@ -3,7 +3,6 @@
   flex-direction: column;
   align-items: flex-start;
 
-  padding-top: clamp(4rem, calc(3.515rem + 2.071vw), 6rem); /* min: 64px, max: 96px */
   padding-bottom: clamp(4rem, calc(3.515rem + 2.071vw), 6rem);
   /* min: 64px, max: 96px */
 

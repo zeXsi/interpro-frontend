@@ -27,18 +27,22 @@ export default function ProjectCard(props: ProjectCardProps) {
   const projectTitle = decodeUnicodeEscapes(props.title);
 
   const refButton = useRef<HTMLButtonElement | null>(null);
-  useWatch(() => { 
-   const button = refButton.current;
+  useWatch(() => {
+    const button = refButton.current;
     if (!button) return;
+
+    const isHovered = props.id === hoveredProject.v;
+    button.classList.toggle('isHover', isHovered);
+
+    if (isHovered) {
+      button.classList.remove('isFeedOut');
+      return;
+    }
 
     if (hoveredProject.v < 0 && button.classList.contains('left-right')) {
       button.classList.add('isFeedOut');
-      return;
     }
-    if (Math.abs(props.id) === hoveredProject.v) {
-      button.classList.remove('isFeedOut');
-    }
-  })
+  });
 
 
   return (
@@ -51,8 +55,8 @@ export default function ProjectCard(props: ProjectCardProps) {
             className={`ProjectCard-title `}
             // onClick={navigateTo}
             isHover={props.id === hoveredProject.v}
-            onMouseEnter={() => hoveredProject.v = props.id}
-            onMouseLeave={() => hoveredProject.v = -props.id}
+            onMouseEnter={() => (hoveredProject.v = props.id)}
+            onMouseLeave={() => (hoveredProject.v = -props.id)}
             ref={refButton}
           >
             {projectTitle}

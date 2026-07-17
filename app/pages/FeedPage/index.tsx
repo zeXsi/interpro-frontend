@@ -45,10 +45,6 @@ const isRoute = (slug: Params['slug'], str: string) => {
   return new RegExp(slug, 'g').test(str);
 };
 
-const isActive = (slug: Params['slug'], str: string) => {
-  return isRoute(slug, str) ? 'active' : '';
-};
-
 export async function _loader(_url: string) {
   const url = new URL(_url);
   const search = url.searchParams;
@@ -151,14 +147,22 @@ export default function FeedPage({ data }: { data: Props }) {
   return (
     <StartPage>
       <div className="FeedPage px">
-        <h1 className="FeedPage-title">
-          <Link to="/news">
-            <span className={isActive('news', pathname)}>Новости</span>
-          </Link>
-          <Link to="/blog">
-            <span className={isActive('blog', pathname)}> Блог</span>
-          </Link>
-        </h1>
+        <div className="FeedPage-title">
+          {typeFeed === 'news' ? (
+            <h1>Новости</h1>
+          ) : (
+            <Link to="/news">
+              <span>Новости</span>
+            </Link>
+          )}
+          {typeFeed === 'blog' ? (
+            <h1>Блог</h1>
+          ) : (
+            <Link to="/blog">
+              <span>Блог</span>
+            </Link>
+          )}
+        </div>
 
         <IsNot value={(category?.length || 0) >= 2}>
           <Filter

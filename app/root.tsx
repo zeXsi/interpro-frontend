@@ -3,6 +3,7 @@ import {
   Links,
   Meta,
   Outlet,
+  redirect,
   Scripts,
   ScrollRestoration,
   useLoaderData,
@@ -28,7 +29,6 @@ import NavigationTracker from 'shared/components/NavigationTracker';
 import ParallaxFooter from 'shared/components/ParallaxFooter';
 import Footer from 'shared/sections/Footer';
 import ErrorNotFound from 'pages/ErrorNotFound';
-import { startSitemapScheduler } from 'create-sitemap';
 import useCookies from 'shared/components/popups/useCookies';
 import useMWForm from 'shared/components/popups/useMWForm';
 
@@ -199,6 +199,12 @@ export const links: Route.LinksFunction = () => [
 
 export async function loader(args: Route.LoaderArgs) {
   const url = new URL(args.request.url);
+  const normalizedPathname = url.pathname.replace(/\/{2,}/g, '/');
+
+  if (normalizedPathname !== url.pathname) {
+    throw redirect(`${normalizedPathname}${url.search}`, { status: 301 });
+  }
+
   const isPresentationRoute = url.pathname.startsWith('/presentation');
 
   if (isPresentationRoute) {
@@ -217,7 +223,6 @@ export async function loader(args: Route.LoaderArgs) {
     getFeedbacks(),
     getFaqs(),
   ]);
-  await startSitemapScheduler();
   return {
     projects: projects ?? [],
   };
@@ -252,7 +257,10 @@ export default function App() {
             <AdBanner />
             <form.Popup />
             <BTNContact />
-            <RouteGuard isValidRoutes={['/', '/privacy']} isInverted={true}>
+            <RouteGuard
+              isValidRoutes={['/', '/privacy', '/museum-spaces', '/office-renovation']}
+              isInverted={true}
+            >
               <NavigationTracker />
             </RouteGuard>
             <ParallaxFooter PreElement={Outlet} Element={FooterC} />

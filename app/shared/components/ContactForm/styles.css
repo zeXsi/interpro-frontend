@@ -380,6 +380,16 @@
     font-size: clamp(1.25rem, calc(1.189rem + 0.259vw), 1.5rem);
   }
 
+  select.Input-self {
+    appearance: auto;
+    cursor: pointer;
+  }
+
+  textarea.Input-self {
+    min-height: 120px;
+    resize: vertical;
+  }
+
   @media (max-width: 768px) {
     .Input-label {
       font-size: clamp(1.25rem, calc(1.011rem + 1.018vw), 1.5rem); /* min: 20px, max: 24px */
@@ -395,4 +405,41 @@
       letter-spacing: -0.04em;
     }
   }
+}
+
+:is(.MuseumSpaces-field, .OfficeRenovation-field) {
+  &.error {
+    span,
+    input {
+      color: #ff3b30;
+      border-color: #ff3b30;
+    }
+  }
+}
+
+:is(.MuseumSpaces-fieldError, .OfficeRenovation-fieldError) {
+  position: absolute !important;
+  top: 100% !important;
+  left: 0 !important;
+  transform: translateY(4px) !important;
+  font-size: 12px !important;
+  line-height: 120% !important;
+  color: #ff3b30 !important;
+  opacity: 1 !important;
+}
+
+:is(.MuseumSpaces-checkbox, .OfficeRenovation-checkbox).error {
+  flex-wrap: wrap;
+
+  :is(.MuseumSpaces-checkboxBox, .OfficeRenovation-checkboxBox) {
+    border-color: #ff3b30;
+  }
+}
+
+:is(.MuseumSpaces-checkboxError, .OfficeRenovation-checkboxError) {
+  flex-basis: 100%;
+  font-family: var(--font-family);
+  font-size: 12px;
+  line-height: 120%;
+  color: #ff3b30;
 }

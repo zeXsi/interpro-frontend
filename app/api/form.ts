@@ -5,8 +5,11 @@ export interface LeadData extends UtmFields {
   name: string;
   phone: string;
   company?: string;
+  email?: string;
   consent: boolean;
   extraInfo?: string;
+  terms?: string;
+  area?: number;
 }
 
 export interface LeadDataPopup extends UtmFields {
