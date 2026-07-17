@@ -83,7 +83,9 @@ class Form<S extends FormShape> {
       message.v = sigs.errorMessage.v;
     });
 
-    return {
+    // Компоненты создаются один раз: новая ссылка на каждый рендер заставила бы React
+    // размонтировать input и потерять его DOM-значение.
+    return useMemo(() => ({
       sg: sigs,
       Input: ({ className = '', onChange, isHide = false, style, ...props }: PropsInput) => {
         const _onChange = (e: OnChange) => {
@@ -144,7 +146,7 @@ class Form<S extends FormShape> {
           </Active>
         );
       },
-    };
+    }), []);
   }
 
   public getSignalField<K extends keyof S>(key: K) {
