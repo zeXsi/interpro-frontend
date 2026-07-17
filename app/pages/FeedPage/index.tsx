@@ -3,7 +3,7 @@ import ContactForm from 'shared/components/ContactForm';
 import Filter from './Filter';
 import Pagination from './Pagination';
 import Article from 'shared/components/Article';
-import { useSearchParams } from 'react-router-dom';
+import { useSearchParams } from 'react-router';
 import Link from 'shared/components/Link';
 
 import { useRef, useState } from 'react';

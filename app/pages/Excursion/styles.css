@@ -1,5 +1,19 @@
 .Excursion {
   position: relative;
-  width: 100vw;
+  width: 100%;
   margin-top: clamp(1.5rem, calc(1.167rem + 0.694vw), 2rem);
+}
+
+/* Заголовок нужен поисковику и скринридерам, но визуально дублировал бы
+   крупный заголовок формы, поэтому убираем его из потока, не пряча от SEO. */
+.Excursion-title {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
 }

@@ -13,6 +13,39 @@ export const streamTimeout = 5_000;
 
 void startSitemapScheduler();
 
+/** Сколько общий кэш (CDN/прокси) держит HTML свежим. Браузер всегда ревалидирует. */
+const HTML_S_MAXAGE = Number(process.env.HTML_S_MAXAGE ?? 60);
+const HTML_STALE_WHILE_REVALIDATE = Number(process.env.HTML_SWR ?? 300);
+
+function applyCacheControl(request: Request, headers: Headers, status: number) {
+  // Роут-специфичный headers()-экспорт имеет приоритет.
+  if (headers.has('Cache-Control')) return;
+
+  const url = new URL(request.url);
+
+  // Персональные презентации не должны попадать в общий кэш.
+  if (url.pathname.startsWith('/presentation')) {
+    headers.set('Cache-Control', 'private, no-store');
+    return;
+  }
+
+  const isCacheable =
+    request.method === 'GET' && status === 200 && !headers.has('Set-Cookie') && !url.search;
+
+  if (!isCacheable) {
+    headers.set('Cache-Control', 'private, no-store');
+    return;
+  }
+
+  // max-age=0 — пользователь никогда не видит устаревшую страницу из своего браузера;
+  // s-maxage/stale-while-revalidate работают только для общего кэша перед приложением.
+  headers.set(
+    'Cache-Control',
+    `public, max-age=0, s-maxage=${HTML_S_MAXAGE}, stale-while-revalidate=${HTML_STALE_WHILE_REVALIDATE}`
+  );
+  headers.set('Vary', 'Accept-Encoding');
+}
+
 export default function handleRequest(
   request: Request,
   responseStatusCode: number,
@@ -45,6 +78,7 @@ export default function handleRequest(
           const stream = createReadableStreamFromReadable(body);
 
           responseHeaders.set('Content-Type', 'text/html');
+          applyCacheControl(request, responseHeaders, responseStatusCode);
           pipe(body);
 
           resolve(
