@@ -29,7 +29,6 @@ import NavigationTracker from 'shared/components/NavigationTracker';
 import ParallaxFooter from 'shared/components/ParallaxFooter';
 import Footer from 'shared/sections/Footer';
 import ErrorNotFound from 'pages/ErrorNotFound';
-import { startSitemapScheduler } from 'create-sitemap';
 import useCookies from 'shared/components/popups/useCookies';
 import useMWForm from 'shared/components/popups/useMWForm';
 
@@ -224,7 +223,6 @@ export async function loader(args: Route.LoaderArgs) {
     getFeedbacks(),
     getFaqs(),
   ]);
-  await startSitemapScheduler();
   return {
     projects: projects ?? [],
   };

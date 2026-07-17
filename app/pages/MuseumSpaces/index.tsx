@@ -17,6 +17,7 @@ import { getOpenGraphMeta } from 'shared/seo/meta';
 import StartPage from 'shared/components/StartPage';
 import Link from 'shared/components/Link';
 import Button from 'shared/components/Button';
+import VideoPlayer from 'shared/components/VideoPlayer';
 import FAQSection from 'shared/sections/FAQSection';
 import { lenisManager } from 'shared/utils/lenis';
 import toFormatNames from 'shared/utils/toFormatNames';
@@ -210,10 +211,15 @@ export default function MuseumSpaces({ loaderData }: Route.ComponentProps) {
     <StartPage>
       <main className="MuseumSpaces">
         <section className="MuseumSpaces-hero">
-          <img
-            className="MuseumSpaces-heroImage"
-            src="/images/museum-spaces/hero-preview.png"
-            alt="Музейное пространство Interpro"
+          <VideoPlayer
+            videoClassName="MuseumSpaces-heroImage"
+            cover="/images/museum-spaces/hero-preview.png"
+            videoSources={[
+              {
+                src: '/videos/museum-spaces/hls/hero.m3u8',
+                type: 'application/x-mpegURL',
+              },
+            ]}
           />
         </section>
 

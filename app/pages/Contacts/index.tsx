@@ -7,6 +7,7 @@ import useBreakpoints from '@qtpy/use-breakpoints';
 import { useLenis } from 'lenis/react';
 import { useState } from 'react';
 import StartPage from 'shared/components/StartPage';
+import TitlePage from 'shared/components/TitlePage';
 
 const coords = [55.834275, 37.648852];
 
@@ -48,6 +49,7 @@ export default function Contacts() {
     <StartPage>
       <YMaps>
         <div className="Contacts">
+          <TitlePage title="Контакты" className="px" />
           <div className="Contacts_info  px">
             <InfoList
               title="связаться:"

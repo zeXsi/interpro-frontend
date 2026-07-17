@@ -15,21 +15,16 @@
     letter-spacing: -0.04em;
     color: #000;
 
+    h1 {
+      font: inherit;
+      letter-spacing: inherit;
+    }
     span {
       cursor: pointer;
       transition: opacity 0.3s ease-out;
       opacity: .3;
-      &.active {
-        pointer-events: none;
-        opacity: 1;
-        /* &:hover {
-          opacity: 0.5;
-        } */
-      }
-      &:not(&.active) {
-        &:hover {
-          opacity: 0.2;
-        }
+      &:hover {
+        opacity: 0.2;
       }
     }
     margin-top: clamp(1.5rem, calc(1.167rem + 0.694vw), 2rem);

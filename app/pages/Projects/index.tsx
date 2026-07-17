@@ -124,9 +124,10 @@ export default function ProjectsPage() {
   return (
     <StartPage>
       <div className="ProjectPage px">
-        <h1 className="ProjectPage-title">
-          <span>Проекты</span> <span>( {filteredData.length} )</span>
-        </h1>
+        <div className="ProjectPage-title">
+          <h1>Проекты</h1>
+          <span>( {filteredData.length} )</span>
+        </div>
 
         <div className="ProjectPage_filter-ModeSwitcher ">
           <FilterProject onClick={onClick} items={mapFiltersToFilterProject(sgFilters.v)} />

@@ -25,6 +25,10 @@
   object-fit: cover;
 }
 
+.MuseumSpaces-hero .VideoPlayer .MuseumSpaces-heroImage {
+  object-position: center;
+}
+
 .MuseumSpaces-intro {
   padding-top: 48px;
   row-gap: 48px;

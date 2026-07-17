@@ -2,6 +2,7 @@ import './styles.css';
 import FAQSection from 'shared/sections/FAQSection';
 import ContactForm from 'shared/components/ContactForm';
 import StartPage from 'shared/components/StartPage';
+import TitlePage from 'shared/components/TitlePage';
 
 import JsonLd from 'shared/seo/JsonLd';
 import { getFaqSchema } from 'shared/seo/schemas';
@@ -30,6 +31,7 @@ export default function FAQPage() {
         )}
       />
       <div className="FAQPage px">
+        <TitlePage title="Частые вопросы" />
         <FAQSection />
         <ContactForm />
       </div>

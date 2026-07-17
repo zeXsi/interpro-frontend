@@ -9,6 +9,7 @@ import { useEffect, useRef, useState, type FormEvent } from 'react';
 import Button from 'shared/components/Button';
 import Link from 'shared/components/Link';
 import StartPage from 'shared/components/StartPage';
+import VideoPlayer from 'shared/components/VideoPlayer';
 import FAQSection from 'shared/sections/FAQSection';
 import { lenisManager } from 'shared/utils/lenis';
 import { decodeUnicodeEscapes } from 'shared/utils/decodeUnicodeEscapes';
@@ -203,10 +204,15 @@ export default function OfficeRenovation({ loaderData }: Route.ComponentProps) {
     <StartPage>
       <main className="OfficeRenovation">
         <section className="OfficeRenovation-hero">
-          <img
-            className="OfficeRenovation-heroImage"
-            src="/images/office-renovation/hero-preview.png"
-            alt="Ремонт офиса под ключ Interpro"
+          <VideoPlayer
+            videoClassName="OfficeRenovation-heroImage"
+            cover="/images/office-renovation/hero-preview.png"
+            videoSources={[
+              {
+                src: '/videos/office-renovation/hls/hero.m3u8',
+                type: 'application/x-mpegURL',
+              },
+            ]}
           />
         </section>
 
