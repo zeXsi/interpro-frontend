@@ -33,7 +33,7 @@ import { decodeUnicodeEscapes } from 'shared/utils/decodeUnicodeEscapes';
 type ViewMode = 'grid' | 'list';
 export const hoveredProject = signal(-Infinity);
 
-export async function clientLoader() {
+export async function loader() {
   await getFilters();
 }
 

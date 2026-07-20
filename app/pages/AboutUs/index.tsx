@@ -94,7 +94,7 @@ export default function AboutUs() {
             type: 'video/mp4',
           }}
         />
-        <TitlePage title={'Наши клиенты'} className="title-2" />
+        <TitlePage title={'Наши клиенты'} className="title-2" as="h2" />
         <div className="AboutUs_companies">
           <CompaniesGrid items={svgCompanies.slice(0, 10)} />
           <Link to={'/about-us/clients'}>
@@ -107,7 +107,7 @@ export default function AboutUs() {
         <div ref={refISO}>
           <div className="AboutUs_iso">
             <div className="AboutUs_iso-head">
-              <TitlePage title={'Лицензии и сертификаты'} className="title-3" />
+              <TitlePage title={'Лицензии и сертификаты'} className="title-3" as="h2" />
               <Link to={'/about-us/certificates'}>
                 <Button.Arrow className="AboutUs_companies-btn __top" direction="right">
                   Все сертификаты

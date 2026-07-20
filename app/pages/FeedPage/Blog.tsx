@@ -1,7 +1,7 @@
 import { Route } from './+types/Blog';
 import FeedPage, { _meta, _loader } from './index';
 
-export async function clientLoader({ request }: Route.LoaderArgs) {
+export async function loader({ request }: Route.LoaderArgs) {
   return _loader(request.url);
 }
 
