@@ -3,6 +3,11 @@ import { useLenis } from 'lenis/react';
 import { useLocation, Link as RouterLink } from 'react-router';
 import { useNavigate as useNavTracker } from './NavigationTracker';
 import { copyEmailToClipboard, isMailtoHref } from 'shared/utils/copyToClipboard';
+import {
+  findSection,
+  scrollToPageBottom,
+  scrollToSection,
+} from 'shared/utils/scrollToSection';
 
 interface LinkProps {
   to: string | string[];
@@ -38,13 +43,9 @@ const Link = ({ slug = [], ...props }: LinkProps) => {
     clearTimer();
 
     const tryScroll = () => {
-      const el = document.querySelector(hash) as HTMLElement | null;
+      const el = findSection(hash);
       if (el) {
-        if (lenis) {
-          lenis.scrollTo(el, { offset: 0, duration: 2 });
-        } else {
-          el.scrollIntoView({ behavior: 'smooth', block: 'start' });
-        }
+        scrollToSection(el);
         return;
       }
 
@@ -82,7 +83,7 @@ const Link = ({ slug = [], ...props }: LinkProps) => {
     const hash = pendingHashRef.current;
     if (hash) {
       pendingHashRef.current = null;
-      scrollToHash(hash);
+      scrollToHash(hash, 20, 50, scrollToPageBottom);
     }
 
     return clearTimer;
@@ -97,8 +98,15 @@ const Link = ({ slug = [], ...props }: LinkProps) => {
     if (Array.isArray(to)) {
       const path = to.find((t) => !isHash(t)) ?? null;
       const hash = to.find((t) => isHash(t)) ?? null;
-      const isCurrPage = !path || path === location.pathname;
 
+      // Секция обычно есть в конце текущей страницы — тогда скроллим к ней,
+      // а на запасную страницу уходим, только если её здесь нет
+      if (hash && findSection(hash)) {
+        scrollToHash(hash, 10, 20);
+        return;
+      }
+
+      const isCurrPage = !path || path === location.pathname;
 
       if (!isCurrPage) {
         if (hash) pendingHashRef.current = hash;
@@ -106,9 +114,8 @@ const Link = ({ slug = [], ...props }: LinkProps) => {
         return;
       }
 
-
       if (hash) {
-        scrollToHash(hash, 10, 20);
+        scrollToHash(hash, 10, 20, scrollToPageBottom);
       } else {
         scrollTop();
       }
