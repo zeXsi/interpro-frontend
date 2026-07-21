@@ -19,7 +19,7 @@ import Link from 'shared/components/Link';
 import Button from 'shared/components/Button';
 import VideoPlayer from 'shared/components/VideoPlayer';
 import FAQSection from 'shared/sections/FAQSection';
-import { lenisManager } from 'shared/utils/lenis';
+import { scrollToContactForm } from 'shared/utils/scrollToSection';
 import toFormatNames from 'shared/utils/toFormatNames';
 import { decodeUnicodeEscapes } from 'shared/utils/decodeUnicodeEscapes';
 import useEvent from '@qtpy/use-event';
@@ -188,24 +188,6 @@ export function meta() {
 
 export default function MuseumSpaces({ loaderData }: Route.ComponentProps) {
   const selectedProjects = getSelectedProjects(loaderData.projects);
-  const scrollToContactForm = () => {
-    if (typeof document === 'undefined') return;
-
-    const element = document.querySelector<HTMLElement>('#ContactForm');
-
-    const lenis = lenisManager.state.v;
-    if (lenis) {
-      lenis.scrollTo(element ?? document.body.scrollHeight, { offset: -120, duration: 2 });
-      return;
-    }
-
-    if (element) {
-      element.scrollIntoView({ behavior: 'smooth', block: 'start' });
-      return;
-    }
-
-    window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
-  };
 
   return (
     <StartPage>

@@ -11,7 +11,7 @@ import Link from 'shared/components/Link';
 import StartPage from 'shared/components/StartPage';
 import VideoPlayer from 'shared/components/VideoPlayer';
 import FAQSection from 'shared/sections/FAQSection';
-import { lenisManager } from 'shared/utils/lenis';
+import { scrollToContactForm } from 'shared/utils/scrollToSection';
 import { decodeUnicodeEscapes } from 'shared/utils/decodeUnicodeEscapes';
 import { getOpenGraphMeta } from 'shared/seo/meta';
 import { useCycleLineMarker, useStickyStepCycle } from 'shared/hooks/useStickyStepCycle';
@@ -185,20 +185,6 @@ export function meta() {
 
 export default function OfficeRenovation({ loaderData }: Route.ComponentProps) {
   const selectedProjects = getOfficeProjects(loaderData.projects);
-
-  const scrollToContactForm = () => {
-    if (typeof document === 'undefined') return;
-
-    const element = document.querySelector<HTMLElement>('#ContactForm');
-    const lenis = lenisManager.state.v;
-
-    if (lenis) {
-      lenis.scrollTo(element ?? document.body.scrollHeight, { offset: -120, duration: 2 });
-      return;
-    }
-
-    element?.scrollIntoView({ behavior: 'smooth', block: 'start' });
-  };
 
   return (
     <StartPage>
