@@ -36,6 +36,21 @@ const qProjects = createQuery<Project[]>({
 export const sgProjects = qProjects.sg;
 export const getProjects = (): Promise<Project[] | null> => qProjects.fetch({});
 
+/**
+ * Точечная выборка по списку слагов — одним запросом. Нужна лендингам, которые
+ * показывают конкретные проекты: WP отдаёт их по slug даже с галочкой
+ * «Приватный», хотя в общем списке (sgProjects) таких проектов нет.
+ */
+const qProjectsBySlugs = createQuery<Project[], { slug: string[] }>({
+  endpoint: '/projects',
+  stateKey: 'projects-by-slugs',
+  initial: [],
+  middleware: (data) => data.map((project) => normalizeProject(project) as Project),
+});
+
+export const getProjectsBySlugs = (slugs: readonly string[]): Promise<Project[] | null> =>
+  qProjectsBySlugs.fetch({ slug: [...slugs] });
+
 const qProjectById = createQuery<Project | undefined, { slug: string }, Project[]>({
   endpoint: '/projects',
   parent: sgProjects,

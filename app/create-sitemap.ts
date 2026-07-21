@@ -276,7 +276,7 @@ export async function buildSitemap() {
       '/office-renovation',
       'monthly',
       0.6,
-      getLatestProjectDate(projects, ['imperia-klimata', 'lidlab'])
+      getLatestProjectDate(projects, ['kontrastnyj-open-space', 'mnogozonal-nyj-ofis'])
     ),
   ];
 

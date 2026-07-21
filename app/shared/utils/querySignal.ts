@@ -77,6 +77,12 @@ interface CreateQueryOptions<TData, TParams = any, TParent = any> {
   takeFirst?: boolean;
   map?: (data: any, resp: any, params: TParams) => TData;
   middleware?: (data: TData) => TData;
+  /**
+   * Ключ SSR-состояния. Нужен, когда на один endpoint приходится несколько
+   * запросов: по умолчанию ключ берётся из endpoint, и такие запросы затирали
+   * бы состояние друг друга в __SSR_STATE__.
+   */
+  stateKey?: string;
   /** Время жизни SSR-кэша в мс. 0 отключает кэш для этого запроса. */
   ttlMs?: number;
   /** Окно, в котором протухшие данные отдаются сразу, а обновление идёт в фоне. */
@@ -89,8 +95,8 @@ export function createQuery<TData, TParams = any, TParent = any>(
   const { endpoint, initial, parent, findInParent, takeFirst, map, middleware } = opts;
   const ttlMs = opts.ttlMs ?? DEFAULT_TTL_MS;
   const swrMs = opts.swrMs ?? DEFAULT_SWR_MS;
-  const pKey = `parent-${endpoint}`;
-  const sg = ssrSignal<TData>(initial, parent ? pKey : endpoint);
+  const stateKey = opts.stateKey ?? (parent ? `parent-${endpoint}` : endpoint);
+  const sg = ssrSignal<TData>(initial, stateKey);
 
   async function request(params: TParams): Promise<TData> {
     const resp = await instance.get(endpoint, { params });

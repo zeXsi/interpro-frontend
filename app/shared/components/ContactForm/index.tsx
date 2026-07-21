@@ -244,6 +244,15 @@ const serviceLandingFormNames: Record<NonNullable<PropsContactForm['landingPrefi
   OfficeRenovation: 'Форма OfficeRenovation',
 };
 
+/**
+ * Отдельные цели Яндекс.Метрики для форм лендингов — отправляются в дополнение
+ * к общей request_form_full, чтобы не ломать уже собранную по ней статистику.
+ */
+const serviceLandingGoals: Record<NonNullable<PropsContactForm['landingPrefix']>, string> = {
+  MuseumSpaces: 'request_form_museum_full',
+  OfficeRenovation: 'request_form_office_full',
+};
+
 const popupFormName = 'Заказать дизайн-проект';
 
 /** Страницы, с которых в названии поп-апа дизайн-проекта указываем источник */
@@ -372,6 +381,12 @@ export default function ContactForm({
       } else {
         ym?.(99631636, 'reachGoal', 'request_form_full');
         _tmr?.push({ type: 'reachGoal', id: 3746602, goal: 'reach_goal_final' });
+
+        const landingGoal =
+          type === 'service-landing' && landingPrefix
+            ? serviceLandingGoals[landingPrefix]
+            : undefined;
+        if (landingGoal) ym?.(99631636, 'reachGoal', landingGoal);
       }
 
       refSend.current?.toggleAttribute('false', true);
