@@ -29,6 +29,8 @@ export interface Project {
     cover: string;
     video: string;
     show_on_home: boolean;
+    /** Приватный проект: WP не отдаёт его в списках, только по прямой ссылке. */
+    is_private: boolean;
     seo: {
       description: string,
       title:string,

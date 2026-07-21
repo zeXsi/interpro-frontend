@@ -119,7 +119,8 @@ function getLatestProjectDate(projects: WpContentEntry[], slugs: string[]) {
 
 async function fetchAllWpEntries<T extends { id: number }>(
   endpoint: string,
-  fields: string[]
+  fields: string[],
+  extraParams: Record<string, string | number> = {}
 ): Promise<T[]> {
   const params = {
     page: 1,
@@ -127,6 +128,7 @@ async function fetchAllWpEntries<T extends { id: number }>(
     order: 'asc',
     orderby: 'id',
     _fields: fields.join(','),
+    ...extraParams,
   };
   const firstResponse = await instance.get<T[]>(endpoint, {
     params,
@@ -192,7 +194,8 @@ ${urls}
 export async function buildSitemap() {
   const contentFields = ['id', 'slug', 'date', 'date_gmt', 'modified', 'modified_gmt'];
   const [projects, categories, services, news] = await Promise.all([
-    fetchAllWpEntries<WpContentEntry>('/projects', contentFields),
+    // Приватные проекты скрыты из списков на сайте, но из выдачи не исключаются.
+    fetchAllWpEntries<WpContentEntry>('/projects', contentFields, { include_private: 1 }),
     fetchAllWpEntries<WpContentEntry>('/service_category', contentFields),
     fetchAllWpEntries<WpServiceEntry>('/service', [...contentFields, 'service_category']),
     fetchAllWpEntries<WpContentEntry>('/news', contentFields),
