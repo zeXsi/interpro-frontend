@@ -54,6 +54,7 @@ export default function ProjectPage({ loaderData: data, params }: Route.Componen
   const { Popup, showWithData } = useMWImage();
   const projectTitle = decodeUnicodeEscapes(data?.payload?.title);
   const nextProjectTitle = decodeUnicodeEscapes(data?.nextItem?.title);
+  const nextSlug = data?.nextItem?.slug;
 
   useLayoutEffect(() => {
     try {
@@ -153,17 +154,19 @@ export default function ProjectPage({ loaderData: data, params }: Route.Componen
 
         {/* У приватного проекта нет соседей: он не попадает в список, из
             которого строится цепочка «следующий» — блок просто не выводим. */}
-        {!!data?.nextItem?.slug && (
+        {nextSlug && (
           <div className="__nextItem">
             <Subtitle>(Следующий проект)</Subtitle>
-            <Link to={`/projects/${data.nextItem.slug}`} slug={[nextProjectTitle]}>
+            <Link to={`/projects/${nextSlug}`} slug={[nextProjectTitle]}>
               <Button.Arrow variant="link" direction="right">
                 {nextProjectTitle}
               </Button.Arrow>
             </Link>
           </div>
         )}
-        <ContactForm className="px" />
+        {/* Без блока «следующий проект» форма теряет отступ, который задавал
+            его margin-bottom, — переносим этот отступ на саму форму. */}
+        <ContactForm className={`px ${nextSlug ? '' : 'isNoNextItem'}`} />
       </div>
     </StartPage>
   );

@@ -593,7 +593,9 @@ function toOfficeShowcaseProjects(projects: OfficeProject[]): ShowcaseProject[] 
     year: project.year,
     nameExhibition: project.exhibition,
     link: project.href,
-    descriptionOnly: true,
+    // Описание сейчас не выводим — карточка как на главной. Вариант оставлен:
+    // достаточно вернуть true, чтобы вместо тегов снова показывалось описание.
+    descriptionOnly: false,
   }));
 }
 

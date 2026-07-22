@@ -8,6 +8,18 @@
   display: flex;
   flex-direction: column;
 
+  /* У приватного проекта блока «следующий проект» нет, а именно его
+     margin-bottom отделял форму от контента — повторяем этот отступ здесь,
+     значения те же, что у .__nextItem ниже. */
+  .ContactForm.isNoNextItem {
+    margin-top: clamp(7.75rem, calc(3rem + 9.896vw), 14.875rem);
+    /* min: 124px, max: 238px */ /* viewPort: 768-1920 */
+    @media (max-width: 768px) {
+      margin-top: clamp(6rem, calc(4.33rem + 7.125vw), 7.75rem);
+      /* min: 96px, max: 124px */ /* viewPort: 375-768 */
+    }
+  }
+
   .__nextItem {
     display: flex;
     flex-direction: column;
