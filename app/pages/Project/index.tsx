@@ -187,6 +187,14 @@ interface TagsProps {
 }
 function TagsDesktop(props: TagsProps) {
   const clIsDesc = props.desc ? 'isDesc' : '';
+
+  // Каждый тег внутри и так скрывается через IsNot (то есть по !!value), но
+  // сама сетка остаётся и даёт отступы. Если пусто всё — не выводим блок.
+  const hasContent =
+    !!props.exhibition || !!props.typeStand || !!props.square || !!props.year || !!props.desc;
+
+  if (!hasContent) return null;
+
   return (
     <div className={`ProjectPage_tags __desktop px ${clIsDesc}`}>
       <IsNot
