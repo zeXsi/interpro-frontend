@@ -238,14 +238,14 @@
     &.isSecondImgs {
       grid-template-columns: 1fr 1fr;
       .ImgWithText-img {
-        height: clamp(46rem, calc(33.542rem + 25.955vw), 64.688rem);
+        /* height: clamp(46rem, calc(33.542rem + 25.955vw), 64.688rem); */
         /* min: 736px, max: 1035px */
         /* viewPort: 768-1920 */
       }
 
       @media (max-width: 1440px) {
         .ImgWithText-img {
-          height: clamp(22.438rem, calc(-0.046rem + 95.929vw), 46rem);
+          /* height: clamp(22.438rem, calc(-0.046rem + 95.929vw), 46rem); */
           /* min: 359px, max: 736px */
           /* viewPort: 375-768 */
         }
@@ -256,11 +256,11 @@
     &:not(&.isSecondImgs) {
       grid-template-columns: 1fr;
       max-height: 80svh;
-      height: clamp(25.813rem, calc(-0.146rem + 54.08vw), 64.75rem);
+      /* height: clamp(25.813rem, calc(-0.146rem + 54.08vw), 64.75rem); */
       /* min: 413px, max: 1036px */
       /* viewPort: 768-1920 */
       @media (max-width: 768px) {
-        height: clamp(12.625rem, calc(0.042rem + 53.69vw), 25.813rem);
+        /* height: clamp(12.625rem, calc(0.042rem + 53.69vw), 25.813rem); */
         /* min: 202px, max: 413px */
         /* viewPort: 375-768 */
       }
