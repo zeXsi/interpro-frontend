@@ -3,7 +3,7 @@ import './styles.css';
 import ArrowIcon from 'assets/icons/arrow.svg?react';
 import CheckmarkIcon from 'assets/icons/checkmark.svg?react';
 import { sendLead } from 'api/form';
-import { getProjects } from 'api/projects/projects.api';
+import { getProjectsBySlugs } from 'api/projects/projects.api';
 import type { Project } from 'api/projects/projects.types';
 import {
   useEffect,
@@ -35,11 +35,7 @@ import 'swiper/css';
 
 import type { Route } from './+types';
 
-const MUSEUM_PROJECT_LINKS = [
-  '/projects/imperia-klimata',
-  '/projects/futuruss',
-  '/projects/novatek',
-];
+const MUSEUM_PROJECT_SLUGS = ['moskovskij-urbanistices-u00adkij-forum', 'muzej-vtoroj-miro-u00advoj-vojny'] as const;
 
 const PROJECT_DESCRIPTION_MAX_PARAGRAPHS = 4;
 
@@ -172,7 +168,7 @@ const creationCards = [
 ];
 
 export async function loader() {
-  const projects = await getProjects();
+  const projects = await getProjectsBySlugs(MUSEUM_PROJECT_SLUGS);
   return {
     projects: projects ?? [],
   };
@@ -760,12 +756,7 @@ function ProjectMetaItem({ title, value }: { title: string; value?: string | num
 }
 
 function getSelectedProjects(projects: Project[]) {
-  const slugs = MUSEUM_PROJECT_LINKS.map((link) => link.split('/').filter(Boolean).at(-1));
-  const selected = slugs
-    .map((slug) => projects.find((project) => project.slug === slug))
-    .filter(Boolean) as Project[];
-
-  return selected.length ? selected : projects.slice(0, 3);
+  return projects;
 }
 
 function toShowcaseProjects(projects: Project[]): ShowcaseProject[] {

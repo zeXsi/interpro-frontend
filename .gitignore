@@ -2,6 +2,7 @@
 .vscode
 # .env
 /node_modules/
+sitemap.xml
 
 # React Router
 /.react-router/
