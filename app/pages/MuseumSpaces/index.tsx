@@ -35,7 +35,7 @@ import 'swiper/css';
 
 import type { Route } from './+types';
 
-const MUSEUM_PROJECT_SLUGS = ['moskovskij-urbanistices-u00adkij-forum', 'muzej-vtoroj-miro-u00advoj-vojny'] as const;
+const MUSEUM_PROJECT_SLUGS = ['moskovskij-urbanisticeskij-forum', 'muzej-vtoroj-mirovoj-vojny'] as const;
 
 const PROJECT_DESCRIPTION_MAX_PARAGRAPHS = 4;
 

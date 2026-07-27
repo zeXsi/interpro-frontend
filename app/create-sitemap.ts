@@ -270,7 +270,7 @@ export async function buildSitemap() {
       '/museum-spaces',
       'monthly',
       0.6,
-      getLatestProjectDate(projects, ['imperia-klimata', 'futuruss', 'novatek'])
+      getLatestProjectDate(projects, ['moskovskij-urbanisticeskij-forum', 'muzej-vtoroj-mirovoj-vojny'])
     ),
     staticEntry(
       '/office-renovation',
