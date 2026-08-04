@@ -272,7 +272,7 @@
 
       .ImgWithText-img {
         /* pointer-events: none; */
-        height: 100%;
+        aspect-ratio: 16 / 9;
         max-height: 80svh;
         cursor: pointer;
       }
