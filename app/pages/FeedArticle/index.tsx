@@ -80,9 +80,12 @@ export async function _loader(_url: string): Promise<ArticleData> {
 }
 
 export function _meta(data: ArticleData, pathname: string) {
-  const title = `Interpro: ${data.article?.payload?.title ?? ''}`;
+  const defaultTitle = `Interpro: ${data.article?.payload?.title ?? ''}`;
+  const title = data.slug === 'blog' ? data.article.payload.seo?.title?.trim() || defaultTitle : defaultTitle;
   const description =
-    data.slug === 'blog' ? 'Читайте статью на нашем сайте' : 'Читайте новость на нашем сайте';
+    data.slug === 'blog'
+      ? data.article.payload.seo?.description?.trim() || 'Читайте статью на нашем сайте'
+      : 'Читайте новость на нашем сайте';
 
   return getOpenGraphMeta({
     title,
