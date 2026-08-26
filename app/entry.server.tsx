@@ -8,9 +8,11 @@ import type { AppLoadContext, EntryContext } from 'react-router';
 import { ServerRouter } from 'react-router';
 
 import { startSitemapScheduler } from 'create-sitemap';
+import { startSsrQueryCachePoller } from 'api/ssrQueryCache.server';
 
 export const streamTimeout = 5_000;
 
+await startSsrQueryCachePoller();
 void startSitemapScheduler();
 
 /** Сколько общий кэш (CDN/прокси) держит HTML свежим. Браузер всегда ревалидирует. */

@@ -1,6 +1,7 @@
 import { createQuery } from 'shared/utils/querySignal';
 import type { Service, ServiceCategory } from './services.types';
 import { addNextItem } from 'shared/utils/addNextItem';
+import { QUERY_FAMILIES } from 'api/queryFamilies';
 
 type PaginationParams = {
   per_page: number;
@@ -8,6 +9,7 @@ type PaginationParams = {
 
 const qServiceCategories = createQuery<ServiceCategory[], PaginationParams>({
   endpoint: '/service_category',
+  family: QUERY_FAMILIES.services,
   initial: [],
   middleware: (data) => {
     addNextItem(data as any);
@@ -17,10 +19,13 @@ const qServiceCategories = createQuery<ServiceCategory[], PaginationParams>({
 
 export const sgServiceCategories = qServiceCategories.sg;
 export const getServiceCategories = () => qServiceCategories.fetch({ per_page: 100 });
+export const primeServiceCategories = (force = false, updateSignal = false) =>
+  qServiceCategories.prime({ per_page: 100 }, { force, updateSignal });
 
 type Param = { slug: string };
 const qServiceCategoryById = createQuery<ServiceCategory | undefined, Param, ServiceCategory[]>({
   endpoint: '/service_category',
+  family: QUERY_FAMILIES.services,
   parent: sgServiceCategories,
   findInParent: (parent, params) => parent?.find((item) => item.slug === params.slug) ?? null,
   takeFirst: true,
@@ -32,6 +37,7 @@ export const getServiceCategoriesById = (params: Param) => qServiceCategoryById.
 
 const qServices = createQuery<Service[], PaginationParams>({
   endpoint: '/service',
+  family: QUERY_FAMILIES.services,
   initial: [],
   middleware: (data) => {
     addNextItem(data as any);
@@ -41,10 +47,13 @@ const qServices = createQuery<Service[], PaginationParams>({
 
 export const sgServices = qServices.sg;
 export const getServices = () => qServices.fetch({ per_page: 100 });
+export const primeServices = (force = false, updateSignal = false) =>
+  qServices.prime({ per_page: 100 }, { force, updateSignal });
 
 // проверить
 const qServiceById = createQuery<Service | undefined, Param, Service[]>({
   endpoint: '/service',
+  family: QUERY_FAMILIES.services,
   parent: sgServices,
   findInParent: (parent, params) => parent?.find((item) => item.slug === params.slug),
   takeFirst: true,

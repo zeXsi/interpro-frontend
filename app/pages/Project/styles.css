@@ -119,6 +119,7 @@
 
       .ProjectPage_tags-container {
         grid-column: 1/6;
+        gap: 32px;
       }
     }
   }
@@ -133,10 +134,9 @@
       line-height: 136%;
       letter-spacing: -0.02em;
       color: #000;
-      text-wrap: balance;
-    }
-    &.__table {
-      display: none;
+
+      white-space: pre-line;
+      text-wrap: pretty;
     }
   }
   .block_1.__intro {
@@ -184,9 +184,6 @@
     }
 
     .ProjectPage_tags.__desktop {
-      .ProjectPage-description {
-        display: none;
-      }
 
       .ProjectPage_tags-container {
         flex-direction: column;
@@ -196,10 +193,6 @@
           gap: 32px;
         }
       }
-    }
-
-    .ProjectPage-description.__table {
-      display: flex;
     }
   }
 }
