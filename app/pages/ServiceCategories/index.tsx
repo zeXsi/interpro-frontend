@@ -6,6 +6,7 @@ import TitlePage from 'shared/components/TitlePage';
 import Link from 'shared/components/Link';
 import { sgServiceCategories } from 'api/services/services.api';
 import StartPage from 'shared/components/StartPage';
+import { ServiceCategoryContent } from './pages/ServiceCategory';
 
 export function meta() {
   const title = 'Interpro: услуги';
@@ -23,6 +24,24 @@ export function meta() {
 }
 
 export default function ServiceCategories({}) {
+  const categories = sgServiceCategories.v;
+
+  if (categories.length === 1) {
+    const category = categories[0];
+
+    return (
+      <StartPage>
+        <ServiceCategoryContent
+          data={category}
+          categorySlug={category.slug}
+          title="Услуги"
+          setCategoryCrumb={false}
+          includePageSchema={false}
+        />
+      </StartPage>
+    );
+  }
+
   return (
     <StartPage>
       <div className="ServiceCategories px">
@@ -32,7 +51,7 @@ export default function ServiceCategories({}) {
         </ServicesDesc>
 
         <div className="ServiceCategories_container">
-          {sgServiceCategories.v.map(({ payload, slug, name }, index) => {
+          {categories.map(({ payload, slug, name }, index) => {
             return (
               <ItemService
                 key={index}

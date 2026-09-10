@@ -8,6 +8,8 @@ import { useLenis } from 'lenis/react';
 import { useState } from 'react';
 import StartPage from 'shared/components/StartPage';
 import TitlePage from 'shared/components/TitlePage';
+import JsonLd from 'shared/seo/JsonLd';
+import { getContactsPageSchema } from 'shared/seo/schemas';
 
 const coords = [55.834275, 37.648852];
 
@@ -47,6 +49,7 @@ export default function Contacts() {
 
   return (
     <StartPage>
+      <JsonLd data={getContactsPageSchema()} />
       <YMaps>
         <div className="Contacts">
           <TitlePage title="Контакты" className="px" />

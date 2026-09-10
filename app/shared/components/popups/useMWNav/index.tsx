@@ -50,6 +50,12 @@ function buildTree(data: any[], parentPath: string = '/services'): NavItem[] {
   });
 }
 
+function buildServicesTree(data: any[]): NavItem[] {
+  const tree = buildTree(data);
+
+  return data.length === 1 ? tree[0]?.children ?? [] : tree;
+}
+
 type unionTypes = 'nav' | 'contacts';
 interface ImpMethods {
   getData: () => unionTypes;
@@ -257,7 +263,7 @@ function Desktop({
   toClosePopup: () => void;
 }) {
   const { goTo } = useNavigate();
-  const servicesTree = useMemo(() => buildTree(sgServiceCategories.v), []);
+  const servicesTree = useMemo(() => buildServicesTree(sgServiceCategories.v), []);
 
   const columns = [
     {
@@ -299,6 +305,7 @@ function Desktop({
 export type ThreeLevelNavItem = {
   label: string;
   link?: string;
+  parentLabel?: string;
   children?: ThreeLevelNavItem[];
 };
 
@@ -347,7 +354,13 @@ export function ThreeLevelNav({ columns, onNavigate }: ThreeLevelNavProps) {
                 setActiveSubItem(null);
               }
             }}
-            onClick={() => child.link && onNavigate(child.link, child.label)}
+            onClick={() =>
+              child.link &&
+              onNavigate(
+                child.link,
+                ...(child.parentLabel ? [child.parentLabel, child.label] : [child.label])
+              )
+            }
           >
             {child.label}
           </li>
@@ -497,6 +510,7 @@ function AboutUs({ toNavigate }: Props) {
 
 function ServicesNavTable({ toNavigate }: Props) {
   const tree = useMemo(() => buildTree(sgServiceCategories.v), []);
+  const hasSingleCategory = sgServiceCategories.v.length === 1;
   const [selectedIndex, setSelectedIndex] = useState<null | number>(null);
   const toClick = (val: boolean, index: number) => {
     setSelectedIndex(val ? index : null);
@@ -507,11 +521,24 @@ function ServicesNavTable({ toNavigate }: Props) {
       <li className="MWNav_title __services" onClick={() => toNavigate('/services')}>
         Все услуги
       </li>
-      {tree.map((item, index) => {
-        const isActive = selectedIndex === index;
-        return (
-          <>
-            <Accordion onClick={(v) => toClick(v, index)} key={index}>
+      {hasSingleCategory && (
+        <ul className="AboutUs_list">
+          {tree[0]?.children?.map((item) => (
+            <li
+              key={item.link ?? item.label}
+              className="AboutUs_list-item"
+              onClick={() => item.link && toNavigate(item.link, tree[0].label, item.label)}
+            >
+              {item.label}
+            </li>
+          ))}
+        </ul>
+      )}
+      {!hasSingleCategory &&
+        tree.map((item, index) => {
+          const isActive = selectedIndex === index;
+          return (
+            <Accordion onClick={(v) => toClick(v, index)} key={item.link ?? item.label}>
               <Accordion.Header>
                 <span className="Accordion_header-title">{item.label}</span>
                 <IconPlus isActive={!isActive} />
@@ -526,6 +553,7 @@ function ServicesNavTable({ toNavigate }: Props) {
                   {item.children?.map((childItem) => {
                     return (
                       <li
+                        key={childItem.link ?? childItem.label}
                         onClick={() => {
                           toNavigate(childItem.link!, item.label, childItem.label);
                         }}
@@ -537,9 +565,8 @@ function ServicesNavTable({ toNavigate }: Props) {
                 </ul>
               </Accordion.Content>
             </Accordion>
-          </>
-        );
-      })}
+          );
+        })}
     </>
   );
 }

@@ -48,6 +48,17 @@ import { getOpenGraphMeta } from 'shared/seo/meta';
 
 const YANDEX_COUNTER_ID = 99631636;
 
+const hasCustomStructuredData = (pathname: string) => {
+  const normalizedPath = pathname.replace(/\/+$/, '') || '/';
+
+  return (
+    normalizedPath === '/' ||
+    normalizedPath === '/contacts' ||
+    normalizedPath === '/projects' ||
+    /^\/services\/[^/]+$/.test(normalizedPath)
+  );
+};
+
 const yandexMetrikaScript = `
   (function(m,e,t,r,i,k,a){
     m[i]=m[i]||function(){
@@ -90,6 +101,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
   const data = useLoaderData();
   const location = useLocation();
   const isPresentationRoute = location.pathname.startsWith('/presentation');
+  const isCustomStructuredDataRoute = hasCustomStructuredData(location.pathname);
   const isPresentationPrint =
     isPresentationRoute &&
     (location.pathname.endsWith('/print') ||
@@ -117,7 +129,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
           media="(prefers-color-scheme: dark)"
         />
 
-        {!isPresentationRoute && (
+        {!isPresentationRoute && !isCustomStructuredDataRoute && (
           <script
             type="application/ld+json"
             dangerouslySetInnerHTML={{ __html: seoScheme(data.projects) }}
@@ -239,10 +251,11 @@ export default function App() {
   }, []);
 
   const isPresentation = location.pathname.startsWith('/presentation');
+  const isCustomStructuredDataRoute = hasCustomStructuredData(location.pathname);
 
   return (
     <>
-      {!isPresentation && (
+      {!isPresentation && !isCustomStructuredDataRoute && (
         <>
           <JsonLd data={getOrganizationSchema()} />
           <JsonLd data={getLocalBusinessSchema()} />

@@ -29,6 +29,8 @@ import { sgProjects } from 'api/projects/projects.api';
 
 import { getFilters, sgFilters } from 'api/filters';
 import { decodeUnicodeEscapes } from 'shared/utils/decodeUnicodeEscapes';
+import JsonLd from 'shared/seo/JsonLd';
+import { getProjectsPageSchema } from 'shared/seo/schemas';
 
 type ViewMode = 'grid' | 'list';
 export const hoveredProject = signal(-Infinity);
@@ -38,24 +40,24 @@ export async function loader() {
 }
 
 
-export function meta() {
-  const title = 'Interpro: проекты';
-  const description =
-    'Посмотрите проекты Interpro: реальные кейсы успешных решений для бизнеса, которые демонстрируют наш опыт и профессионализм.';
+const PROJECTS_TITLE = 'Interpro: проекты';
+const PROJECTS_DESCRIPTION =
+  'Посмотрите проекты Interpro: реальные кейсы успешных решений для бизнеса, которые демонстрируют наш опыт и профессионализм.';
 
+export function meta() {
   return [
-    { title },
+    { title: PROJECTS_TITLE },
     {
       name: 'description',
-      content: description,
+      content: PROJECTS_DESCRIPTION,
     },
     {
       property: 'og:title',
-      content: title,
+      content: PROJECTS_TITLE,
     },
     {
       property: 'og:description',
-      content: description,
+      content: PROJECTS_DESCRIPTION,
     },
   ];
 }
@@ -123,6 +125,15 @@ export default function ProjectsPage() {
   };
   return (
     <StartPage>
+      <JsonLd
+        data={getProjectsPageSchema({
+          description: PROJECTS_DESCRIPTION,
+          projects: sgProjects.v.map((project) => ({
+            slug: project.slug,
+            name: project.payload?.title || project.title?.rendered,
+          })),
+        })}
+      />
       <div className="ProjectPage px">
         <div className="ProjectPage-title">
           <h1>Проекты</h1>

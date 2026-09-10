@@ -11,6 +11,7 @@ import { useNavigate } from 'shared/components/NavigationTracker';
 import { useLayoutEffect, useRef } from 'react';
 import { lenisManager } from 'shared/utils/lenis';
 import { getServiceCategoriesById } from 'api/services/services.api';
+import type { ServiceCategory } from 'api/services/services.types';
 import { Route } from './+types';
 
 import Accordion from 'shared/components/Accordion';
@@ -26,8 +27,15 @@ import svgCompanies from 'assets/companies';
 import FAQSection from 'shared/sections/FAQSection';
 
 import JsonLd from 'shared/seo/JsonLd';
-import { getFaqSchema, getReviewSchemas } from 'shared/seo/schemas';
+import {
+  getFaqSchema,
+  getReviewSchemas,
+  getServiceCategoryPageSchema,
+} from 'shared/seo/schemas';
 import { getOpenGraphMeta } from 'shared/seo/meta';
+
+const DEFAULT_SERVICE_CATEGORY_DESCRIPTION =
+  'Этот проект был реализован компанией Interpro с применением современных решений и экспертизы.';
 
 export async function loader({ params }: Route.LoaderArgs) {
   const data = await getServiceCategoriesById({ slug: params.slug });
@@ -41,9 +49,7 @@ export async function loader({ params }: Route.LoaderArgs) {
 
 export function meta({ loaderData, location }: Route.MetaArgs) {
   const titlePart = loaderData?.name || '';
-  const description =
-    loaderData?.description ||
-    'Этот проект был реализован компанией Interpro с применением современных решений и экспертизы.';
+  const description = loaderData?.description || DEFAULT_SERVICE_CATEGORY_DESCRIPTION;
 
   const title = `Interpro: категория услуги ${titlePart}`;
 
@@ -56,25 +62,59 @@ export function meta({ loaderData, location }: Route.MetaArgs) {
 }
 
 export default function ServiceCategoryPage({ loaderData: data, params }: Route.ComponentProps) {
+  return <ServiceCategoryContent data={data} categorySlug={params.slug} />;
+}
+
+interface ServiceCategoryContentProps {
+  data: ServiceCategory;
+  categorySlug: string;
+  title?: string;
+  setCategoryCrumb?: boolean;
+  includePageSchema?: boolean;
+}
+
+export function ServiceCategoryContent({
+  data,
+  categorySlug,
+  title,
+  setCategoryCrumb = true,
+  includePageSchema = true,
+}: ServiceCategoryContentProps) {
   const clIsImg = !!data?.payload.cover ? 'with-img' : '';
   const { goTo, setCrumbs } = useNavigate();
   const contactFormRef = useRef<HTMLDivElement>(null);
 
   useLayoutEffect(() => {
-    const path = `/services/${params?.slug}`;
-    if (data?.payload?.name) {
+    const path = `/services/${categorySlug}`;
+    if (setCategoryCrumb && data?.payload?.name) {
       setCrumbs(path, data?.payload?.name);
     }
-  }, [data]);
+  }, [categorySlug, data?.payload?.name, setCategoryCrumb]);
 
   return (
     <div className="InteractiveExhibit service">
+      <JsonLd
+        data={
+          includePageSchema
+            ? getServiceCategoryPageSchema({
+                slug: categorySlug,
+                title: `Interpro: категория услуги ${data.name || data.payload.name}`,
+                description: data.description || DEFAULT_SERVICE_CATEGORY_DESCRIPTION,
+                name: data.payload.name || data.name,
+                serviceDescription:
+                  data.payload.description ||
+                  data.description ||
+                  DEFAULT_SERVICE_CATEGORY_DESCRIPTION,
+              })
+            : null
+        }
+      />
       <JsonLd data={getFaqSchema(data?.payload?.faq)} />
       <JsonLd data={getReviewSchemas(data?.payload?.reviews)} />
       
       <div className="wrap-first-wrap px">
         <div className="wrap-first-title">
-          <TitlePage title={data?.payload.name!} />
+          <TitlePage title={title ?? data?.payload.name!} />
           {data?.payload.description || (data?.payload.accordion?.length ?? 0) > 0 ? (
             <div className="wrap-desc">
               {data?.payload.description && (
@@ -111,7 +151,7 @@ export default function ServiceCategoryPage({ loaderData: data, params }: Route.
               const post = data?.payload?.posts[index];
               if (!post) return;
 
-              goTo(`/services/${params?.slug}/${post.slug}`, data?.payload.name, post.title);
+              goTo(`/services/${categorySlug}/${post.slug}`, data?.payload.name, post.title);
             }}
             items={data?.payload?.posts?.map(({ title }) => [title, '']) || []}
           />
