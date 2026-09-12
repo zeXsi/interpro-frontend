@@ -37,6 +37,7 @@ export default function ServiceCategories({}) {
           title="Услуги"
           setCategoryCrumb={false}
           includePageSchema={false}
+          directServiceLinks
         />
       </StartPage>
     );

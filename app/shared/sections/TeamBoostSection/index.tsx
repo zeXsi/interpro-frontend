@@ -6,6 +6,8 @@ import { sgServiceCategories } from 'api/services/services.api';
 import Link from 'shared/components/Link';
 
 function TeamBoostSection() {
+  const hasSingleCategory = sgServiceCategories.v.length === 1;
+
   return (
     <div className="TeamBoostSection ">
       <Tabs startTrigger="design_0">
@@ -15,7 +17,7 @@ function TeamBoostSection() {
           </Tabs.Item>,
           <Tabs.Content key={`content-${index}`} trigger={[`design_${index}`]}>
             <Template
-              link={`/services/${item.slug}`}
+              link={hasSingleCategory ? '/services' : `/services/${item.slug}`}
               tags={item.payload?.posts?.map((_item) => _item.title)}
               title={item.payload.description}
             />

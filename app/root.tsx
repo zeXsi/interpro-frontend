@@ -17,7 +17,11 @@ import { getFaqs } from 'api/faq/faq.api';
 import { getFeedNews, getFeedBlog } from 'api/feed/feed.api';
 import { getFeedbacks } from 'api/feedbacks/feedbacks.api';
 import { getLicenses } from 'api/licenses/license.api';
-import { getServiceCategories, getServices } from 'api/services/services.api';
+import {
+  getServiceCategories,
+  getServices,
+  sgServiceCategories,
+} from 'api/services/services.api';
 import { useLocation } from 'react-router';
 
 import { getSSRStore } from 'shared/utils/_stm';
@@ -45,17 +49,21 @@ import {
   getOrganizationSchema,
 } from 'shared/seo/schemas';
 import { getOpenGraphMeta } from 'shared/seo/meta';
+import { getCanonicalUrl, normalizeCanonicalPathname } from 'shared/seo/canonical';
 
 const YANDEX_COUNTER_ID = 99631636;
 
-const hasCustomStructuredData = (pathname: string) => {
+const hasCustomStructuredData = (pathname: string, serviceCategorySlugs: string[]) => {
   const normalizedPath = pathname.replace(/\/+$/, '') || '/';
+  const serviceCategoryMatch = normalizedPath.match(/^\/services\/([^/]+)$/);
+  const isServiceCategoryRoute =
+    !!serviceCategoryMatch && serviceCategorySlugs.includes(serviceCategoryMatch[1]);
 
   return (
     normalizedPath === '/' ||
     normalizedPath === '/contacts' ||
     normalizedPath === '/projects' ||
-    /^\/services\/[^/]+$/.test(normalizedPath)
+    isServiceCategoryRoute
   );
 };
 
@@ -101,7 +109,10 @@ export function Layout({ children }: { children: React.ReactNode }) {
   const data = useLoaderData();
   const location = useLocation();
   const isPresentationRoute = location.pathname.startsWith('/presentation');
-  const isCustomStructuredDataRoute = hasCustomStructuredData(location.pathname);
+  const isCustomStructuredDataRoute = hasCustomStructuredData(
+    location.pathname,
+    sgServiceCategories.v.map((category) => category.slug)
+  );
   const isPresentationPrint =
     isPresentationRoute &&
     (location.pathname.endsWith('/print') ||
@@ -116,6 +127,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
         {/* <script crossOrigin="anonymous" src="//unpkg.com/react-scan/dist/auto.global.js"></script> */}
         <Meta />
         <Links />
+        <link rel="canonical" href={getCanonicalUrl(location.pathname, location.search)} />
         <link
           rel="icon"
           type="image/svg+xml"
@@ -212,7 +224,7 @@ export const links: Route.LinksFunction = () => [
 
 export async function loader(args: Route.LoaderArgs) {
   const url = new URL(args.request.url);
-  const normalizedPathname = url.pathname.replace(/\/{2,}/g, '/');
+  const normalizedPathname = normalizeCanonicalPathname(url.pathname);
 
   if (normalizedPathname !== url.pathname) {
     throw redirect(`${normalizedPathname}${url.search}`, { status: 301 });
@@ -251,7 +263,10 @@ export default function App() {
   }, []);
 
   const isPresentation = location.pathname.startsWith('/presentation');
-  const isCustomStructuredDataRoute = hasCustomStructuredData(location.pathname);
+  const isCustomStructuredDataRoute = hasCustomStructuredData(
+    location.pathname,
+    sgServiceCategories.v.map((category) => category.slug)
+  );
 
   return (
     <>

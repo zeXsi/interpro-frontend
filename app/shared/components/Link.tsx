@@ -8,6 +8,7 @@ import {
   scrollToPageBottom,
   scrollToSection,
 } from 'shared/utils/scrollToSection';
+import { normalizeInternalHref } from 'shared/seo/canonical';
 
 interface LinkProps {
   to: string | string[];
@@ -74,7 +75,7 @@ const Link = ({ slug = [], ...props }: LinkProps) => {
   const navigateWithCrumbs = (path: string) => {
     const slugArr =
       Array.isArray(slug) ? slug.filter(Boolean) : slug ? [slug] : [];
-    goTo(path, ...slugArr);
+    goTo(normalizeInternalHref(path), ...slugArr);
   };
 
   useEffect(() => {
@@ -131,9 +132,10 @@ const Link = ({ slug = [], ...props }: LinkProps) => {
     }
   };
 
-  const href = Array.isArray(props.to)
+  const rawHref = Array.isArray(props.to)
     ? ((props.to.find((t) => !isHash(t)) ?? props.to[0]) as string)
     : (props.to as string);
+  const href = props.typeLink === 'external' ? rawHref : normalizeInternalHref(rawHref);
 
   const handleClickExternal = async (e: React.MouseEvent<HTMLAnchorElement>) => {
     props.onClick?.();

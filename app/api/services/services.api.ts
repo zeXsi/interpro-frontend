@@ -62,3 +62,43 @@ const qServiceById = createQuery<Service | undefined, Param, Service[]>({
 
 export const sgCurrService = qServiceById.sg;
 export const getServiceById = (params: Param) => qServiceById.fetch(params);
+
+export async function getServiceWithNextItem(slug: string): Promise<Service | undefined> {
+  const service = await getServiceById({ slug });
+
+  if (!service) {
+    return undefined;
+  }
+
+  const categorySlug = service.payload?.category?.slug;
+  if (!categorySlug) {
+    return service;
+  }
+
+  const category = await getServiceCategoriesById({ slug: categorySlug });
+  const posts = category?.payload?.posts ?? [];
+
+  if (posts.length <= 1) {
+    return service;
+  }
+
+  const currentIndex = posts.findIndex((post) => post.slug === service.slug);
+  if (currentIndex < 0) {
+    return service;
+  }
+
+  const nextPost = posts[(currentIndex + 1) % posts.length];
+  if (!nextPost || nextPost.slug === service.slug) {
+    return service;
+  }
+
+  return {
+    ...service,
+    nextItem: {
+      id: nextPost.id,
+      slug: nextPost.slug,
+      title: nextPost.title,
+      categorySlug,
+    },
+  };
+}

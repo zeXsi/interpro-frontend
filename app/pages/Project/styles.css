@@ -80,6 +80,14 @@
       /* min: 64px, max: 200px */
       /* viewPort: 375-768 */
     }
+
+    .ProjectPage_title-context {
+      display: block;
+      margin-top: 0.2em;
+      font-size: clamp(1.5rem, calc(0.667rem + 1.736vw), 2.75rem);
+      line-height: 110%;
+      letter-spacing: -0.02em;
+    }
   }
 
   .ProjectPage_tags {

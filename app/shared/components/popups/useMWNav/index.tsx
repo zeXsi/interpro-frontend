@@ -51,9 +51,16 @@ function buildTree(data: any[], parentPath: string = '/services'): NavItem[] {
 }
 
 function buildServicesTree(data: any[]): NavItem[] {
-  const tree = buildTree(data);
+  if (data.length === 1) {
+    return (
+      data[0].payload?.posts?.map((post: any) => ({
+        label: post.title,
+        link: `/services/${post.slug}`,
+      })) ?? []
+    );
+  }
 
-  return data.length === 1 ? tree[0]?.children ?? [] : tree;
+  return buildTree(data);
 }
 
 type unionTypes = 'nav' | 'contacts';
@@ -510,6 +517,7 @@ function AboutUs({ toNavigate }: Props) {
 
 function ServicesNavTable({ toNavigate }: Props) {
   const tree = useMemo(() => buildTree(sgServiceCategories.v), []);
+  const servicesTree = useMemo(() => buildServicesTree(sgServiceCategories.v), []);
   const hasSingleCategory = sgServiceCategories.v.length === 1;
   const [selectedIndex, setSelectedIndex] = useState<null | number>(null);
   const toClick = (val: boolean, index: number) => {
@@ -523,11 +531,11 @@ function ServicesNavTable({ toNavigate }: Props) {
       </li>
       {hasSingleCategory && (
         <ul className="AboutUs_list">
-          {tree[0]?.children?.map((item) => (
+          {servicesTree.map((item) => (
             <li
               key={item.link ?? item.label}
               className="AboutUs_list-item"
-              onClick={() => item.link && toNavigate(item.link, tree[0].label, item.label)}
+              onClick={() => item.link && toNavigate(item.link, item.label)}
             >
               {item.label}
             </li>
