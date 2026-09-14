@@ -10,6 +10,7 @@ export interface LeadData extends UtmFields {
   extraInfo?: string;
   terms?: string;
   area?: number;
+  project?: string;
 }
 
 export interface LeadDataPopup extends UtmFields {

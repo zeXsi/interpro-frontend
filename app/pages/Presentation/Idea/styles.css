@@ -176,7 +176,7 @@
         }
 
         .Idea__gallery-image {
-          aspect-ratio: 16/9;
+          /* aspect-ratio: 16/9; */
           min-height: 37.5rem;
           max-height: 37.5rem;
 

@@ -10,8 +10,14 @@ import Link from 'shared/components/Link';
 import { useNavigate } from 'shared/components/NavigationTracker';
 import { useLayoutEffect, useRef } from 'react';
 import { lenisManager } from 'shared/utils/lenis';
-import { getServiceCategoriesById } from 'api/services/services.api';
+import {
+  getServiceCategories,
+  getServiceCategoriesById,
+  getServiceWithNextItem,
+} from 'api/services/services.api';
+import type { Service, ServiceCategory } from 'api/services/services.types';
 import { Route } from './+types';
+import { redirect } from 'react-router';
 
 import Accordion from 'shared/components/Accordion';
 import CrossIcon from 'assets/icons/cross.svg?react';
@@ -26,55 +32,148 @@ import svgCompanies from 'assets/companies';
 import FAQSection from 'shared/sections/FAQSection';
 
 import JsonLd from 'shared/seo/JsonLd';
-import { getFaqSchema, getReviewSchemas } from 'shared/seo/schemas';
+import {
+  getFaqSchema,
+  getReviewSchemas,
+  getServiceCategoryPageSchema,
+} from 'shared/seo/schemas';
 import { getOpenGraphMeta } from 'shared/seo/meta';
+import { ServicePageContent } from '../ServicePage';
 
-export async function loader({ params }: Route.LoaderArgs) {
+const DEFAULT_SERVICE_CATEGORY_DESCRIPTION =
+  'Этот проект был реализован компанией Interpro с применением современных решений и экспертизы.';
+
+type CategoryRouteData =
+  | { kind: 'category'; data: ServiceCategory }
+  | { kind: 'service'; data: Service; categorySlug: string };
+
+export async function loader({ params }: Route.LoaderArgs): Promise<CategoryRouteData> {
+  const categories = await getServiceCategories();
+
+  if (categories?.length === 1) {
+    const category = categories[0];
+
+    if (params.slug === category.slug) {
+      throw redirect('/services', { status: 301 });
+    }
+
+    const service = await getServiceWithNextItem(params.slug);
+    const belongsToCategory =
+      service?.service_category?.includes(category.id) ||
+      service?.payload?.category?.slug === category.slug;
+
+    if (!service || !belongsToCategory) {
+      throw new Response('Not found', { status: 404 });
+    }
+
+    return {
+      kind: 'service',
+      data: service,
+      categorySlug: category.slug,
+    };
+  }
+
   const data = await getServiceCategoriesById({ slug: params.slug });
 
   if (!data) {
     throw new Response('Not found', { status: 404 });
   }
 
-  return data;
+  return { kind: 'category', data };
 }
 
 export function meta({ loaderData, location }: Route.MetaArgs) {
-  const titlePart = loaderData?.name || '';
-  const description =
-    loaderData?.description ||
-    'Этот проект был реализован компанией Interpro с применением современных решений и экспертизы.';
+  if (loaderData?.kind === 'service') {
+    const titlePart = loaderData.data.payload?.title || '';
+    const description =
+      loaderData.data.payload?.description || DEFAULT_SERVICE_CATEGORY_DESCRIPTION;
 
-  const title = `Interpro: категория услуги ${titlePart}`;
+    return getOpenGraphMeta({
+      title: `Interpro: услуга ${titlePart}`,
+      description,
+      pathname: location.pathname,
+      image: loaderData.data.payload?.cover,
+    });
+  }
+
+  const titlePart = loaderData?.data?.name || '';
+  const description = loaderData?.data?.description || DEFAULT_SERVICE_CATEGORY_DESCRIPTION;
 
   return getOpenGraphMeta({
-    title,
+    title: `Interpro: категория услуги ${titlePart}`,
     description,
     pathname: location.pathname,
-    image: loaderData?.payload?.cover,
+    image: loaderData?.data?.payload?.cover,
   });
 }
 
-export default function ServiceCategoryPage({ loaderData: data, params }: Route.ComponentProps) {
+export default function ServiceCategoryPage({ loaderData, params }: Route.ComponentProps) {
+  if (loaderData.kind === 'service') {
+    return (
+      <ServicePageContent
+        data={loaderData.data}
+        categorySlug={loaderData.categorySlug}
+        serviceSlug={params.slug}
+        isDirectPath
+      />
+    );
+  }
+
+  return <ServiceCategoryContent data={loaderData.data} categorySlug={params.slug} />;
+}
+
+interface ServiceCategoryContentProps {
+  data: ServiceCategory;
+  categorySlug: string;
+  title?: string;
+  setCategoryCrumb?: boolean;
+  includePageSchema?: boolean;
+  directServiceLinks?: boolean;
+}
+
+export function ServiceCategoryContent({
+  data,
+  categorySlug,
+  title,
+  setCategoryCrumb = true,
+  includePageSchema = true,
+  directServiceLinks = false,
+}: ServiceCategoryContentProps) {
   const clIsImg = !!data?.payload.cover ? 'with-img' : '';
   const { goTo, setCrumbs } = useNavigate();
   const contactFormRef = useRef<HTMLDivElement>(null);
 
   useLayoutEffect(() => {
-    const path = `/services/${params?.slug}`;
-    if (data?.payload?.name) {
+    const path = `/services/${categorySlug}`;
+    if (setCategoryCrumb && data?.payload?.name) {
       setCrumbs(path, data?.payload?.name);
     }
-  }, [data]);
+  }, [categorySlug, data?.payload?.name, setCategoryCrumb]);
 
   return (
     <div className="InteractiveExhibit service">
+      <JsonLd
+        data={
+          includePageSchema
+            ? getServiceCategoryPageSchema({
+                slug: categorySlug,
+                title: `Interpro: категория услуги ${data.name || data.payload.name}`,
+                description: data.description || DEFAULT_SERVICE_CATEGORY_DESCRIPTION,
+                name: data.payload.name || data.name,
+                serviceDescription:
+                  data.payload.description ||
+                  data.description ||
+                  DEFAULT_SERVICE_CATEGORY_DESCRIPTION,
+              })
+            : null
+        }
+      />
       <JsonLd data={getFaqSchema(data?.payload?.faq)} />
       <JsonLd data={getReviewSchemas(data?.payload?.reviews)} />
       
       <div className="wrap-first-wrap px">
         <div className="wrap-first-title">
-          <TitlePage title={data?.payload.name!} />
+          <TitlePage title={title ?? data?.payload.name!} />
           {data?.payload.description || (data?.payload.accordion?.length ?? 0) > 0 ? (
             <div className="wrap-desc">
               {data?.payload.description && (
@@ -111,7 +210,14 @@ export default function ServiceCategoryPage({ loaderData: data, params }: Route.
               const post = data?.payload?.posts[index];
               if (!post) return;
 
-              goTo(`/services/${params?.slug}/${post.slug}`, data?.payload.name, post.title);
+              const path = directServiceLinks
+                ? `/services/${post.slug}`
+                : `/services/${categorySlug}/${post.slug}`;
+
+              goTo(
+                path,
+                ...(directServiceLinks ? [post.title] : [data?.payload.name, post.title])
+              );
             }}
             items={data?.payload?.posts?.map(({ title }) => [title, '']) || []}
           />

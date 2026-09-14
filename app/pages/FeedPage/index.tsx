@@ -3,7 +3,7 @@ import ContactForm from 'shared/components/ContactForm';
 import Filter from './Filter';
 import Pagination from './Pagination';
 import Article from 'shared/components/Article';
-import { useSearchParams } from 'react-router-dom';
+import { useSearchParams } from 'react-router';
 import Link from 'shared/components/Link';
 
 import { useRef, useState } from 'react';
@@ -23,6 +23,7 @@ import {
 import { useLocation } from 'react-router';
 import formatDateToRussian from 'shared/utils/formatDateToRussian';
 import StartPage from 'shared/components/StartPage';
+import { getOpenGraphMeta } from 'shared/seo/meta';
 
 export type Params = { slug: 'blog' | 'news' };
 export type QParams = Partial<Record<'news_category' | 'blog_category', number>> & {
@@ -43,10 +44,6 @@ export const getRouteFeedName = (route: Params['slug']) => {
 
 const isRoute = (slug: Params['slug'], str: string) => {
   return new RegExp(slug, 'g').test(str);
-};
-
-const isActive = (slug: Params['slug'], str: string) => {
-  return isRoute(slug, str) ? 'active' : '';
 };
 
 export async function _loader(_url: string) {
@@ -92,19 +89,16 @@ export async function _loader(_url: string) {
   }
 }
 
-export function _meta() {
-  const title = 'Interpro: последние новости и обновления';
-  const description =
-    'Следите за новостями Interpro: новые проекты, события компании и актуальные обновления в сфере бизнес-решений.';
+export function _meta(type: Params['slug']) {
+  const isBlog = type === 'blog';
+  const title = isBlog
+    ? 'Interpro: блог о выставочных стендах и событиях'
+    : 'Interpro: новости компании и новые проекты';
+  const description = isBlog
+    ? 'Статьи Interpro о дизайне, проектировании и строительстве выставочных стендов, отраслевых событиях и практических решениях.'
+    : 'Новости Interpro: новые выставочные проекты, события компании, достижения команды и актуальные обновления.';
 
-  return [
-    { title },
-
-    { name: "description", content: description },
-
-    { property: "og:title", content: title },
-    { property: "og:description", content: description },
-  ];
+  return getOpenGraphMeta({ title, description, pathname: `/${type}` });
 }
 
 
@@ -151,14 +145,22 @@ export default function FeedPage({ data }: { data: Props }) {
   return (
     <StartPage>
       <div className="FeedPage px">
-        <h1 className="FeedPage-title">
-          <Link to="/news">
-            <span className={isActive('news', pathname)}>Новости</span>
-          </Link>
-          <Link to="/blog">
-            <span className={isActive('blog', pathname)}> Блог</span>
-          </Link>
-        </h1>
+        <div className="FeedPage-title">
+          {typeFeed === 'news' ? (
+            <h1>Новости</h1>
+          ) : (
+            <Link to="/news">
+              <span>Новости</span>
+            </Link>
+          )}
+          {typeFeed === 'blog' ? (
+            <h1>Блог</h1>
+          ) : (
+            <Link to="/blog">
+              <span>Блог</span>
+            </Link>
+          )}
+        </div>
 
         <IsNot value={(category?.length || 0) >= 2}>
           <Filter

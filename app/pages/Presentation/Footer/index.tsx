@@ -7,6 +7,7 @@ export default function PresentationFooter() {
   const presentationResponse = useLoaderData();
   const activeId = useActiveSection();
   const listRef = useRef<HTMLUListElement>(null);
+  const shouldShowFirstSlide = presentationResponse?.show_first_slide !== false;
 
   const scrollToSection = (id: string) => {
     const element = document.getElementById(id);
@@ -32,14 +33,16 @@ export default function PresentationFooter() {
     <section className="PresentationFooter">
       <nav className="PresentationFooter__nav">
         <ul className="PresentationFooter__list" ref={listRef}>
-          <li className="PresentationFooter__item">
-            <button
-              onClick={() => scrollToSection('hero')}
-              className={`PresentationFooter__link ${activeId === 'hero' ? 'active' : ''}`}
-            >
-              {presentationResponse.title}
-            </button>
-          </li>
+          {shouldShowFirstSlide && (
+            <li className="PresentationFooter__item">
+              <button
+                onClick={() => scrollToSection('hero')}
+                className={`PresentationFooter__link ${activeId === 'hero' ? 'active' : ''}`}
+              >
+                {presentationResponse.title}
+              </button>
+            </li>
+          )}
           {presentationResponse.slides.map(
             (item: any) =>
               item.slide_title && (

@@ -8,6 +8,18 @@
   display: flex;
   flex-direction: column;
 
+  /* У приватного проекта блока «следующий проект» нет, а именно его
+     margin-bottom отделял форму от контента — повторяем этот отступ здесь,
+     значения те же, что у .__nextItem ниже. */
+  .ContactForm.isNoNextItem {
+    margin-top: clamp(7.75rem, calc(3rem + 9.896vw), 14.875rem);
+    /* min: 124px, max: 238px */ /* viewPort: 768-1920 */
+    @media (max-width: 768px) {
+      margin-top: clamp(6rem, calc(4.33rem + 7.125vw), 7.75rem);
+      /* min: 96px, max: 124px */ /* viewPort: 375-768 */
+    }
+  }
+
   .__nextItem {
     display: flex;
     flex-direction: column;
@@ -68,6 +80,14 @@
       /* min: 64px, max: 200px */
       /* viewPort: 375-768 */
     }
+
+    .ProjectPage_title-context {
+      display: block;
+      margin-top: 0.2em;
+      font-size: clamp(1.5rem, calc(0.667rem + 1.736vw), 2.75rem);
+      line-height: 110%;
+      letter-spacing: -0.02em;
+    }
   }
 
   .ProjectPage_tags {
@@ -107,6 +127,7 @@
 
       .ProjectPage_tags-container {
         grid-column: 1/6;
+        gap: 32px;
       }
     }
   }
@@ -121,10 +142,9 @@
       line-height: 136%;
       letter-spacing: -0.02em;
       color: #000;
-      text-wrap: balance;
-    }
-    &.__table {
-      display: none;
+
+      white-space: pre-line;
+      text-wrap: pretty;
     }
   }
   .block_1.__intro {
@@ -172,9 +192,6 @@
     }
 
     .ProjectPage_tags.__desktop {
-      .ProjectPage-description {
-        display: none;
-      }
 
       .ProjectPage_tags-container {
         flex-direction: column;
@@ -184,10 +201,6 @@
           gap: 32px;
         }
       }
-    }
-
-    .ProjectPage-description.__table {
-      display: flex;
     }
   }
 }
@@ -226,14 +239,14 @@
     &.isSecondImgs {
       grid-template-columns: 1fr 1fr;
       .ImgWithText-img {
-        height: clamp(46rem, calc(33.542rem + 25.955vw), 64.688rem);
+        /* height: clamp(46rem, calc(33.542rem + 25.955vw), 64.688rem); */
         /* min: 736px, max: 1035px */
         /* viewPort: 768-1920 */
       }
 
       @media (max-width: 1440px) {
         .ImgWithText-img {
-          height: clamp(22.438rem, calc(-0.046rem + 95.929vw), 46rem);
+          /* height: clamp(22.438rem, calc(-0.046rem + 95.929vw), 46rem); */
           /* min: 359px, max: 736px */
           /* viewPort: 375-768 */
         }
@@ -244,11 +257,12 @@
     &:not(&.isSecondImgs) {
       grid-template-columns: 1fr;
       max-height: 80svh;
-      height: clamp(25.813rem, calc(-0.146rem + 54.08vw), 64.75rem);
+      aspect-ratio: 16 / 9;
+      /* height: clamp(25.813rem, calc(-0.146rem + 54.08vw), 64.75rem); */
       /* min: 413px, max: 1036px */
       /* viewPort: 768-1920 */
       @media (max-width: 768px) {
-        height: clamp(12.625rem, calc(0.042rem + 53.69vw), 25.813rem);
+        /* height: clamp(12.625rem, calc(0.042rem + 53.69vw), 25.813rem); */
         /* min: 202px, max: 413px */
         /* viewPort: 375-768 */
       }
@@ -260,7 +274,7 @@
 
       .ImgWithText-img {
         /* pointer-events: none; */
-        height: 100%;
+        aspect-ratio: 16 / 9;
         max-height: 80svh;
         cursor: pointer;
       }

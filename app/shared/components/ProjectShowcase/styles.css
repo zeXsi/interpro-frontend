@@ -41,8 +41,15 @@
     }
   }
 
-  .ProjectCard-title {
-    font-size: clamp(6rem, calc(4.667rem + 2.778vw), 8rem); /* min: 96px, max: 128px */
+  /* Размер как у Project-title-button на главной: там он наследуется от
+     .Project-title-animate. Формула покрывает все адаптивы (64px на 375px →
+     96px на 1920px), поэтому отдельный брейкпоинт ниже не нужен.
+
+     Селектор намеренно с .ProjectCard: правила карточки лежат в другом
+     CSS-чанке и при равной специфичности (0,2,0) перебивали этот блок
+     порядком загрузки. Здесь (0,3,0) — выигрывает независимо от порядка. */
+  .ProjectCard .ProjectCard-title {
+    font-size: clamp(4rem, calc(3.515rem + 2.071vw), 6rem); /* min: 64px, max: 96px */
   }
 
   @media (max-width: 1024px) {
@@ -55,12 +62,6 @@
 
     .ProjectShowcase-right {
       display: none;
-    }
-  }
-
-  @media (max-width: 768px) {
-    .ProjectCard-title {
-      font-size: clamp(4rem, calc(2.092rem + 8.142vw), 6rem); /* min: 64px, max: 96px */
     }
   }
 }

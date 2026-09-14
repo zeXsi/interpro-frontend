@@ -362,9 +362,33 @@
         margin-top: clamp(0.5rem, calc(0.333rem + 0.347vw), 0.75rem);
       }
 
+      table {
+        border-collapse: collapse;
+
+        th,
+        td {
+          border: 1px solid #000;
+          padding: 8px;
+          font-size: 24px;
+          line-height: 110%;
+        }
+      }
+
       @media (max-width: 768px) {
         --font-size: clamp(1.125rem, calc(0.767rem + 1.527vw), 1.5rem);
         /* min: 18px, max: 24px */ /* viewPort: 375-768 */
+
+        table {
+          display: block;
+          max-width: 100%;
+          overflow-x: auto;
+
+          th,
+          td {
+            padding: 4px;
+            font-size: 16px;
+          }
+        }
       }
     }
 

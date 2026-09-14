@@ -21,6 +21,11 @@ export interface ProjectCardProps {
   slug: string | number;
   id: number;
   nextItem: { id?: string | number; title?: string };
+  /**
+   * Карточка без тегов выставки/типа/года: вместо них выводим короткое
+   * описание. Нужен офисным проектам — у них этих полей нет.
+   */
+  descriptionOnly?: boolean;
 }
 
 export default function ProjectCard(props: ProjectCardProps) {
@@ -64,38 +69,56 @@ export default function ProjectCard(props: ProjectCardProps) {
         </Link>
       </div>
 
-      <p className="ProjectCard-description">{/* { props.description } */}</p>
-      <div className="ProjectCard_footer">
-        <IsNot
-          value={props.nameExhibition}
-          children={
-            <Tag
-              className="__exhibition"
-              subTitle="Выставка"
-              title={<Text>{props.nameExhibition}</Text>}
+      {props.descriptionOnly ? (
+        // Обёртка .Tag обязательна: в Tag/styles.css правила заданы как
+        // `.Tag .Tag-title`, без родителя типографика не применится.
+        <div className="ProjectCard-descriptionTag Tag">
+          <p className="Tag-title">{props.description}</p>
+        </div>
+      ) : (
+        <>
+          <p className="ProjectCard-description">{/* { props.description } */}</p>
+          <div className="ProjectCard_footer">
+            <IsNot
+              value={props.nameExhibition}
+              children={
+                <Tag
+                  className="__exhibition"
+                  subTitle="Выставка"
+                  title={<Text>{props.nameExhibition}</Text>}
+                />
+              }
             />
-          }
-        />
-        <IsNot
-          value={props.typeStand}
-          children={
-            <Tag
-              className="__typeStand"
-              subTitle="Тип стенда"
-              title={<Text>{props.typeStand}</Text>}
+            <IsNot
+              value={props.typeStand}
+              children={
+                <Tag
+                  className="__typeStand"
+                  subTitle="Тип стенда"
+                  title={<Text>{props.typeStand}</Text>}
+                />
+              }
             />
-          }
-        />
-        <IsNot
-          value={props.year}
-          children={<Tag className="__year" subTitle="Год" title={props.year} />}
-        />
-      </div>
+            <IsNot
+              value={props.year}
+              children={<Tag className="__year" subTitle="Год" title={props.year} />}
+            />
+          </div>
+        </>
+      )}
       <Link to={`/projects/${props.slug}`} slug={[projectTitle]}>
         <div className="ProjectCard-img">
           <img
             src={props.image}
-            alt={`Проект: ${projectTitle}, выставка ${props.nameExhibition}, ${props.year} год`}
+            // У офисных проектов нет выставки и года — пустые части не подставляем,
+            // иначе в alt остаётся «выставка , год».
+            alt={[
+              `Проект: ${projectTitle}`,
+              props.nameExhibition && `выставка ${props.nameExhibition}`,
+              props.year && `${props.year} год`,
+            ]
+              .filter(Boolean)
+              .join(', ')}
           />
         </div>
       </Link>

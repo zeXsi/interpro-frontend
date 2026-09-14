@@ -3,7 +3,7 @@ import './styles.css';
 import ArrowIcon from 'assets/icons/arrow.svg?react';
 import CheckmarkIcon from 'assets/icons/checkmark.svg?react';
 import { sendLead } from 'api/form';
-import { getProjects } from 'api/projects/projects.api';
+import { getProjectsBySlugs } from 'api/projects/projects.api';
 import type { Project } from 'api/projects/projects.types';
 import {
   useEffect,
@@ -17,8 +17,9 @@ import { getOpenGraphMeta } from 'shared/seo/meta';
 import StartPage from 'shared/components/StartPage';
 import Link from 'shared/components/Link';
 import Button from 'shared/components/Button';
+import VideoPlayer from 'shared/components/VideoPlayer';
 import FAQSection from 'shared/sections/FAQSection';
-import { lenisManager } from 'shared/utils/lenis';
+import { scrollToContactForm } from 'shared/utils/scrollToSection';
 import toFormatNames from 'shared/utils/toFormatNames';
 import { decodeUnicodeEscapes } from 'shared/utils/decodeUnicodeEscapes';
 import useEvent from '@qtpy/use-event';
@@ -34,11 +35,7 @@ import 'swiper/css';
 
 import type { Route } from './+types';
 
-const MUSEUM_PROJECT_LINKS = [
-  '/projects/imperia-klimata',
-  '/projects/futuruss',
-  '/projects/novatek',
-];
+const MUSEUM_PROJECT_SLUGS = ['moskovskij-urbanisticeskij-forum', 'muzej-vtoroj-mirovoj-vojny'] as const;
 
 const PROJECT_DESCRIPTION_MAX_PARAGRAPHS = 4;
 
@@ -71,7 +68,7 @@ const cycleSteps = [
 
 const competenceCards = [
   {
-    title: 'Собственное производство на ЦК',
+    title: 'Собственное производство на ВДНХ',
     description:
       'Проектируем, производим и собираем элементы пространства на собственной производственной базе.',
     Icon: BoxIcon,
@@ -171,7 +168,7 @@ const creationCards = [
 ];
 
 export async function loader() {
-  const projects = await getProjects();
+  const projects = await getProjectsBySlugs(MUSEUM_PROJECT_SLUGS);
   return {
     projects: projects ?? [],
   };
@@ -187,33 +184,20 @@ export function meta() {
 
 export default function MuseumSpaces({ loaderData }: Route.ComponentProps) {
   const selectedProjects = getSelectedProjects(loaderData.projects);
-  const scrollToContactForm = () => {
-    if (typeof document === 'undefined') return;
-
-    const element = document.querySelector<HTMLElement>('#ContactForm');
-
-    const lenis = lenisManager.state.v;
-    if (lenis) {
-      lenis.scrollTo(element ?? document.body.scrollHeight, { offset: -120, duration: 2 });
-      return;
-    }
-
-    if (element) {
-      element.scrollIntoView({ behavior: 'smooth', block: 'start' });
-      return;
-    }
-
-    window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
-  };
 
   return (
     <StartPage>
       <main className="MuseumSpaces">
         <section className="MuseumSpaces-hero">
-          <img
-            className="MuseumSpaces-heroImage"
-            src="/images/museum-spaces/hero-preview.png"
-            alt="Музейное пространство Interpro"
+          <VideoPlayer
+            videoClassName="MuseumSpaces-heroImage"
+            cover="/images/museum-spaces/hero-preview.png"
+            videoSources={[
+              {
+                src: '/videos/museum-spaces/hls/hero.m3u8',
+                type: 'application/x-mpegURL',
+              },
+            ]}
           />
         </section>
 
@@ -772,12 +756,7 @@ function ProjectMetaItem({ title, value }: { title: string; value?: string | num
 }
 
 function getSelectedProjects(projects: Project[]) {
-  const slugs = MUSEUM_PROJECT_LINKS.map((link) => link.split('/').filter(Boolean).at(-1));
-  const selected = slugs
-    .map((slug) => projects.find((project) => project.slug === slug))
-    .filter(Boolean) as Project[];
-
-  return selected.length ? selected : projects.slice(0, 3);
+  return projects;
 }
 
 function toShowcaseProjects(projects: Project[]): ShowcaseProject[] {
@@ -795,7 +774,10 @@ function toShowcaseProjects(projects: Project[]): ShowcaseProject[] {
 }
 
 function cleanText(value = '') {
-  return decodeUnicodeEscapes(value).replace(/\u00ad/g, '').trim();
+  // \u041c\u044f\u0433\u043a\u0438\u0439 \u043f\u0435\u0440\u0435\u043d\u043e\u0441 (U+00AD) \u043d\u0435 \u0432\u044b\u0440\u0435\u0437\u0430\u0435\u043c: \u0432 \u043d\u0430\u0437\u0432\u0430\u043d\u0438\u044f\u0445 \u043f\u0440\u043e\u0435\u043a\u0442\u043e\u0432 \u043e\u043d \u0440\u0430\u0441\u0441\u0442\u0430\u0432\u043b\u0435\u043d
+  // \u0432\u0440\u0443\u0447\u043d\u0443\u044e, \u0447\u0442\u043e\u0431\u044b \u0434\u043b\u0438\u043d\u043d\u043e\u0435 \u0441\u043b\u043e\u0432\u043e \u043f\u0435\u0440\u0435\u043d\u043e\u0441\u0438\u043b\u043e\u0441\u044c \u0432 \u043d\u0443\u0436\u043d\u043e\u043c \u043c\u0435\u0441\u0442\u0435. \u0421\u0438\u043c\u0432\u043e\u043b \u043d\u0435\u0432\u0438\u0434\u0438\u043c,
+  // \u043f\u043e\u043a\u0430 \u043f\u0435\u0440\u0435\u043d\u043e\u0441 \u043d\u0435 \u043f\u043e\u043d\u0430\u0434\u043e\u0431\u0438\u0442\u0441\u044f \u2014 \u0442\u0430\u043a \u0436\u0435 \u044d\u0442\u043e \u0440\u0430\u0431\u043e\u0442\u0430\u0435\u0442 \u043d\u0430 /projects.
+  return decodeUnicodeEscapes(value).trim();
 }
 
 function toProjectDescription(value = '') {

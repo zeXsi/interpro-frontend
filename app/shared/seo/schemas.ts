@@ -1,5 +1,242 @@
 import { COMPANY, SITE_URL } from './company';
 
+type PageSchemaOptions = {
+  title: string;
+  description: string;
+};
+
+type ServiceCategorySchemaOptions = PageSchemaOptions & {
+  slug: string;
+  name: string;
+  serviceDescription: string;
+};
+
+type ProjectListItem = {
+  slug: string;
+  name: string;
+};
+
+const organizationId = `${SITE_URL}/#organization`;
+const websiteId = `${SITE_URL}/#website`;
+
+function getOrganizationNode() {
+  return {
+    '@type': 'Organization',
+    '@id': organizationId,
+    name: COMPANY.name,
+    legalName: COMPANY.legalName,
+    url: COMPANY.url,
+    logo: {
+      '@type': 'ImageObject',
+      url: COMPANY.logo,
+    },
+    telephone: COMPANY.phone,
+    email: COMPANY.email,
+    taxID: COMPANY.taxId,
+    identifier: [
+      {
+        '@type': 'PropertyValue',
+        propertyID: 'ОГРН',
+        value: COMPANY.ogrn,
+      },
+      {
+        '@type': 'PropertyValue',
+        propertyID: 'КПП',
+        value: COMPANY.kpp,
+      },
+    ],
+    address: {
+      '@type': 'PostalAddress',
+      postalCode: COMPANY.address.postalCode,
+      addressCountry: COMPANY.address.country,
+      addressLocality: COMPANY.address.city,
+      streetAddress: COMPANY.address.street,
+    },
+  };
+}
+
+export function getHomePageSchema({ title, description }: PageSchemaOptions) {
+  return {
+    '@context': 'https://schema.org',
+    '@graph': [
+      getOrganizationNode(),
+      {
+        '@type': 'WebSite',
+        '@id': websiteId,
+        url: COMPANY.url,
+        name: COMPANY.name,
+        publisher: {
+          '@id': organizationId,
+        },
+        inLanguage: 'ru-RU',
+      },
+      {
+        '@type': 'WebPage',
+        '@id': `${SITE_URL}/#webpage`,
+        url: COMPANY.url,
+        name: title,
+        description,
+        isPartOf: {
+          '@id': websiteId,
+        },
+        about: {
+          '@id': organizationId,
+        },
+        inLanguage: 'ru-RU',
+      },
+    ],
+  };
+}
+
+export function getContactsPageSchema() {
+  return {
+    '@context': 'http://schema.org',
+    '@type': 'LocalBusiness',
+    name: COMPANY.legalName,
+    telephone: COMPANY.displayPhone,
+    email: '',
+    address: {
+      '@type': 'PostalAddress',
+      streetAddress:
+        '129226, г. Москва, ул. Сельскохозяйственная, д. 4, стр. 16, эт.1, пом. II , ком. 3',
+    },
+  };
+}
+
+export function getServiceCategoryPageSchema({
+  slug,
+  title,
+  description,
+  name,
+  serviceDescription,
+}: ServiceCategorySchemaOptions) {
+  const canonicalUrl = `${SITE_URL}/services/${slug}`;
+  const breadcrumbId = `${canonicalUrl}#breadcrumb`;
+  const serviceId = `${canonicalUrl}#service`;
+
+  return {
+    '@context': 'https://schema.org',
+    '@graph': [
+      {
+        '@type': 'WebPage',
+        '@id': `${canonicalUrl}#webpage`,
+        url: canonicalUrl,
+        name: title,
+        description,
+        isPartOf: {
+          '@id': websiteId,
+        },
+        breadcrumb: {
+          '@id': breadcrumbId,
+        },
+        mainEntity: {
+          '@id': serviceId,
+        },
+        inLanguage: 'ru-RU',
+      },
+      {
+        '@type': 'Service',
+        '@id': serviceId,
+        name,
+        serviceType: name,
+        description: serviceDescription,
+        url: canonicalUrl,
+        provider: {
+          '@id': organizationId,
+        },
+      },
+      {
+        '@type': 'BreadcrumbList',
+        '@id': breadcrumbId,
+        itemListElement: [
+          {
+            '@type': 'ListItem',
+            position: 1,
+            name: 'Главная',
+            item: `${SITE_URL}/`,
+          },
+          {
+            '@type': 'ListItem',
+            position: 2,
+            name: 'Услуги',
+            item: `${SITE_URL}/services`,
+          },
+          {
+            '@type': 'ListItem',
+            position: 3,
+            name,
+            item: canonicalUrl,
+          },
+        ],
+      },
+    ],
+  };
+}
+
+export function getProjectsPageSchema({
+  description,
+  projects,
+}: {
+  description: string;
+  projects: ProjectListItem[];
+}) {
+  const canonicalUrl = `${SITE_URL}/projects`;
+  const breadcrumbId = `${canonicalUrl}#breadcrumb`;
+  const projectsListId = `${canonicalUrl}#projects-list`;
+
+  return {
+    '@context': 'https://schema.org',
+    '@graph': [
+      {
+        '@type': 'CollectionPage',
+        '@id': `${canonicalUrl}#webpage`,
+        url: canonicalUrl,
+        name: 'Проекты',
+        description,
+        breadcrumb: {
+          '@id': breadcrumbId,
+        },
+        mainEntity: {
+          '@id': projectsListId,
+        },
+        isPartOf: {
+          '@id': websiteId,
+        },
+        inLanguage: 'ru-RU',
+      },
+      {
+        '@type': 'ItemList',
+        '@id': projectsListId,
+        numberOfItems: projects.length,
+        itemListElement: projects.map((project, index) => ({
+          '@type': 'ListItem',
+          position: index + 1,
+          name: project.name,
+          url: `${canonicalUrl}/${project.slug}`,
+        })),
+      },
+      {
+        '@type': 'BreadcrumbList',
+        '@id': breadcrumbId,
+        itemListElement: [
+          {
+            '@type': 'ListItem',
+            position: 1,
+            name: 'Главная',
+            item: `${SITE_URL}/`,
+          },
+          {
+            '@type': 'ListItem',
+            position: 2,
+            name: 'Проекты',
+            item: canonicalUrl,
+          },
+        ],
+      },
+    ],
+  };
+}
+
 export function getOrganizationSchema() {
   return {
     '@context': 'https://schema.org',

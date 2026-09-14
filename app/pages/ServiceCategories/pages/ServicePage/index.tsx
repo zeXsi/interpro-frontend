@@ -1,13 +1,14 @@
 import './styles.css';
 import TitlePage from 'shared/components/TitlePage';
 import ContactForm from 'shared/components/ContactForm';
+import { redirect } from 'react-router';
 
 import { useLayoutEffect, useRef } from 'react';
 import { lenisManager } from 'shared/utils/lenis';
 
 import { useNavigate } from 'shared/components/NavigationTracker';
 
-import { getServiceById, getServiceCategoriesById } from 'api/services/services.api';
+import { getServiceCategories, getServiceWithNextItem } from 'api/services/services.api';
 import type { Service } from 'api/services/services.types';
 import { Route } from './+types';
 import Accordion from 'shared/components/Accordion';
@@ -30,33 +31,45 @@ import { getFaqSchema, getReviewSchemas } from 'shared/seo/schemas';
 import { getOpenGraphMeta } from 'shared/seo/meta';
 
 export async function loader({ params }: Route.LoaderArgs): Promise<Service> {
-  const data = await getServiceById({ slug: params.slugService });
+  const [categories, data] = await Promise.all([
+    getServiceCategories(),
+    getServiceWithNextItem(params.slugService),
+  ]);
 
   if (!data) {
     throw new Response('Not found', { status: 404 });
   }
 
-  const categorySlug = data.payload?.category?.slug;
-  if (categorySlug) {
-    const category = await getServiceCategoriesById({ slug: categorySlug });
-    const posts = category?.payload?.posts ?? [];
+  if (categories?.length === 1) {
+    const category = categories[0];
+    const belongsToCategory =
+      data.service_category?.includes(category.id) ||
+      data.payload?.category?.slug === category.slug;
 
-    if (posts.length > 1) {
-      const currentIndex = posts.findIndex((post) => post.slug === data.slug);
-
-      if (currentIndex >= 0) {
-        const nextPost = posts[(currentIndex + 1) % posts.length];
-
-        if (nextPost && nextPost.slug !== data.slug) {
-          data.nextItem = {
-            id: nextPost.id,
-            slug: nextPost.slug,
-            title: nextPost.title,
-            categorySlug,
-          };
-        }
-      }
+    if (!belongsToCategory) {
+      throw new Response('Not found', { status: 404 });
     }
+
+    throw redirect(`/services/${params.slugService}`, { status: 301 });
+  }
+
+  const requestedCategory = categories?.find((category) => category.slug === params.slug);
+  const belongsToRequestedCategory =
+    !!requestedCategory &&
+    (data.service_category?.includes(requestedCategory.id) ||
+      data.payload?.category?.slug === requestedCategory.slug);
+  const actualCategory = categories?.find(
+    (category) =>
+      data.service_category?.includes(category.id) ||
+      data.payload?.category?.slug === category.slug
+  );
+
+  if (!belongsToRequestedCategory) {
+    if (actualCategory) {
+      throw redirect(`/services/${actualCategory.slug}/${data.slug}`, { status: 301 });
+    }
+
+    throw new Response('Not found', { status: 404 });
   }
 
   return data;
@@ -79,15 +92,45 @@ export function meta({ loaderData, location }: Route.MetaArgs) {
 }
 
 export default function ServicePage({ loaderData: data, params }: Route.ComponentProps) {
+  return (
+    <ServicePageContent
+      data={data}
+      categorySlug={params.slug}
+      serviceSlug={params.slugService}
+    />
+  );
+}
+
+interface ServicePageContentProps {
+  data: Service;
+  categorySlug: string;
+  serviceSlug: string;
+  isDirectPath?: boolean;
+}
+
+export function ServicePageContent({
+  data,
+  categorySlug,
+  serviceSlug,
+  isDirectPath = false,
+}: ServicePageContentProps) {
   const { setCrumbs, goTo } = useNavigate();
   const contactFormRef = useRef<HTMLDivElement>(null);
 
   useLayoutEffect(() => {
-    const path = `/services/${params?.slug}/${params?.slugService}`;
+    const path = isDirectPath
+      ? `/services/${serviceSlug}`
+      : `/services/${categorySlug}/${serviceSlug}`;
+
     if (data?.payload.category.name && data?.payload.title) {
-      setCrumbs(path, data?.payload.category.name, data?.payload.title);
+      setCrumbs(
+        path,
+        ...(isDirectPath
+          ? [data.payload.title]
+          : [data.payload.category.name, data.payload.title])
+      );
     }
-  }, [data, params?.slug, params?.slugService, setCrumbs]);
+  }, [categorySlug, data, isDirectPath, serviceSlug, setCrumbs]);
 
   return (
     <div className="InteractiveExhibit service">
@@ -170,8 +213,16 @@ export default function ServicePage({ loaderData: data, params }: Route.Componen
           <div className="wrap-next-page">
             <Subtitle>( следующая услуга )</Subtitle>
             <Link
-              to={`/services/${data.nextItem.categorySlug ?? params?.slug}/${data.nextItem.slug}`}
-              slug={[data?.payload.category.name ?? '', data.nextItem.title ?? '']}
+              to={
+                isDirectPath
+                  ? `/services/${data.nextItem.slug}`
+                  : `/services/${data.nextItem.categorySlug ?? categorySlug}/${data.nextItem.slug}`
+              }
+              slug={
+                isDirectPath
+                  ? [data.nextItem.title ?? '']
+                  : [data?.payload.category.name ?? '', data.nextItem.title ?? '']
+              }
             >
               <Button.Arrow variant="link" direction="right" className="ItemService_btn">
                 {data.nextItem.title}

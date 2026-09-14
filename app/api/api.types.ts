@@ -2,6 +2,6 @@ export interface NextItem {
   id?: number | string;
   title?: string;
   slug?: string;
-  /** slug категории для URL услуг: /services/{categorySlug}/{slug} */
+  /** Slug категории для URL услуги при наличии нескольких категорий. */
   categorySlug?: string;
 }

@@ -66,6 +66,10 @@ export interface FeedItem {
     slug: string;
     date: string;
     title: string;
+    seo?: {
+      title: string;
+      description: string;
+    };
     subtitle: string;
     subtitle_photos: {
       id: number;

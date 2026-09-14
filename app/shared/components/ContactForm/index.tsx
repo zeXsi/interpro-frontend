@@ -6,6 +6,7 @@ import CheckmarkIcon from 'assets/icons/checkmark.svg?react';
 import React, { Activity, PropsWithChildren, useEffect, useId, useRef, useState } from 'react';
 
 import Form, { useForm, type FormConfig } from 'shared/utils/_stm/react/createForm';
+import { useLocation } from 'react-router';
 import { useNavigate } from '../NavigationTracker';
 import { sendExcursion, sendLead, sendLeadPopup, type LeadResponse } from 'api/form';
 import { useSignalValue, useWatch } from 'shared/utils/_stm/react/react';
@@ -59,6 +60,13 @@ function getDigitIndexToRemove(
 const isValidRuPhone = (value: string) => /^7\d{10}$/.test(String(value ?? '').replace(/\D/g, ''));
 const phoneErrorMessage = 'Введите полный номер в формате +7 (XXX) XXX-XX-XX';
 
+// Имя: слова из букв, между ними пробел, дефис или апостроф («Данил Тест», «Анна-Мария», «O'Neil»)
+const nameLetters = 'A-Za-zА-Яа-яЁё';
+const nameRegex = new RegExp(`^[${nameLetters}]+(?:[ \\-'][${nameLetters}]+)*$`);
+const normalizeName = (value: string) => String(value ?? '').trim().replace(/\s+/g, ' ');
+const isValidName = (value: string) => nameRegex.test(normalizeName(value));
+const nameErrorMessage = 'Некорректные символы';
+
 type PubValues = {
   username: string;
   phone: string;
@@ -104,9 +112,9 @@ type ServiceLandingValues = {
 const publicConf: FormConfig<PubValues> = {
   username: {
     initialValue: '',
-    validate: (value) => /^[a-zA-Zа-яА-Я]+$/.test(value),
+    validate: isValidName,
     title: 'Ваше имя',
-    errorMessage: 'Некорректные символы',
+    errorMessage: nameErrorMessage,
   },
   phone: {
     initialValue: '',
@@ -142,9 +150,9 @@ const globalConf: FormConfig<GlobValues> = {
 const miniConf: FormConfig<MiniValues> = {
   username: {
     initialValue: '',
-    validate: (value) => /^[a-zA-Zа-яА-Я]+$/.test(value),
+    validate: isValidName,
     title: 'Ваше имя',
-    errorMessage: 'Некорректные символы',
+    errorMessage: nameErrorMessage,
   },
   phone: {
     initialValue: '',
@@ -236,16 +244,30 @@ const serviceLandingFormNames: Record<NonNullable<PropsContactForm['landingPrefi
   OfficeRenovation: 'Форма OfficeRenovation',
 };
 
-function getServiceLandingExtraInfo(
-  landingPrefix: PropsContactForm['landingPrefix'],
-  project: unknown
-) {
-  const formName = landingPrefix
-    ? serviceLandingFormNames[landingPrefix]
-    : 'Заявка со страницы услуги';
-  const projectText = typeof project === 'string' ? project.trim() : '';
+/**
+ * Отдельные цели Яндекс.Метрики для форм лендингов — отправляются в дополнение
+ * к общей request_form_full, чтобы не ломать уже собранную по ней статистику.
+ */
+const serviceLandingGoals: Record<NonNullable<PropsContactForm['landingPrefix']>, string> = {
+  MuseumSpaces: 'request_form_museum_full',
+  OfficeRenovation: 'request_form_office_full',
+};
 
-  return projectText ? `${formName}. ${projectText}` : formName;
+const popupFormName = 'Заказать дизайн-проект';
+
+/** Страницы, с которых в названии поп-апа дизайн-проекта указываем источник */
+const popupLandingPages: Record<string, NonNullable<PropsContactForm['landingPrefix']>> = {
+  '/museum-spaces': 'MuseumSpaces',
+  '/office-renovation': 'OfficeRenovation',
+};
+
+function getPopupExtraInfo(pathname: string) {
+  const landing = popupLandingPages[pathname.replace(/\/+$/, '')];
+  return landing ? `${popupFormName} со страницы ${landing}` : popupFormName;
+}
+
+function getServiceLandingExtraInfo(landingPrefix: PropsContactForm['landingPrefix']) {
+  return landingPrefix ? serviceLandingFormNames[landingPrefix] : 'Заявка со страницы услуги';
 }
 
 export default function ContactForm({
@@ -259,6 +281,7 @@ export default function ContactForm({
   landingPrefix,
 }: PropsContactForm) {
   const { goTo } = useNavigate();
+  const { pathname } = useLocation();
   useEffect(() => {
     saveUtmToStorage();
   }, []);
@@ -280,23 +303,24 @@ export default function ContactForm({
   const submit = () => {
     form.onSubmit(async (data: any) => {
       refSend.current?.toggleAttribute('disabled', true);
+      const name = normalizeName(data.username);
       const extraInfoByType =
         type === 'excursion'
           ? 'Заявка на экскурсию'
           : type === 'popup'
-            ? 'Заказать дизайн-проект'
+            ? getPopupExtraInfo(pathname)
                : type === 'mini-normal'
                  ? serviceName
                    ? `Услуга ${serviceName}`
                    : undefined
                : type === 'service-landing'
-                 ? getServiceLandingExtraInfo(landingPrefix, data.project)
+                 ? getServiceLandingExtraInfo(landingPrefix)
                : 'Основная заявка';
 
       let response: LeadResponse;
       if (type === 'excursion') {
         response = await sendExcursion({
-          name: data.username,
+          name,
           phone: data.phone ?? '',
           email: data.email,
           company: data.nameCompany ?? '',
@@ -306,7 +330,7 @@ export default function ContactForm({
         });
       } else if (type === 'popup') {
         response = await sendLeadPopup({
-          name: data.username,
+          name,
           phone: data.phone ?? '',
           email: data.email,
           consent: data.ad,
@@ -314,7 +338,7 @@ export default function ContactForm({
         });
       } else if (type === 'mini-normal') {
         response = await sendLead({
-          name: data.username,
+          name,
           phone: data.phone,
           company: '',
           consent: data.ad,
@@ -322,18 +346,19 @@ export default function ContactForm({
         });
       } else if (type === 'service-landing') {
         response = await sendLead({
-          name: data.username,
+          name,
           phone: data.phone,
           company: data.nameCompany,
           email: data.email,
           consent: data.consent,
           extraInfo: extraInfoByType,
           terms: data.terms || undefined,
+          project: data.project?.trim() || undefined,
           ...(includeArea && Number.isFinite(data.area) ? { area: data.area } : {}),
         });
       } else {
         response = await sendLead({
-          name: data.username,
+          name,
           phone: data.phone,
           company: data.nameCompany,
           consent: data.ad,
@@ -356,6 +381,12 @@ export default function ContactForm({
       } else {
         ym?.(99631636, 'reachGoal', 'request_form_full');
         _tmr?.push({ type: 'reachGoal', id: 3746602, goal: 'reach_goal_final' });
+
+        const landingGoal =
+          type === 'service-landing' && landingPrefix
+            ? serviceLandingGoals[landingPrefix]
+            : undefined;
+        if (landingGoal) ym?.(99631636, 'reachGoal', landingGoal);
       }
 
       refSend.current?.toggleAttribute('false', true);
@@ -495,13 +526,7 @@ function ServiceLandingForm({
             name="nameCompany"
             label="Название компании*"
           />
-          <ServiceLandingInput
-            form={form}
-            prefix={prefix}
-            name="phone"
-            label="Номер телефона*"
-            type="tel"
-          />
+          <ServiceLandingPhoneInput form={form} prefix={prefix} />
           <ServiceLandingInput
             form={form}
             prefix={prefix}
@@ -585,8 +610,11 @@ function ServiceLandingInput({
   className?: string;
 }) {
   const field = form.useField(name);
+  const value = useSignalValue(field.sg.value);
   const isSubmitted = useSignalValue(form.isSubmitted);
-  const isError = !!isSubmitted && !form.validateField(name);
+  // Как в основной форме: ошибку показываем сразу при вводе, а не только после отправки
+  const isFilled = typeof value === 'number' ? Number.isFinite(value) : !!String(value ?? '').trim();
+  const isError = (isFilled || !!isSubmitted) && !form.validateField(name);
 
   return (
     <label className={`${prefix}-field ${className} ${isError ? 'error' : ''}`}>
@@ -595,6 +623,36 @@ function ServiceLandingInput({
       {isError && (
         <p className={`${prefix}-fieldError`}>{field.sg.errorMessage.v}</p>
       )}
+    </label>
+  );
+}
+
+function ServiceLandingPhoneInput({
+  form,
+  prefix,
+}: {
+  form: Form<any>;
+  prefix: 'MuseumSpaces' | 'OfficeRenovation';
+}) {
+  const field = form.useField('phone');
+  const digits = String(useSignalValue(field.sg.value) ?? '');
+  const isSubmitted = useSignalValue(form.isSubmitted);
+  const { formatted, handleChange, handleKeyDown } = usePhoneMask(field, digits);
+  const isError = (!!digits || !!isSubmitted) && !form.validateField('phone');
+
+  return (
+    <label className={`${prefix}-field ${isError ? 'error' : ''}`}>
+      <span>Номер телефона*</span>
+      <input
+        type="tel"
+        inputMode="tel"
+        autoComplete="tel"
+        placeholder=" "
+        value={formatted}
+        onChange={handleChange}
+        onKeyDown={handleKeyDown}
+      />
+      {isError && <p className={`${prefix}-fieldError`}>{field.sg.errorMessage.v}</p>}
     </label>
   );
 }
@@ -815,6 +873,37 @@ interface PhoneInputProps {
   form: Form<any>;
 }
 
+/** Общая логика маски +7 (XXX) XXX-XX-XX для основной формы и форм лендингов */
+function usePhoneMask(field: ReturnType<Form<any>['useField']>, digits: string) {
+  const formatted = formatPhoneDisplay(digits);
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    field.sg.value.v = normalizePhoneDigits(e.target.value);
+  };
+
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    const cursorPos = e.currentTarget.selectionStart ?? 0;
+    const charToDelete =
+      e.key === 'Backspace'
+        ? formatted[cursorPos - 1]
+        : e.key === 'Delete'
+          ? formatted[cursorPos]
+          : null;
+
+    if (charToDelete && !/\d/.test(charToDelete)) {
+      e.preventDefault();
+      const idx = getDigitIndexToRemove(formatted, cursorPos, e.key === 'Backspace');
+      if (idx >= 0) {
+        const arr = digits.split('');
+        arr.splice(idx, 1);
+        field.sg.value.v = arr.join('');
+      }
+    }
+  };
+
+  return { formatted, handleChange, handleKeyDown };
+}
+
 const PhoneInput = React.memo(({ form }: PhoneInputProps) => {
   const name = 'phone' as const;
   const field = form.useField(name);
@@ -839,34 +928,8 @@ const PhoneInput = React.memo(({ form }: PhoneInputProps) => {
     ref.current?.classList.toggle('noEmpty', !!val);
   });
 
-  const formatted = formatPhoneDisplay(String(digits));
   const errorMessage = useSignalValue(field.sg.errorMessage) ?? '';
-
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const newDigits = normalizePhoneDigits(e.target.value);
-    field.sg.value.v = newDigits;
-  };
-
-  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    const input = e.currentTarget;
-    const cursorPos = input.selectionStart ?? 0;
-    const charToDelete =
-      e.key === 'Backspace'
-        ? formatted[cursorPos - 1]
-        : e.key === 'Delete'
-          ? formatted[cursorPos]
-          : null;
-
-    if (charToDelete && !/\d/.test(charToDelete)) {
-      e.preventDefault();
-      const idx = getDigitIndexToRemove(formatted, cursorPos, e.key === 'Backspace');
-      if (idx >= 0) {
-        const arr = String(digits).split('');
-        arr.splice(idx, 1);
-        field.sg.value.v = arr.join('');
-      }
-    }
-  };
+  const { formatted, handleChange, handleKeyDown } = usePhoneMask(field, String(digits));
 
   return (
     <div className="Input" ref={ref}>

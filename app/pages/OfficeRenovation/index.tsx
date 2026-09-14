@@ -3,14 +3,15 @@ import './styles.css';
 import ArrowIcon from 'assets/icons/arrow.svg?react';
 import CheckmarkIcon from 'assets/icons/checkmark.svg?react';
 import { sendLead } from 'api/form';
-import { getProjects } from 'api/projects/projects.api';
+import { getProjectsBySlugs } from 'api/projects/projects.api';
 import type { Project } from 'api/projects/projects.types';
 import { useEffect, useRef, useState, type FormEvent } from 'react';
 import Button from 'shared/components/Button';
 import Link from 'shared/components/Link';
 import StartPage from 'shared/components/StartPage';
+import VideoPlayer from 'shared/components/VideoPlayer';
 import FAQSection from 'shared/sections/FAQSection';
-import { lenisManager } from 'shared/utils/lenis';
+import { scrollToContactForm } from 'shared/utils/scrollToSection';
 import { decodeUnicodeEscapes } from 'shared/utils/decodeUnicodeEscapes';
 import { getOpenGraphMeta } from 'shared/seo/meta';
 import { useCycleLineMarker, useStickyStepCycle } from 'shared/hooks/useStickyStepCycle';
@@ -83,7 +84,7 @@ const cycleSteps = [
 
 const competenceCards = [
   {
-    title: 'Собственное производство на ЦК',
+    title: 'Собственное производство на ВДНХ',
     description:
       'Проектируем, производим и собираем элементы пространства на собственной производственной базе.',
     Icon: BoxIcon,
@@ -167,8 +168,14 @@ type OfficeProject = {
   href: string;
 };
 
+const officeProjectSlugs = ['kontrastnyj-open-space', 'mnogozonal-nyj-ofis'] as const;
+
 export async function loader() {
-  const projects = await getProjects();
+  // Оба проекта помечены «Приватный», поэтому в общем списке их нет. Тянем по
+  // слагам одним запросом: так WP отдаёт их независимо от галочки, и страница
+  // не зависит от того, снимут её потом или нет.
+  const projects = await getProjectsBySlugs(officeProjectSlugs);
+
   return {
     projects: projects ?? [],
   };
@@ -185,28 +192,19 @@ export function meta() {
 export default function OfficeRenovation({ loaderData }: Route.ComponentProps) {
   const selectedProjects = getOfficeProjects(loaderData.projects);
 
-  const scrollToContactForm = () => {
-    if (typeof document === 'undefined') return;
-
-    const element = document.querySelector<HTMLElement>('#ContactForm');
-    const lenis = lenisManager.state.v;
-
-    if (lenis) {
-      lenis.scrollTo(element ?? document.body.scrollHeight, { offset: -120, duration: 2 });
-      return;
-    }
-
-    element?.scrollIntoView({ behavior: 'smooth', block: 'start' });
-  };
-
   return (
     <StartPage>
       <main className="OfficeRenovation">
         <section className="OfficeRenovation-hero">
-          <img
-            className="OfficeRenovation-heroImage"
-            src="/images/office-renovation/hero-preview.png"
-            alt="Ремонт офиса под ключ Interpro"
+          <VideoPlayer
+            videoClassName="OfficeRenovation-heroImage"
+            cover="/images/office-renovation/hero-preview.png"
+            videoSources={[
+              {
+                src: '/videos/office-renovation/hls/hero.m3u8',
+                type: 'application/x-mpegURL',
+              },
+            ]}
           />
         </section>
 
@@ -559,28 +557,27 @@ function ChevronIcon() {
 }
 
 function getOfficeProjects(projects: Project[]): OfficeProject[] {
-  const imperiaKlimata = projects.find((project) => project.slug === 'imperia-klimata');
-  const lidlab = projects.find((project) => project.slug === 'lidlab');
+  const openSpace = projects.find((project) => project.slug === 'kontrastnyj-open-space');
+  const multiZone = projects.find((project) => project.slug === 'mnogozonal-nyj-ofis');
 
   return [
-    projectToOfficeCard(imperiaKlimata) ?? {
-      title: 'Империя Климата',
+    projectToOfficeCard(openSpace) ?? {
+      title: 'Контрастный Open Space',
       description: '',
       exhibition: '',
       type: '',
       year: '',
-      cover: '/images/office-renovation/rzd-project.png',
-      href: '/projects/imperia-klimata',
+      cover: 'https://api.interpro.pro/wp-content/uploads/2026/07/oblozka-1.jpeg.webp',
+      href: '/projects/kontrastnyj-open-space',
     },
-    projectToOfficeCard(lidlab) ?? {
-      title: 'Лидлаб',
-      description:
-        'Чистая геометрия, лаконичные материалы и акцент на продукт. Пространство собрано под ключ: без лишнего, со сдержанным стилем.',
-      exhibition: 'Диагнополис',
-      type: 'Офисный',
-      year: '2024',
-      cover: 'https://api.interpro.pro/wp-content/uploads/2025/09/006-5.jpg.webp',
-      href: '/projects/lidlab',
+    projectToOfficeCard(multiZone) ?? {
+      title: 'Многозональный офис',
+      description: '',
+      exhibition: '',
+      type: '',
+      year: '',
+      cover: 'https://api.interpro.pro/wp-content/uploads/2026/07/oblozka.jpeg.webp',
+      href: '/projects/mnogozonal-nyj-ofis',
     },
   ];
 }
@@ -596,24 +593,32 @@ function toOfficeShowcaseProjects(projects: OfficeProject[]): ShowcaseProject[] 
     year: project.year,
     nameExhibition: project.exhibition,
     link: project.href,
+    // Описание сейчас не выводим — карточка как на главной. Вариант оставлен:
+    // достаточно вернуть true, чтобы вместо тегов снова показывалось описание.
+    descriptionOnly: false,
   }));
 }
 
 function projectToOfficeCard(project?: Project): OfficeProject | null {
   if (!project) return null;
 
+  // Офисные проекты не привязаны к выставке: у них нет ни выставки, ни типа
+  // стенда, ни года. Подставлять сюда заглушки нельзя — карточка показала бы
+  // чужие данные, поэтому отдаём пустое, а ProjectCard сам скроет такие теги.
   return {
     title: cleanText(project.payload.title),
-    description:
-      'Чистая геометрия, лаконичные материалы и акцент на продукт. Пространство собрано под ключ: без лишнего, со сдержанным стилем.',
-    exhibition: project.payload.meta.exhibition?.map(({ name }) => name).join(', ') || 'Диагнополис',
-    type: project.payload.meta.type_tax?.map(({ name }) => name).join(', ') || 'Офисный',
-    year: project.payload.meta.year?.name ?? '2024',
-    cover: project.payload.cover || 'https://api.interpro.pro/wp-content/uploads/2025/09/006-5.jpg.webp',
+    description: cleanText(project.payload.about),
+    exhibition: project.payload.meta.exhibition?.map(({ name }) => name).join(', ') ?? '',
+    type: project.payload.meta.type_tax?.map(({ name }) => name).join(', ') ?? '',
+    year: project.payload.meta.year?.name ?? '',
+    cover: project.payload.cover || '/images/office-renovation/rzd-project.png',
     href: `/projects/${project.slug}`,
   };
 }
 
 function cleanText(value = '') {
-  return decodeUnicodeEscapes(value).replace(/\u00ad/g, '').trim();
+  // \u041c\u044f\u0433\u043a\u0438\u0439 \u043f\u0435\u0440\u0435\u043d\u043e\u0441 (U+00AD) \u043d\u0435 \u0432\u044b\u0440\u0435\u0437\u0430\u0435\u043c: \u0432 \u043d\u0430\u0437\u0432\u0430\u043d\u0438\u044f\u0445 \u043f\u0440\u043e\u0435\u043a\u0442\u043e\u0432 \u043e\u043d \u0440\u0430\u0441\u0441\u0442\u0430\u0432\u043b\u0435\u043d
+  // \u0432\u0440\u0443\u0447\u043d\u0443\u044e, \u0447\u0442\u043e\u0431\u044b \u0434\u043b\u0438\u043d\u043d\u043e\u0435 \u0441\u043b\u043e\u0432\u043e \u043f\u0435\u0440\u0435\u043d\u043e\u0441\u0438\u043b\u043e\u0441\u044c \u0432 \u043d\u0443\u0436\u043d\u043e\u043c \u043c\u0435\u0441\u0442\u0435. \u0421\u0438\u043c\u0432\u043e\u043b \u043d\u0435\u0432\u0438\u0434\u0438\u043c,
+  // \u043f\u043e\u043a\u0430 \u043f\u0435\u0440\u0435\u043d\u043e\u0441 \u043d\u0435 \u043f\u043e\u043d\u0430\u0434\u043e\u0431\u0438\u0442\u0441\u044f \u2014 \u0442\u0430\u043a \u0436\u0435 \u044d\u0442\u043e \u0440\u0430\u0431\u043e\u0442\u0430\u0435\u0442 \u043d\u0430 /projects.
+  return decodeUnicodeEscapes(value).trim();
 }

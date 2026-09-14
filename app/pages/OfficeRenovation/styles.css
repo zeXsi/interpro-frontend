@@ -25,6 +25,10 @@
   object-fit: cover;
 }
 
+.OfficeRenovation-hero .VideoPlayer .OfficeRenovation-heroImage {
+  object-position: center;
+}
+
 .OfficeRenovation-intro {
   padding-top: 48px;
   row-gap: 48px;

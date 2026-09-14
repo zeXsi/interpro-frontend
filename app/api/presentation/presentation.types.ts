@@ -110,6 +110,7 @@ export interface Presentation {
     id: number;
     title: string;
     theme: 'light' | 'dark' | string;
+    show_first_slide?: boolean;
     project_size: number;
     tax: PresentationTax;
     slides: PresentationSlide[];

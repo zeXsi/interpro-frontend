@@ -2,10 +2,8 @@
 .vscode
 # .env
 /node_modules/
+sitemap.xml
 
 # React Router
 /.react-router/
 /build/
-/public/sitemap.xml
-
-public/sitemap.xml

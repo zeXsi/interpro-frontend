@@ -7,6 +7,9 @@ import useBreakpoints from '@qtpy/use-breakpoints';
 import { useLenis } from 'lenis/react';
 import { useState } from 'react';
 import StartPage from 'shared/components/StartPage';
+import TitlePage from 'shared/components/TitlePage';
+import JsonLd from 'shared/seo/JsonLd';
+import { getContactsPageSchema } from 'shared/seo/schemas';
 
 const coords = [55.834275, 37.648852];
 
@@ -46,8 +49,10 @@ export default function Contacts() {
 
   return (
     <StartPage>
+      <JsonLd data={getContactsPageSchema()} />
       <YMaps>
         <div className="Contacts">
+          <TitlePage title="Контакты" className="px" />
           <div className="Contacts_info  px">
             <InfoList
               title="связаться:"
@@ -57,7 +62,6 @@ export default function Contacts() {
                 ['Whatsapp', import.meta.env.VITE_WHATSAPP_URL, 'external'],
                 ['+7 (499) 390 03-75', import.meta.env.VITE_PHONE, 'external'],
                 [import.meta.env.VITE_EMAIL_NAME, import.meta.env.VITE_EMAIL, 'external'],
-                ['mail@interpro.pro2', 'mailto:mail@interpro.pro?subject=Заявка%20с%20interpro.pro&body=Привет,%20хочу%20сделать%20заказ.%0A%0AИсточник:%20сайт%20interpro.pro%0AСтраница:%20главная', 'external', { disableMailtoCopy: true }]
               ]}
             />
             <InfoList

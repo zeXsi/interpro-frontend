@@ -23,6 +23,7 @@ import { Project } from 'api/projects/projects.types';
 import StartPage from 'shared/components/StartPage';
 import { decodeUnicodeEscapes } from 'shared/utils/decodeUnicodeEscapes';
 import GalleryImage from 'shared/components/GalleryImage';
+import { getOpenGraphMeta } from 'shared/seo/meta';
 
 export async function loader({ params }: Route.LoaderArgs) {
   const project = await getProjectsById({ slug: params.slug });
@@ -33,27 +34,49 @@ export async function loader({ params }: Route.LoaderArgs) {
 
   return project;
 }
-export function meta({ data }: Route.MetaArgs) {
+function getProjectSeoContext(project?: Project) {
+  const projectTitle = decodeUnicodeEscapes(project?.payload?.title || project?.title?.rendered || '').trim();
+  const seoTitle = decodeUnicodeEscapes(project?.payload?.seo?.title || projectTitle).trim();
+  const exhibitions = project?.payload?.meta?.exhibition;
+  const exhibition = Array.isArray(exhibitions)
+    ? exhibitions.map((item) => item.name?.trim()).filter(Boolean).join(', ')
+    : '';
+  const year = project?.payload?.meta?.year?.name?.trim();
+  const qualifier = [exhibition, year].filter(Boolean).join(', ') || project?.slug || '';
+  const title = `Interpro: проект ${seoTitle}${qualifier ? ` — ${qualifier}` : ''}`;
+  const fallbackDescription = exhibition
+    ? `Проект «${projectTitle}» для выставки «${exhibition}»${year ? ` ${year} года` : ''}: выставочный стенд, спроектированный и реализованный компанией Interpro.`
+    : `Проект «${projectTitle}»${year ? ` ${year} года` : ''}: выставочный стенд, спроектированный и реализованный компанией Interpro.`;
+
+  return {
+    projectTitle,
+    qualifier,
+    title,
+    description:
+      project?.payload?.seo?.description?.trim() ||
+      project?.payload?.about?.trim() ||
+      fallbackDescription,
+  };
+}
+
+export function meta({ data, location }: Route.MetaArgs) {
   const project = data as Awaited<ReturnType<typeof loader>> | undefined;
+  const { title, description } = getProjectSeoContext(project);
 
-  const title = project?.payload?.seo?.title;
-  const description =
-    project?.payload?.seo?.description ||
-    'Этот проект был реализован компанией Interpro с применением современных решений и экспертизы.';
-
-  return [
-    { title: `Interpro: проект ${title || ''}` },
-    { name: 'description', content: description },
-    { property: 'og:title', content: `Interpro: проект ${title || ''}` },
-    { property: 'og:description', content: description },
-  ];
+  return getOpenGraphMeta({
+    title,
+    description,
+    pathname: location.pathname,
+    image: project?.payload?.cover,
+  });
 }
 
 export default function ProjectPage({ loaderData: data, params }: Route.ComponentProps) {
   const { setCrumbs } = useNavigate();
   const { Popup, showWithData } = useMWImage();
-  const projectTitle = decodeUnicodeEscapes(data?.payload?.title);
+  const { projectTitle, qualifier: projectTitleQualifier } = getProjectSeoContext(data);
   const nextProjectTitle = decodeUnicodeEscapes(data?.nextItem?.title);
+  const nextSlug = data?.nextItem?.slug;
 
   useLayoutEffect(() => {
     try {
@@ -86,8 +109,12 @@ export default function ProjectPage({ loaderData: data, params }: Route.Componen
     <StartPage>
       <div className="ProjectPage">
         <Popup />
-        {/* <link rel="canonical" href={window.location.href} /> */}
-        <h1 className="ProjectPage_title px">{projectTitle}</h1>
+        <h1 className="ProjectPage_title px">
+          {projectTitle}
+          {projectTitleQualifier && (
+            <span className="ProjectPage_title-context"> — {projectTitleQualifier}</span>
+          )}
+        </h1>
 
         <TagsDesktop
           year={data?.payload?.meta?.year?.name ?? ''}
@@ -151,15 +178,21 @@ export default function ProjectPage({ loaderData: data, params }: Route.Componen
           </ImgWithText>
         ))}
 
-        <div className="__nextItem">
-          <Subtitle>(Следующий проект)</Subtitle>
-          <Link to={`/projects/${data?.nextItem?.slug}`} slug={[nextProjectTitle]}>
-            <Button.Arrow variant="link" direction="right">
-              {nextProjectTitle}
-            </Button.Arrow>
-          </Link>
-        </div>
-        <ContactForm className="px" />
+        {/* У приватного проекта нет соседей: он не попадает в список, из
+            которого строится цепочка «следующий» — блок просто не выводим. */}
+        {nextSlug && (
+          <div className="__nextItem">
+            <Subtitle>(Следующий проект)</Subtitle>
+            <Link to={`/projects/${nextSlug}`} slug={[nextProjectTitle]}>
+              <Button.Arrow variant="link" direction="right">
+                {nextProjectTitle}
+              </Button.Arrow>
+            </Link>
+          </div>
+        )}
+        {/* Без блока «следующий проект» форма теряет отступ, который задавал
+            его margin-bottom, — переносим этот отступ на саму форму. */}
+        <ContactForm className={`px ${nextSlug ? '' : 'isNoNextItem'}`} />
       </div>
     </StartPage>
   );
@@ -180,6 +213,14 @@ interface TagsProps {
 }
 function TagsDesktop(props: TagsProps) {
   const clIsDesc = props.desc ? 'isDesc' : '';
+
+  // Каждый тег внутри и так скрывается через IsNot (то есть по !!value), но
+  // сама сетка остаётся и даёт отступы. Если пусто всё — не выводим блок.
+  const hasContent =
+    !!props.exhibition || !!props.typeStand || !!props.square || !!props.year || !!props.desc;
+
+  if (!hasContent) return null;
+
   return (
     <div className={`ProjectPage_tags __desktop px ${clIsDesc}`}>
       <IsNot
