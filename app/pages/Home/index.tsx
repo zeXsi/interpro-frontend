@@ -29,7 +29,11 @@ import Subtitle from 'shared/components/Subtitle';
 import Button from 'shared/components/Button';
 
 import JsonLd from 'shared/seo/JsonLd';
-import { getFaqSchema, getFeedbackReviewSchemas } from 'shared/seo/schemas';
+import {
+  getFaqSchema,
+  getFeedbackReviewSchemas,
+  getHomePageSchema,
+} from 'shared/seo/schemas';
 import { sgFaqs } from 'api/faq/faq.api';
 import { sgFeedbacks } from 'api/feedbacks/feedbacks.api';
 import { useSignalValue } from 'shared/utils/_stm/react/react';
@@ -44,13 +48,13 @@ const srcVideo4Mobile = srcVideo4;
 // video_3: мобилка использует те же видео и обложку что десктоп
 const srcVideo3Mobile = srcVideo3;
 
-export function meta() {
-  const title =
-    'Выставочные стенды под ключ в Москве | Заказать стенд для выставки в компании Interpro';
-  const description =
-    'Стенды для выставки на заказ от компании Interpro в Москве. Широкий спектр услуг для бизнеса и частных клиентов. Проектируем и строим выставочные стенды любого масштаба!';
+const HOME_TITLE =
+  'Выставочные стенды под ключ в Москве | Заказать стенд для выставки в компании Interpro';
+const HOME_DESCRIPTION =
+  'Стенды для выставки на заказ от компании Interpro в Москве. Широкий спектр услуг для бизнеса и частных клиентов. Проектируем и строим выставочные стенды любого масштаба!';
 
-  return getOpenGraphMeta({ title, description });
+export function meta() {
+  return getOpenGraphMeta({ title: HOME_TITLE, description: HOME_DESCRIPTION });
 }
 
 const DETAIL_INFO_SEO_CONTENT_ID = 'detail-info-seo-content';
@@ -465,6 +469,7 @@ export default function Home() {
 
   return (
     <StartPage>
+      <JsonLd data={getHomePageSchema({ title: HOME_TITLE, description: HOME_DESCRIPTION })} />
       <JsonLd
         data={getFaqSchema(
           sgFaqs.v.slice(0, 4).map(({ payload }) => ({

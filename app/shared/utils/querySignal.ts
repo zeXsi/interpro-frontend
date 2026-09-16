@@ -30,6 +30,7 @@ const DEFAULT_TTL_MS = envMs('SSR_QUERY_TTL_MS', 30 * 60_000);
  * протухший ключ заставлял бы живого пользователя ждать полный ответ API.
  */
 const DEFAULT_SWR_MS = envMs('SSR_QUERY_SWR_MS', 10 * 60_000);
+const DEFAULT_PRIME_TIMEOUT_MS = envMs('SSR_QUERY_PRIME_TIMEOUT_MS', 10_000);
 
 /** Ключи включают params, поэтому в долгоживущем процессе нужен потолок. */
 const MAX_CACHE_ENTRIES = 500;
@@ -37,8 +38,22 @@ const CLEANUP_INTERVAL_MS = 60_000;
 
 type CacheEntry = { expiresAt: number; staleUntil: number; data: unknown };
 
-const cache = new Map<string, CacheEntry>();
-const inFlight = new Map<string, Promise<unknown>>();
+type VersionedCacheEntry = CacheEntry & {
+  family: string;
+  generation: number;
+  ttlMs: number;
+  swrMs: number;
+};
+
+type PendingRequest = {
+  generation: number;
+  promise: Promise<unknown>;
+};
+
+const cache = new Map<string, VersionedCacheEntry>();
+const inFlight = new Map<string, PendingRequest>();
+const familyGenerations = new Map<string, number>();
+const signalGenerations = new WeakMap<SSRSignal<unknown>, number>();
 
 let lastCleanup = 0;
 
@@ -71,6 +86,8 @@ function cacheKey(endpoint: string, params: unknown) {
 
 interface CreateQueryOptions<TData, TParams = any, TParent = any> {
   endpoint: string;
+  /** Группа связанных cache keys, которые обновляются одним событием polling. */
+  family?: string;
   initial: TData;
   parent?: SSRSignal<TParent>;
   findInParent?: (parent: TParent, params: TParams) => TData | null | undefined;
@@ -93,13 +110,14 @@ export function createQuery<TData, TParams = any, TParent = any>(
   opts: CreateQueryOptions<TData, TParams, TParent>
 ) {
   const { endpoint, initial, parent, findInParent, takeFirst, map, middleware } = opts;
+  const family = opts.family ?? endpoint;
   const ttlMs = opts.ttlMs ?? DEFAULT_TTL_MS;
   const swrMs = opts.swrMs ?? DEFAULT_SWR_MS;
   const stateKey = opts.stateKey ?? (parent ? `parent-${endpoint}` : endpoint);
   const sg = ssrSignal<TData>(initial, stateKey);
 
-  async function request(params: TParams): Promise<TData> {
-    const resp = await instance.get(endpoint, { params });
+  async function request(params: TParams, timeout?: number): Promise<TData> {
+    const resp = await instance.get(endpoint, { params, timeout });
 
     const raw = takeFirst ? resp.data?.[0] : resp.data;
     let result = map ? map(raw, resp, params) : (raw ?? initial);
@@ -112,10 +130,19 @@ export function createQuery<TData, TParams = any, TParent = any>(
   }
 
   async function fetch(params: TParams = {} as TParams): Promise<TData> {
-    if (parent && findInParent) {
+    const generation = getFamilyGeneration(family);
+
+    // На сервере parent signal является process-wide singleton. После обновления
+    // family используем его только когда он точно заполнен тем же поколением.
+    const canUseParent =
+      parent &&
+      findInParent &&
+      (!isServer || signalGenerations.get(parent as SSRSignal<unknown>) === generation);
+
+    if (canUseParent) {
       const found = findInParent(parent.v, params);
       if (found != null) {
-        sg.v = found;
+        setSignal(found, generation);
         return found;
       }
     }
@@ -127,27 +154,27 @@ export function createQuery<TData, TParams = any, TParent = any>(
       const now = Date.now();
       const hit = cache.get(key);
 
-      if (hit && hit.expiresAt > now) {
-        sg.v = hit.data as TData;
+      if (hit && hit.generation === generation && hit.expiresAt > now) {
+        setSignal(hit.data as TData, hit.generation);
         return hit.data as TData;
       }
 
       if (hit && hit.staleUntil > now) {
         // Протухло, но ещё в SWR-окне: отдаём как есть, обновляем в фоне.
         // catch обязателен: фоновая ошибка иначе всплывёт как unhandled rejection.
-        void refresh(key, params).catch((err) => {
+        void refresh(key, params, generation).catch((err) => {
           console.error(`Background refresh failed (${endpoint}):`, err);
         });
-        sg.v = hit.data as TData;
+        setSignal(hit.data as TData, hit.generation);
         return hit.data as TData;
       }
 
       // Схлопываем параллельные одинаковые запросы в один поход в сеть.
       const pending = inFlight.get(key);
-      if (pending) {
+      if (pending?.generation === generation) {
         try {
-          const data = (await pending) as TData;
-          sg.v = data;
+          const data = (await pending.promise) as TData;
+          setSignal(data, generation);
           return data;
         } catch (err) {
           console.error(`Query error (${endpoint}):`, err);
@@ -157,14 +184,40 @@ export function createQuery<TData, TParams = any, TParent = any>(
     }
 
     try {
-      const result = useCache ? ((await refresh(key, params)) as TData) : await request(params);
-      sg.v = result;
+      const result = useCache
+        ? ((await refresh(key, params, generation)) as TData)
+        : await request(params);
+      setSignal(result, generation);
       return result;
     } catch (err) {
       // Ошибки не кэшируем — следующий запрос попробует сеть заново.
       console.error(`Query error (${endpoint}):`, err);
       return fallback(useCache, key);
     }
+  }
+
+  /** Заполняет server cache, не изменяя process-wide SSR signal. */
+  async function prime(
+    params: TParams = {} as TParams,
+    options: { force?: boolean; updateSignal?: boolean } = {}
+  ): Promise<TData> {
+    const useCache = isServer && ttlMs > 0;
+    if (!useCache) return request(params);
+
+    const generation = getFamilyGeneration(family);
+    const key = cacheKey(endpoint, params);
+    const hit = cache.get(key);
+
+    if (!options.force && hit?.generation === generation && hit.expiresAt > Date.now()) {
+      if (options.updateSignal) setSignal(hit.data as TData, generation);
+      return hit.data as TData;
+    }
+
+    const result = await refresh(key, params, generation, DEFAULT_PRIME_TIMEOUT_MS);
+    if (options.updateSignal && getFamilyGeneration(family) === generation) {
+      setSignal(result, generation);
+    }
+    return result;
   }
 
   /**
@@ -176,29 +229,82 @@ export function createQuery<TData, TParams = any, TParent = any>(
     if (!useCache) return sg.v;
 
     const stale = cache.get(key);
-    return stale ? (stale.data as TData) : initial;
+    return stale && stale.staleUntil > Date.now() ? (stale.data as TData) : initial;
   }
 
   /** Один сетевой поход на ключ: пишет в кэш, дедуплицирует параллельные вызовы. */
-  function refresh(key: string, params: TParams): Promise<TData> {
-    const existing = inFlight.get(key) as Promise<TData> | undefined;
-    if (existing) return existing;
+  function refresh(
+    key: string,
+    params: TParams,
+    generation: number,
+    timeout?: number
+  ): Promise<TData> {
+    const existing = inFlight.get(key);
+    if (existing?.generation === generation) return existing.promise as Promise<TData>;
 
-    const promise = request(params)
+    let pending: PendingRequest;
+    const promise = request(params, timeout)
       .then((result) => {
-        const now = Date.now();
-        cache.set(key, { expiresAt: now + ttlMs, staleUntil: now + ttlMs + swrMs, data: result });
-        cleanupExpired(cache.size > MAX_CACHE_ENTRIES);
+        // Старый запрос, завершившийся после invalidation, не должен вернуть
+        // устаревшее значение в новое поколение cache.
+        if (getFamilyGeneration(family) === generation && inFlight.get(key) === pending) {
+          const now = Date.now();
+          cache.set(key, {
+            family,
+            generation,
+            ttlMs,
+            swrMs,
+            expiresAt: now + ttlMs,
+            staleUntil: now + ttlMs + swrMs,
+            data: result,
+          });
+          cleanupExpired(cache.size > MAX_CACHE_ENTRIES);
+        }
         return result;
       })
       .finally(() => {
-        inFlight.delete(key);
+        if (inFlight.get(key) === pending) inFlight.delete(key);
       });
 
-    inFlight.set(key, promise);
+    pending = { generation, promise };
+    inFlight.set(key, pending);
 
     return promise;
   }
 
-  return { sg, fetch };
+  function setSignal(data: TData, generation: number) {
+    sg.v = data;
+    signalGenerations.set(sg as SSRSignal<unknown>, generation);
+  }
+
+  return { sg, fetch, prime, family };
+}
+
+function getFamilyGeneration(family: string) {
+  return familyGenerations.get(family) ?? 0;
+}
+
+export const isSsrQueryCacheEnabled = isServer && DEFAULT_TTL_MS > 0;
+
+/** Мягко инвалидирует family: старые данные остаются fallback до успешного prime. */
+export function invalidateSsrQueryFamily(family: string) {
+  const generation = getFamilyGeneration(family) + 1;
+  familyGenerations.set(family, generation);
+  return generation;
+}
+
+/** Продлевает TTL только подтверждённых записей текущего поколения. */
+export function touchSsrQueryFamily(family: string) {
+  const generation = getFamilyGeneration(family);
+  const now = Date.now();
+  let touched = 0;
+
+  for (const entry of cache.values()) {
+    if (entry.family !== family || entry.generation !== generation) continue;
+    entry.expiresAt = now + entry.ttlMs;
+    entry.staleUntil = entry.expiresAt + entry.swrMs;
+    touched += 1;
+  }
+
+  return touched;
 }

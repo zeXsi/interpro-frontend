@@ -31,6 +31,8 @@ export function meta() {
 }
 
 export default function MapWebsite() {
+  const hasSingleServiceCategory = sgServiceCategories.v.length === 1;
+
   return (
     <StartPage>
       <div className="MapWebsite px">
@@ -66,7 +68,9 @@ export default function MapWebsite() {
                   (_item) =>
                     [
                       [item.payload.name, _item.title] as any,
-                      `/services/${item.slug}/${_item.slug}`,
+                      hasSingleServiceCategory
+                        ? `/services/${_item.slug}`
+                        : `/services/${item.slug}/${_item.slug}`,
                     ] as [string, string]
                 )
               )}
@@ -79,7 +83,7 @@ export default function MapWebsite() {
               isModeSlug={true}
               items={sgServiceCategories.v?.map((item) => [
                 item.payload.name,
-                `/services/${item.slug}`,
+                hasSingleServiceCategory ? '/services' : `/services/${item.slug}`,
               ])}
             />
             <InfoList

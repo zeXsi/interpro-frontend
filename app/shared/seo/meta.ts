@@ -2,6 +2,7 @@ import type { MetaDescriptor } from 'react-router';
 
 import defaultOgImage from 'assets/imgs/hero.webp';
 import { COMPANY, SITE_URL } from './company';
+import { getCanonicalUrl } from './canonical';
 
 interface OpenGraphMetaOptions {
   title: string;
@@ -27,7 +28,7 @@ export function getOpenGraphMeta({
   type = 'website',
 }: OpenGraphMetaOptions): MetaDescriptor[] {
   const siteUrl = (import.meta.env.VITE_ORIGINAL_URL || SITE_URL).replace(/\/$/, '');
-  const url = toAbsoluteUrl(pathname, siteUrl);
+  const url = getCanonicalUrl(pathname);
   const imageUrl = toAbsoluteUrl(image || defaultOgImage, siteUrl);
 
   return [

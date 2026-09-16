@@ -23,6 +23,7 @@ import {
 import { useLocation } from 'react-router';
 import formatDateToRussian from 'shared/utils/formatDateToRussian';
 import StartPage from 'shared/components/StartPage';
+import { getOpenGraphMeta } from 'shared/seo/meta';
 
 export type Params = { slug: 'blog' | 'news' };
 export type QParams = Partial<Record<'news_category' | 'blog_category', number>> & {
@@ -88,19 +89,16 @@ export async function _loader(_url: string) {
   }
 }
 
-export function _meta() {
-  const title = 'Interpro: последние новости и обновления';
-  const description =
-    'Следите за новостями Interpro: новые проекты, события компании и актуальные обновления в сфере бизнес-решений.';
+export function _meta(type: Params['slug']) {
+  const isBlog = type === 'blog';
+  const title = isBlog
+    ? 'Interpro: блог о выставочных стендах и событиях'
+    : 'Interpro: новости компании и новые проекты';
+  const description = isBlog
+    ? 'Статьи Interpro о дизайне, проектировании и строительстве выставочных стендов, отраслевых событиях и практических решениях.'
+    : 'Новости Interpro: новые выставочные проекты, события компании, достижения команды и актуальные обновления.';
 
-  return [
-    { title },
-
-    { name: "description", content: description },
-
-    { property: "og:title", content: title },
-    { property: "og:description", content: description },
-  ];
+  return getOpenGraphMeta({ title, description, pathname: `/${type}` });
 }
 
 

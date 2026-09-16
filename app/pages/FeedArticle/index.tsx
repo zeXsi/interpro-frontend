@@ -31,6 +31,7 @@ import InfoList from 'shared/components/InfoList';
 import JsonLd from 'shared/seo/JsonLd';
 import { getArticleSchema } from 'shared/seo/schemas';
 import { getOpenGraphMeta } from 'shared/seo/meta';
+import { sgServiceCategories } from 'api/services/services.api';
 
 export type ArticleData = {
   slug: 'news' | 'blog';
@@ -103,6 +104,7 @@ export default function FeedArticle({ data }: { data: ArticleData }) {
   const location = useLocation();
   const contentBlocks = article?.payload?.blocks ?? [];
   const relatedServices = article?.payload?.related_services ?? [];
+  const hasSingleServiceCategory = sgServiceCategories.v.length === 1;
   const anchorLinks = contentBlocks.reduce<AnchorLink[]>((acc, block, index) => {
     const title = block.title?.trim();
     if (!title) return acc;
@@ -197,7 +199,14 @@ export default function FeedArticle({ data }: { data: ArticleData }) {
                 const category = post?.categories?.[0];
                 if (!post || !category?.slug) return;
 
-                goTo(`/services/${category.slug}/${post.slug}`, category.name, post.title);
+                const path = hasSingleServiceCategory
+                  ? `/services/${post.slug}`
+                  : `/services/${category.slug}/${post.slug}`;
+
+                goTo(
+                  path,
+                  ...(hasSingleServiceCategory ? [post.title] : [category.name, post.title])
+                );
               }}
               items={relatedServices.map(({ title }) => [title, ''])}
             />

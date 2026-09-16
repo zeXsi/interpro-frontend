@@ -6,7 +6,7 @@ export async function loader({ request }: Route.LoaderArgs) {
 }
 
 export function meta() {
-  return _meta();
+  return _meta('news');
 }
 export default function News({ loaderData }: Route.ComponentProps) {
   return <FeedPage data={loaderData} />;

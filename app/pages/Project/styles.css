@@ -80,6 +80,14 @@
       /* min: 64px, max: 200px */
       /* viewPort: 375-768 */
     }
+
+    .ProjectPage_title-context {
+      display: block;
+      margin-top: 0.2em;
+      font-size: clamp(1.5rem, calc(0.667rem + 1.736vw), 2.75rem);
+      line-height: 110%;
+      letter-spacing: -0.02em;
+    }
   }
 
   .ProjectPage_tags {
@@ -119,6 +127,7 @@
 
       .ProjectPage_tags-container {
         grid-column: 1/6;
+        gap: 32px;
       }
     }
   }
@@ -133,10 +142,9 @@
       line-height: 136%;
       letter-spacing: -0.02em;
       color: #000;
-      text-wrap: balance;
-    }
-    &.__table {
-      display: none;
+
+      white-space: pre-line;
+      text-wrap: pretty;
     }
   }
   .block_1.__intro {
@@ -184,9 +192,6 @@
     }
 
     .ProjectPage_tags.__desktop {
-      .ProjectPage-description {
-        display: none;
-      }
 
       .ProjectPage_tags-container {
         flex-direction: column;
@@ -196,10 +201,6 @@
           gap: 32px;
         }
       }
-    }
-
-    .ProjectPage-description.__table {
-      display: flex;
     }
   }
 }

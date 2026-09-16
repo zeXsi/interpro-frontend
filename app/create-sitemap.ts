@@ -287,17 +287,20 @@ export async function buildSitemap() {
     priority: 0.6,
   }));
 
-  const categoryUrls: SitemapEntry[] = categories.map((category) => ({
-    loc: `/services/${category.slug}`,
-    lastmod: getLatestDate(
-      getContentLastmod(category),
-      getLatestContentDate(
-        services.filter((service) => service.service_category?.includes(category.id))
-      )
-    ),
-    changefreq: 'weekly',
-    priority: 0.6,
-  }));
+  const hasSingleServiceCategory = categories.length === 1;
+  const categoryUrls: SitemapEntry[] = hasSingleServiceCategory
+    ? []
+    : categories.map((category) => ({
+        loc: `/services/${category.slug}`,
+        lastmod: getLatestDate(
+          getContentLastmod(category),
+          getLatestContentDate(
+            services.filter((service) => service.service_category?.includes(category.id))
+          )
+        ),
+        changefreq: 'weekly',
+        priority: 0.6,
+      }));
 
   const categoriesById = new Map(categories.map((category) => [category.id, category]));
   const serviceUrls: SitemapEntry[] = services.flatMap((service) =>
@@ -307,7 +310,9 @@ export async function buildSitemap() {
 
       return [
         {
-          loc: `/services/${category.slug}/${service.slug}`,
+          loc: hasSingleServiceCategory
+            ? `/services/${service.slug}`
+            : `/services/${category.slug}/${service.slug}`,
           lastmod: getContentLastmod(service),
           changefreq: 'weekly' as const,
           priority: 0.5,
