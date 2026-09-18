@@ -5,6 +5,8 @@
   "scripts": {
     "build": "react-router build",
     "dev": "react-router dev",
+    "test": "node --test app/shared/utils/_stm/index.test.mjs tests/ssr-concurrency.test.mjs",
+    "test:ssr": "node --test tests/ssr-concurrency.test.mjs",
     "convert-video-3": "pwsh -File scripts/convert-video-3.ps1",
     "start": "react-router-serve ./build/server/index.js",
     "typecheck": "react-router typegen && tsc",

@@ -50,6 +50,11 @@ import {
 } from 'shared/seo/schemas';
 import { getOpenGraphMeta } from 'shared/seo/meta';
 import { getCanonicalUrl, normalizeCanonicalPathname } from 'shared/seo/canonical';
+import { runWithSSRRequestState } from 'shared/utils/_stm/ssr.server';
+
+export const middleware: Route.MiddlewareFunction[] = [
+  (_args, next) => runWithSSRRequestState(next),
+];
 
 const YANDEX_COUNTER_ID = 99631636;
 
