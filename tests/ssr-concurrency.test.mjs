@@ -10,6 +10,7 @@ import test from 'node:test';
 import { chromium } from 'playwright';
 
 const projectRoot = path.resolve(import.meta.dirname, '..');
+const npmCommand = process.platform === 'win32' ? 'npm.cmd' : 'npm';
 const processOutput = new Map();
 
 function deferred() {
@@ -62,7 +63,7 @@ function article(slug, title, id) {
       subtitle_photos: [],
       cover: {
         id: 0,
-        url: '',
+        url: `https://api.interpro.pro/wp-content/uploads/${slug}.webp`,
         width: 0,
         height: 0,
         alt: '',
@@ -144,6 +145,7 @@ function run(command, args, options = {}) {
     const child = spawn(command, args, {
       cwd: projectRoot,
       env: { ...process.env, ...options.env },
+      shell: process.platform === 'win32',
       stdio: ['ignore', 'pipe', 'pipe'],
     });
     let output = '';
@@ -257,8 +259,11 @@ test('parallel SSR requests isolate route state and hydrate without mismatch', {
   let appServer;
 
   try {
-    await run('npm', ['run', 'build'], {
-      env: { VITE_BASE_URL: `${mockOrigin}/wp-json/wp/v2` },
+    await run(npmCommand, ['run', 'build'], {
+      env: {
+        VITE_BASE_URL: `${mockOrigin}/wp-json/wp/v2`,
+        VITE_CDN_ORIGIN: 'https://cdn.interpro.pro',
+      },
     });
 
     const portServer = createServer();
@@ -308,6 +313,11 @@ test('parallel SSR requests isolate route state and hydrate without mismatch', {
     assert.equal(alphaState['parent-/blog'].payload.title, 'ALPHA');
     assert.equal(betaState['parent-/blog'].slug, 'beta');
     assert.equal(betaState['parent-/blog'].payload.title, 'BETA');
+    assert.equal(
+      alphaState['parent-/blog'].payload.cover.url,
+      'https://cdn.interpro.pro/wp-content/uploads/alpha.webp'
+    );
+    assert.match(alphaHtml, /https:\/\/cdn\.interpro\.pro\/wp-content\/uploads\/alpha\.webp/);
     assert.doesNotMatch(JSON.stringify(alphaState), /BETA|"beta"/);
     assert.doesNotMatch(JSON.stringify(betaState), /ALPHA|"alpha"/);
 

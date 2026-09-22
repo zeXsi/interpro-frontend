@@ -1,6 +1,7 @@
 import { createHash, randomUUID } from 'node:crypto';
 import { instance, interproApiBaseURL } from 'api/api.config';
 import type { Presentation } from 'api/presentation/presentation.types';
+import { toCdnMediaUrls } from 'shared/utils/toCdnMediaUrl';
 
 const PRESENTATION_PRIME_TTL_MS = 5 * 60 * 1000;
 const PDF_CACHE_TTL_MS = 60 * 60 * 1000;
@@ -31,11 +32,13 @@ export async function fetchPresentation(slug: string): Promise<Presentation | nu
       `${interproApiBaseURL}/presentations/${slug}/`
     );
 
-    if (!response.data?.slides?.length) {
+    const data = toCdnMediaUrls(response.data);
+
+    if (!data?.slides?.length) {
       return null;
     }
 
-    return response.data;
+    return data;
   } catch {
     return null;
   }

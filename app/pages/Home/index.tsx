@@ -38,12 +38,13 @@ import { sgFaqs } from 'api/faq/faq.api';
 import { sgFeedbacks } from 'api/feedbacks/feedbacks.api';
 import { useSignalValue } from 'shared/utils/_stm/react/react';
 import { getOpenGraphMeta } from 'shared/seo/meta';
+import { toCdnMediaUrl } from 'shared/utils/toCdnMediaUrl';
 
 // HLS видео пути
-const srcVideo2 = '/videos/video_2/hls/video.m3u8';
-const srcVideo3 = '/videos/video_3/hls/video.m3u8';
-const srcVideo4 = '/videos/video_4/hls/video.m3u8';
-const srcVideo2Mobile = '/videos/video_2/hls/video_mobile.m3u8';
+const srcVideo2 = toCdnMediaUrl('/videos/video_2/hls/video.m3u8');
+const srcVideo3 = toCdnMediaUrl('/videos/video_3/hls/video.m3u8');
+const srcVideo4 = toCdnMediaUrl('/videos/video_4/hls/video.m3u8');
+const srcVideo2Mobile = toCdnMediaUrl('/videos/video_2/hls/video_mobile.m3u8');
 const srcVideo4Mobile = srcVideo4;
 // video_3: мобилка использует те же видео и обложку что десктоп
 const srcVideo3Mobile = srcVideo3;

@@ -5,6 +5,7 @@ import { memo } from 'react';
 import { Preloader } from 'shared/components/Preloader';
 import VideoPlayer from 'shared/components/VideoPlayer';
 import { useHidePreloader } from 'store/stPreloader';
+import { toCdnMediaUrl } from 'shared/utils/toCdnMediaUrl';
 
 function Hero() {
   const { clIsHidePreload } = useHidePreloader();
@@ -17,7 +18,9 @@ function Hero() {
         <VideoPlayer
           className="Hero-bg"
           cover={srcCover}
-          videoSources={[{ src: '/videos/hls/hero.m3u8', type: 'application/x-mpegURL' }]}
+          videoSources={[
+            { src: toCdnMediaUrl('/videos/hls/hero.m3u8'), type: 'application/x-mpegURL' },
+          ]}
         />
       </div>
     </div>

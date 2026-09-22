@@ -200,6 +200,7 @@ const VideoPlayer = ({
         loop={loop}
         playsInline={playsInline}
         preload={preload}
+        data-video-src={videoSources[0]?.src}
         // onClick={handleVideoClick}
       >
         {/* {videoSources.map((source, index) => (

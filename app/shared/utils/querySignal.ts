@@ -6,6 +6,7 @@ import {
   ssrSignal,
   type SSRSignal,
 } from './_stm';
+import { toCdnMediaUrls } from './toCdnMediaUrl';
 
 const isServer = typeof window === 'undefined';
 
@@ -122,8 +123,9 @@ export function createQuery<TData, TParams = any, TParent = any>(
 
   async function request(params: TParams, timeout?: number): Promise<TData> {
     const resp = await instance.get(endpoint, { params, timeout });
+    const responseData = toCdnMediaUrls(resp.data);
 
-    const raw = takeFirst ? resp.data?.[0] : resp.data;
+    const raw = takeFirst ? responseData?.[0] : responseData;
     let result = map ? map(raw, resp, params) : (raw ?? initial);
 
     if (middleware) {

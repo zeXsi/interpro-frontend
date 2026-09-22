@@ -22,6 +22,7 @@ import FAQSection from 'shared/sections/FAQSection';
 import { scrollToContactForm } from 'shared/utils/scrollToSection';
 import toFormatNames from 'shared/utils/toFormatNames';
 import { decodeUnicodeEscapes } from 'shared/utils/decodeUnicodeEscapes';
+import { toCdnMediaUrl } from 'shared/utils/toCdnMediaUrl';
 import useEvent from '@qtpy/use-event';
 import useRefMap from '@qtpy/use-ref-map';
 import { useDebouncedUpdate } from 'shared/hooks/useDebouncedUpdate';
@@ -194,7 +195,7 @@ export default function MuseumSpaces({ loaderData }: Route.ComponentProps) {
             cover="/images/museum-spaces/hero-preview.png"
             videoSources={[
               {
-                src: '/videos/museum-spaces/hls/hero.m3u8',
+                src: toCdnMediaUrl('/videos/museum-spaces/hls/hero.m3u8'),
                 type: 'application/x-mpegURL',
               },
             ]}
