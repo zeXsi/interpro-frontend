@@ -9,8 +9,24 @@ const setPath = (dir: string) => {
   return path.resolve(__dirname, dir);
 };
 
-export default defineConfig({
-  plugins: [
+export default defineConfig(({ command }) => {
+  const assetBaseUrl = process.env.VITE_ASSET_BASE_URL?.trim().replace(/\/+$/, '');
+
+  if (command === 'build' && assetBaseUrl) {
+    const parsedAssetBaseUrl = new URL(assetBaseUrl);
+    if (
+      parsedAssetBaseUrl.protocol !== 'https:' ||
+      parsedAssetBaseUrl.origin !== assetBaseUrl ||
+      parsedAssetBaseUrl.username ||
+      parsedAssetBaseUrl.password
+    ) {
+      throw new Error('VITE_ASSET_BASE_URL must be an HTTPS origin without credentials, path, query, or hash');
+    }
+  }
+
+  return {
+    base: command === 'build' && assetBaseUrl ? `${assetBaseUrl}/` : '/',
+    plugins: [
     svgr(),
     reactRouter(),
     tsconfigPaths(),
@@ -43,29 +59,30 @@ export default defineConfig({
       },
     },
   ],
-  css: {
-    modules: {
-      generateScopedName: '[local]-[hash:base64:8]',
+    css: {
+      modules: {
+        generateScopedName: '[local]-[hash:base64:8]',
+      },
     },
-  },
-  resolve: {
-    alias: {
-      app: setPath('./app/app'),
-      shared: setPath('./app/shared'),
-      pages: setPath('./app/pages'),
-      assets: setPath('./app/assets'),
-      store: setPath('./app/store'),
-      api: setPath('./app/api'),
+    resolve: {
+      alias: {
+        app: setPath('./app/app'),
+        shared: setPath('./app/shared'),
+        pages: setPath('./app/pages'),
+        assets: setPath('./app/assets'),
+        store: setPath('./app/store'),
+        api: setPath('./app/api'),
+      },
     },
-  },
-  assetsInclude: ['**/*.m3u8'],
-  server: {
-    host: '0.0.0.0',
-    port: 5027,
-    strictPort: true,
-    hmr: {
-      host: 'localhost',
+    assetsInclude: ['**/*.m3u8'],
+    server: {
+      host: '0.0.0.0',
+      port: 5027,
+      strictPort: true,
+      hmr: {
+        host: 'localhost',
+      },
+      allowedHosts: ['interpro.murukae.ru', 'desktop-3unaitt.taile5ae1a.ts.net','tech.interpro.pro'],
     },
-    allowedHosts: ['interpro.murukae.ru', 'desktop-3unaitt.taile5ae1a.ts.net','tech.interpro.pro'],
-  },
+  };
 });
