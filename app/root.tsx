@@ -53,6 +53,7 @@ import { getOpenGraphMeta } from 'shared/seo/meta';
 import { getCanonicalUrl, normalizeCanonicalPathname } from 'shared/seo/canonical';
 import { runWithSSRRequestState } from 'shared/utils/_stm/ssr.server';
 import { getHomeData } from 'api/home/home.api';
+import heroCover from 'assets/imgs/hero.webp';
 
 export const middleware: Route.MiddlewareFunction[] = [
   (_args, next) => runWithSSRRequestState(next),
@@ -164,6 +165,9 @@ export function Layout({ children }: { children: React.ReactNode }) {
         <Meta />
         <Links />
         <link rel="canonical" href={getCanonicalUrl(location.pathname, location.search)} />
+        {location.pathname === '/' && (
+          <link rel="preload" as="image" href={heroCover} fetchPriority="high" />
+        )}
         <link
           rel="icon"
           type="image/svg+xml"
