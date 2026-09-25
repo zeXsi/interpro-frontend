@@ -79,7 +79,12 @@ function MediaItem({ title, subTitle, srcImg }: MediaItemProps) {
         <div className="MediaItem_text-title">{title}</div>
         <div className="MediaItem_text-subtitle">{subTitle}</div>
       </div>
-      <img src={srcImg} alt={`Иллюстрация к разделу: ${title} — ${subTitle}`} />
+      <img
+        src={srcImg}
+        loading="lazy"
+        decoding="async"
+        alt={`Иллюстрация к разделу: ${title} — ${subTitle}`}
+      />
     </div>
   );
 }
