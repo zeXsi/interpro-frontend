@@ -13,8 +13,7 @@ import ContactForm from 'shared/components/ContactForm';
 
 import MediaSection from 'shared/sections/MediaSection';
 import Footer from 'shared/sections/Footer';
-import { useInView } from 'motion/react';
-import { type ComponentProps, useRef, useState } from 'react';
+import { type ComponentProps, useEffect, useRef, useState } from 'react';
 import useBreakpoints from '@qtpy/use-breakpoints';
 
 import ParallaxFooter from 'shared/components/ParallaxFooter';
@@ -428,19 +427,36 @@ const DetailInfoSeo = () => {
   );
 };
 
+function useElementInView(
+  ref: React.RefObject<Element | null>,
+  rootMargin = '-33% 0px -33% 0px'
+) {
+  const [isInView, setIsInView] = useState(false);
+
+  useEffect(() => {
+    const element = ref.current;
+    if (!element) return;
+
+    const observer = new IntersectionObserver(
+      ([entry]) => setIsInView(Boolean(entry?.isIntersecting)),
+      { rootMargin }
+    );
+
+    observer.observe(element);
+    return () => observer.disconnect();
+  }, [ref, rootMargin]);
+
+  return isInView;
+}
+
 export default function Home() {
   const homeData = useSignalValue(sgHomeData);
 
   const refProjects = useRef<HTMLDivElement>(null);
   const refFAQSection = useRef<HTMLDivElement>(null);
 
-  const isInViewFAQSection = useInView(refFAQSection, {
-    margin: '-33% 0px -33% 0px',
-  });
-
-  const isInViewProjects = useInView(refProjects, {
-    margin: '-33% 0px -33% 0px',
-  });
+  const isInViewFAQSection = useElementInView(refFAQSection);
+  const isInViewProjects = useElementInView(refProjects);
 
   const configMedia = useBreakpoints(
     {
