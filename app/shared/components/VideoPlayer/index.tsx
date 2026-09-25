@@ -1,6 +1,5 @@
 import './styles.css';
 import { memo, useEffect, useRef, useState } from 'react';
-import Hls from 'hls.js';
 
 export interface VideoSource<T extends string> {
   src: string;
@@ -34,10 +33,10 @@ const VideoPlayer = ({
   onError,
 }: VideoHeroProps) => {
   const refVideo = useRef<HTMLVideoElement>(null);
-  const hlsRef = useRef<Hls | null>(null);
+  const hlsRef = useRef<import('hls.js').default | null>(null);
   const [isVideoReady, setIsVideoReady] = useState(false);
 
-  const updateSources = () => {
+  const updateSources = async () => {
     const video = refVideo.current;
     if (!video) return;
 
@@ -53,25 +52,35 @@ const VideoPlayer = ({
     );
 
     if (hlsSource) {
-      // Используем HLS.js для воспроизведения
-      if (Hls.isSupported()) {
+      // Safari умеет HLS нативно — hls.js ему вообще не нужен.
+      if (video.canPlayType('application/vnd.apple.mpegurl')) {
+        video.src = hlsSource.src;
+        video.addEventListener(
+          'loadedmetadata',
+          () => {
+            setIsVideoReady(true);
+            if (autoPlay) {
+              playVideo();
+            }
+          },
+          { once: true }
+        );
+      } else {
+        // На остальных браузерах подгружаем hls.js только когда HLS-видео
+        // действительно дошло до загрузки (MediaSection делает это по IntersectionObserver).
+        const { default: Hls } = await import('hls.js');
+        if (!refVideo.current || refVideo.current !== video || !Hls.isSupported()) return;
+
         const hls = new Hls({
           enableWorker: true,
-
-          // Быстрее до первого кадра
-          startFragPrefetch: true,      // заранее тянуть стартовый сегмент
-          testBandwidth: true,          // быстрее выбрать качество на старте
-
-          // Меньше буфера = быстрее старт (но менее устойчиво на плохой сети)
-          maxBufferLength: 10,          // сек
-          maxMaxBufferLength: 20,
-          backBufferLength: 0,
+          startFragPrefetch: true,
+          testBandwidth: true,
+          maxBufferLength: 30,
+          maxMaxBufferLength: 60,
+          backBufferLength: 30,
           maxBufferHole: 0.5,
-
-          // Иногда помогает старту на мобильных
-          capLevelToPlayerSize: true,   // не грузить 1080p на маленький блок
-
-          lowLatencyMode: false,       
+          capLevelToPlayerSize: true,
+          lowLatencyMode: false,
         });
 
         hlsRef.current = hls;
@@ -84,7 +93,7 @@ const VideoPlayer = ({
           if (autoPlay) playVideo();
         });
 
-        hls.on(Hls.Events.ERROR, (event, data) => {
+        hls.on(Hls.Events.ERROR, (_event, data) => {
           console.error('HLS ошибка:', data);
           if (data.fatal) {
             switch (data.type) {
@@ -104,15 +113,6 @@ const VideoPlayer = ({
           }
           if (onError) {
             onError(new Error(data.details));
-          }
-        });
-      } else if (video.canPlayType('application/vnd.apple.mpegurl')) {
-        // Нативная поддержка HLS (Safari)
-        video.src = hlsSource.src;
-        video.addEventListener('loadedmetadata', () => {
-          setIsVideoReady(true);
-          if (autoPlay) {
-            playVideo();
           }
         });
       }
@@ -154,7 +154,7 @@ const VideoPlayer = ({
   //   if (!video) return;
 
   //   if (video.paused || !isVideoReady) {
-  //     updateSources();
+  //     void updateSources();
   //     playVideo();
   //   }
   // };
