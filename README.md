@@ -4,13 +4,16 @@ Frontend на React Router 7 с серверным рендерингом. Produ
 
 ## Обновить production
 
-Основная команда для обычного production deploy после внесения исправлений:
+Подключиться к production-серверу, обновить checkout и запустить deploy:
 
 ```bash
+ssh interpro
+cd ~/interpro/frontend
+git pull --ff-only origin dev
 npm run deploy:prod
 ```
 
-Она собирает release, публикует и проверяет assets через CDN, а затем переключает frontend. Если публикация или проверка завершится с ошибкой, production не переключится.
+Команда выполняется на сервере. Она устанавливает зависимости, собирает release и Docker image, публикует и проверяет assets через CDN, затем переключает frontend. Локальный Docker и SSH из deploy-скрипта не используются. Если сборка или проверка завершается с ошибкой, работающий production не переключается.
 
 Для возврата к предыдущему release:
 
@@ -18,7 +21,7 @@ npm run deploy:prod
 npm run rollback:prod
 ```
 
-Команды можно запускать из обычного терминала IDE или PowerShell: npm сам откроет Git Bash на Windows. Подробности и ручной двухэтапный режим описаны ниже.
+Rollback также выполняется на production-сервере из каталога проекта.
 
 ## Локальная разработка
 
@@ -96,63 +99,41 @@ Production overlay закрепляет frontend по точному image diges
 
 ## Production deployment
 
-Deploy-скрипт использует Bash. На Windows npm-команды автоматически находят Git Bash; на Linux и WSL используется системный `bash`. При нестандартном расположении Bash путь можно задать через `DEPLOY_BASH`.
-
-Локально требуются `git`, `node`, `npm`, `docker`, `curl`, `ssh`, `tar`, `sha256sum`, `awk` и GNU coreutils. На сервере должны работать Docker Compose, reverse proxy и CDN origin.
+Deploy запускается непосредственно на production-сервере. Для npm-команды требуются Node.js и `npm`; сама сборка приложения выполняется внутри Docker и не использует host `node_modules`. Также нужны `git`, `bash`, Docker с Compose plugin, `curl`, `flock`, `sha256sum`, `awk` и GNU coreutils. Reverse proxy и CDN origin должны уже работать.
 
 Для обычного deploy достаточно одной команды:
 
 ```bash
+git pull --ff-only origin dev
 npm run deploy:prod
 ```
 
-Внутри команды по-прежнему соблюдается безопасный порядок: build, публикация assets, полная CDN-проверка и только затем переключение frontend.
+Скрипт деплоит текущий commit checkout и не выполняет `git pull` самостоятельно. Перед deploy рабочее дерево должно быть чистым. Каталог `.deploy/` игнорируется Git и хранит локальное состояние релизов.
 
-Ручной двухэтапный режим нужен, если требуется остановиться после публикации и переключить production позже.
+Внутри команды соблюдается безопасный порядок:
 
-### 1. Опубликовать release
+- блокировка параллельных deploy и rollback через `flock`;
+- установка зависимостей, production build и сборка runtime image внутри Docker на сервере;
+- публикация immutable hashed assets в persistent-каталог;
+- полная проверка assets через CDN;
+- запуск и health-check Playwright-сервиса;
+- переключение frontend на точный image ID;
+- health check и автоматическое восстановление прежнего image при ошибке;
+- фиксация предыдущего release для rollback.
 
-Сначала можно посмотреть параметры без сборки и изменений:
+Посмотреть параметры без сборки и изменений:
 
 ```bash
-scripts/deploy.sh --dry-run
+bash scripts/deploy.sh --dry-run
 ```
-
-Создать release:
-
-```bash
-scripts/deploy.sh --publish-assets
-```
-
-Команда:
-
-- собирает приложение для `cdn.interpro.pro`;
-- добавляет новые hashed assets в persistent-каталог, не удаляя старые;
-- проверяет каждый asset через CDN;
-- собирает и загружает точный runtime image;
-- выводит `Ready release: RELEASE_ID` и команду следующего шага.
-
-На этом шаге работающий frontend не переключается.
 
 При необходимости можно задать понятное имя release:
 
 ```bash
-scripts/deploy.sh --publish-assets --tag RELEASE_ID
+bash scripts/deploy.sh --deploy --tag RELEASE_ID
 ```
 
 Имя должно начинаться с буквы или цифры и может содержать только буквы, цифры, `_`, `.` и `-`. Повторно использовать имя нельзя, включая неудачные публикации.
-
-### 2. Переключить frontend
-
-Подставить ID, который напечатал первый шаг:
-
-```bash
-scripts/deploy.sh --deploy-server RELEASE_ID
-```
-
-Скрипт переключит production на проверенный image, выполнит health checks и сохранит предыдущий release для rollback.
-
-Не запускайте этот шаг, если публикация не завершилась сообщением `Ready release`.
 
 ### Rollback
 
@@ -167,18 +148,16 @@ ID указывать не нужно: скрипт берёт предыдущ�
 ## Production defaults
 
 ```text
-DEPLOY_SSH=interpro
-DEPLOY_DIR=/root/interpro/frontend
 DEPLOY_ASSET_DIR=/srv/interpro-assets
 DEPLOY_CDN_ORIGIN=https://cdn.interpro.pro
 DEPLOY_IMAGE=interpro-frontend
-DEPLOY_STATE_DIR=$DEPLOY_DIR/.deploy
+DEPLOY_STATE_DIR=<checkout>/.deploy
 ```
 
 Значения можно переопределить переменными окружения:
 
 ```bash
-DEPLOY_SSH=user@example.com DEPLOY_DIR=/srv/interpro/frontend scripts/deploy.sh --dry-run
+DEPLOY_ASSET_DIR=/srv/interpro-assets DEPLOY_STATE_DIR=/srv/interpro-deploy bash scripts/deploy.sh --dry-run
 ```
 
 `DEPLOY_CDN_ORIGIN` должен быть HTTPS origin без пути и завершающего `/`. Если задан `VITE_ASSET_BASE_URL`, он должен полностью совпадать с `DEPLOY_CDN_ORIGIN`.
@@ -189,7 +168,8 @@ DEPLOY_SSH=user@example.com DEPLOY_DIR=/srv/interpro/frontend scripts/deploy.sh 
 - Не переключайте production вручную через `docker compose up`.
 - Не удаляйте старые файлы из `/srv/interpro-assets`: cached pages и rollback releases могут ссылаться на старые hashes.
 - Assets и Docker images автоматически не удаляются.
-- `docker-compose.yml`, `docker-compose.deploy.yml` и `deploy/asset-origin.conf` должны находиться в `DEPLOY_DIR` на сервере до запуска deploy.
+- `docker-compose.yml`, `docker-compose.deploy.yml` и `deploy/asset-origin.conf` должны находиться в server checkout до запуска deploy.
 - На сервере должен существовать контейнер `nginx_proxy_manager`: скрипт очищает его HTML microcache при переключении и восстановлении.
 - Скрипт обновляет уже подготовленный сервер. На нём должны существовать frontend, Playwright, Docker-сети и pinned image для `asset-origin`; первичная настройка пустого сервера выполняется отдельно.
-- Если публикация была принудительно завершена и новый запуск сообщает о занятом lock, убедитесь, что другой deploy не работает, затем удалите каталог `.git/interpro-deploy-publish.lock`.
+- `git pull` выполняется отдельно перед deploy. Скрипт никогда не переключает ветку и не изменяет историю Git.
+- Если deploy сообщает о занятом lock, дождитесь завершения другого deploy или rollback; lock освобождается автоматически после завершения процесса.

@@ -4,9 +4,9 @@
   "type": "module",
   "scripts": {
     "build": "react-router build",
-    "deploy:prod": "node scripts/run-deploy.mjs --deploy",
+    "deploy:prod": "bash scripts/deploy.sh --deploy",
     "dev": "react-router dev",
-    "rollback:prod": "node scripts/run-deploy.mjs --rollback",
+    "rollback:prod": "bash scripts/deploy.sh --rollback",
     "test": "node --test app/shared/utils/_stm/index.test.mjs app/shared/utils/toCdnMediaUrl.test.mjs tests/ssr-concurrency.test.mjs",
     "test:ssr": "node --test tests/ssr-concurrency.test.mjs",
     "convert-video-3": "pwsh -File scripts/convert-video-3.ps1",
