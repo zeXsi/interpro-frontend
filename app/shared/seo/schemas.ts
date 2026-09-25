@@ -386,6 +386,13 @@ type ArticleSchemaItem = {
         title?: string;
         descriptions?: string[];
       }>;
+      author?: {
+        name?: string;
+        about?: string;
+        image?: {
+          url?: string;
+        } | null;
+      } | null;
     };
   };
 };
@@ -405,7 +412,7 @@ function toPlainText(value?: string) {
 }
 
 export function getArticleSchema(data?: ArticleSchemaItem) {
-  if (data?.slug !== 'blog') {
+  if (data?.slug !== 'blog' && data?.slug !== 'news') {
     return null;
   }
 
@@ -419,7 +426,10 @@ export function getArticleSchema(data?: ArticleSchemaItem) {
   const cover = payload.cover;
   const image = typeof cover === 'string' ? cover : cover?.url;
   const description = payload.subtitle || '';
-  const pathname = article.slug ? `/blog/${article.slug}` : '';
+  const pathname = article.slug ? `/${data.slug}/${article.slug}` : '';
+  const authorName = payload.author?.name?.trim();
+  const authorAbout = toPlainText(payload.author?.about);
+  const authorImage = payload.author?.image?.url?.trim();
   const articleBody = [
     payload.subtitle,
     ...(payload.blocks?.flatMap((block) => [block.title, ...(block.descriptions ?? [])]) ?? []),
@@ -430,7 +440,7 @@ export function getArticleSchema(data?: ArticleSchemaItem) {
 
   return {
     '@context': 'https://schema.org',
-    '@type': 'Article',
+    '@type': data.slug === 'news' ? 'NewsArticle' : 'Article',
     headline: payload.title,
     description,
     articleBody: articleBody || undefined,
@@ -441,11 +451,14 @@ export function getArticleSchema(data?: ArticleSchemaItem) {
       '@type': 'WebPage',
       '@id': `${SITE_URL}${pathname}`,
     },
-    author: {
-      '@type': 'Organization',
-      name: COMPANY.name,
-      url: SITE_URL,
-    },
+    author: authorName
+      ? {
+          '@type': 'Person',
+          name: authorName,
+          description: authorAbout || undefined,
+          image: authorImage || undefined,
+        }
+      : undefined,
     publisher: {
       '@type': 'Organization',
       name: COMPANY.name,
