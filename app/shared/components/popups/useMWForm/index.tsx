@@ -8,7 +8,7 @@ import srcDesk from './assets/desk.webp';
 import srcTable from './assets/table.webp';
 import srcMob from './assets/mob.webp';
 import { GlobalScrollLock } from 'shared/components/_helpers/GlobalScrollLock';
-import { useWatch } from 'shared/utils/_stm/react/react';
+import { useSignalValue } from 'shared/utils/_stm/react/react';
 import { sgIsHide } from 'store/stPreloader';
 import { signal } from 'shared/utils/_stm';
 import { useEffect } from 'react';
@@ -32,14 +32,42 @@ export default function useMWForm() {
     MWForm.v.toOpenPopup = props.toOpenPopup;
     MWForm.v.toClosePopup = props.toClosePopup;
   }, []);
-  useWatch(() => {
-    if (sgIsHide.v && !isShowed.v) {
-      setTimeout(() => {
-        if (isShowed.v) return;
-        props.toOpenPopup();
-      }, 1000 * 10);
-    }
-  });
+  const isPreloaderHidden = useSignalValue(sgIsHide);
+  const hasShown = useSignalValue(isShowed);
+
+  useEffect(() => {
+    if (!isPreloaderHidden || hasShown) return;
+
+    let timer: ReturnType<typeof setTimeout> | null = null;
+    let isArmed = false;
+
+    const removeInteractionListeners = () => {
+      window.removeEventListener('pointerdown', armAutoPopup);
+      window.removeEventListener('keydown', armAutoPopup);
+      window.removeEventListener('scroll', armAutoPopup);
+    };
+
+    const armAutoPopup = () => {
+      if (isArmed || isShowed.v) return;
+      isArmed = true;
+      removeInteractionListeners();
+
+      timer = setTimeout(() => {
+        if (!isShowed.v) {
+          MWForm.v.toOpenPopup?.();
+        }
+      }, 10_000);
+    };
+
+    window.addEventListener('pointerdown', armAutoPopup, { passive: true, once: true });
+    window.addEventListener('keydown', armAutoPopup, { once: true });
+    window.addEventListener('scroll', armAutoPopup, { passive: true, once: true });
+
+    return () => {
+      removeInteractionListeners();
+      if (timer) clearTimeout(timer);
+    };
+  }, [isPreloaderHidden, hasShown]);
 
   return Popup.Memo(
     {
@@ -47,7 +75,6 @@ export default function useMWForm() {
       Popup: () => {
         return (
           <>
-            <BGLinks/>
             <Popup className="MWForm" isOnCloseBG={true} eventCloseBG="onClick">
               <GlobalScrollLock
                 active={true}
@@ -67,16 +94,6 @@ export default function useMWForm() {
       },
     },
     []
-  );
-}
-
-export function BGLinks() {
-  return (
-    <>
-      <link rel="prefetch" as="image" href={srcDesk} />
-      <link rel="prefetch" as="image" href={srcTable} />
-      <link rel="prefetch" as="image" href={srcMob} />
-    </>
   );
 }
 
