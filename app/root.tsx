@@ -157,14 +157,6 @@ export function Layout({ children }: { children: React.ReactNode }) {
             dangerouslySetInnerHTML={{ __html: seoScheme(data.projects) }}
           />
         )}
-        {!isPresentationPrint && (
-          <script
-            type="text/javascript"
-            dangerouslySetInnerHTML={{ __html: getSSRStore() }}
-            suppressHydrationWarning
-          />
-        )}
-
         {/* Yandex.Metrika counter */}
         <script type="text/javascript" dangerouslySetInnerHTML={{ __html: yandexMetrikaScript }} /> 
 
@@ -198,6 +190,13 @@ export function Layout({ children }: { children: React.ReactNode }) {
         {children}
         {!isPresentationPrint && <CopyToast />}
         {!isPresentationPrint && <ScrollRestoration />}
+        {!isPresentationPrint && (
+          <script
+            type="text/javascript"
+            dangerouslySetInnerHTML={{ __html: getSSRStore() }}
+            suppressHydrationWarning
+          />
+        )}
         {!isPresentationPrint && <Scripts />}
       </body>
     </html>

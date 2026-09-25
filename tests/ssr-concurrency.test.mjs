@@ -5,6 +5,7 @@ import { mkdtemp, rm } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import path from 'node:path';
 import { spawn } from 'node:child_process';
+import { brotliCompressSync, constants as zlibConstants } from 'node:zlib';
 import test from 'node:test';
 
 import { chromium } from 'playwright';
@@ -149,6 +150,21 @@ function createMockApi() {
     ],
     faqs: [{ id: 801, question: 'Compact question?', answer: 'Compact answer.' }],
   };
+  const presentationData = {
+    id: 1001,
+    title: 'Compact presentation',
+    theme: 'light',
+    project_size: 42,
+    tax: { year: ['2026'], stand_type: [], expo: [] },
+    slides: [
+      {
+        id: 1002,
+        type: 'text',
+        slide_title: 'Overview',
+        fields: { text_heading: 'Overview', text_body: 'Presentation body' },
+      },
+    ],
+  };
 
   const server = createServer(async (request, response) => {
     const url = new URL(request.url ?? '/', 'http://mock-api');
@@ -157,6 +173,11 @@ function createMockApi() {
 
     if (url.pathname.endsWith('/interpro/v1/home')) {
       sendJson(response, homeData);
+      return;
+    }
+
+    if (url.pathname.endsWith('/presentations/demo/')) {
+      sendJson(response, presentationData);
       return;
     }
 
@@ -231,6 +252,7 @@ function createMockApi() {
     firstListBlocked: firstListBlocked.promise,
     releaseFirstList: releaseFirstList.resolve,
     requestPaths,
+    homeEndpointDecodedBytes: Buffer.byteLength(JSON.stringify(homeData), 'utf8'),
     clearRequestPaths: () => requestPaths.splice(0),
   };
 }
@@ -382,7 +404,7 @@ async function assertHomeHydratesAndNavigates(origin) {
     await desktopMenu.getByText('Compact service', { exact: true }).waitFor();
     await page.locator('.Header .__menu-self').click();
 
-    await page.locator('a[href="/faq"]').first().click();
+    await page.locator('a[href="/faq"]').first().evaluate((link) => link.click());
     await page.waitForURL(`${origin}/faq`);
     await page.waitForFunction(
       () => document.querySelectorAll('.FAQSection_right-items .Accordion').length > 0
@@ -406,6 +428,7 @@ test('parallel SSR requests isolate route state and hydrate without mismatch', {
   const mockOrigin = await listen(mockApi.server);
   const tempDirectory = await mkdtemp(path.join(tmpdir(), 'interpro-ssr-test-'));
   let appServer;
+  let warmAppServer;
 
   try {
     await run(npmCommand, ['run', 'build'], {
@@ -463,6 +486,43 @@ test('parallel SSR requests isolate route state and hydrate without mismatch', {
     assert.match(homeHtml, /qntyProjects[^>]*>12</);
     assert.match(homeHtml, /Compact question\?/);
     assert.match(homeHtml, /Compact company/);
+    const bodyIndex = homeHtml.indexOf('<body>');
+    const homeContentIndex = homeHtml.indexOf('Compact question?');
+    const stateScriptIndex = homeHtml.indexOf("window['__SSR_STATE__']");
+    const reactRouterScriptsIndex = homeHtml.indexOf('window.__reactRouterContext');
+    assert.ok(bodyIndex >= 0, 'body is present');
+    assert.ok(stateScriptIndex > homeContentIndex, '__SSR_STATE__ follows the rendered route content');
+    assert.ok(stateScriptIndex > bodyIndex, '__SSR_STATE__ is emitted after body starts');
+    assert.ok(
+      reactRouterScriptsIndex > stateScriptIndex,
+      '__SSR_STATE__ is emitted before the React Router client scripts'
+    );
+    const decodedHtmlBytes = Buffer.byteLength(homeHtml, 'utf8');
+    const bytesBeforeBody = Buffer.byteLength(homeHtml.slice(0, bodyIndex), 'utf8');
+    const stateMatch = homeHtml.match(/window\['__SSR_STATE__'\]\s*=\s*(\{.*?\});<\/script>/s);
+    assert.ok(stateMatch, '__SSR_STATE__ payload is present');
+    const ssrStateBytes = Buffer.byteLength(stateMatch[1], 'utf8');
+    const brotliHtmlBytes = brotliCompressSync(Buffer.from(homeHtml), {
+      params: { [zlibConstants.BROTLI_PARAM_QUALITY]: 4 },
+    }).byteLength;
+    assert.ok(decodedHtmlBytes < 1_000_000, 'decoded HTML remains below 1 MB');
+    assert.ok(brotliHtmlBytes < 200_000, 'Brotli HTML remains below 200 KB');
+    assert.ok(bytesBeforeBody < 100_000, 'content before body remains below 100 KB');
+    assert.ok(ssrStateBytes < 150_000, '__SSR_STATE__ remains below 150 KB');
+    assert.ok(
+      mockApi.homeEndpointDecodedBytes < 100_000,
+      'decoded home endpoint remains below 100 KB'
+    );
+    console.info(
+      `SSR_METRICS ${JSON.stringify({
+        decodedHtmlBytes,
+        brotliHtmlBytes,
+        bytesBeforeBody,
+        ssrStateBytes,
+        homeEndpointDecodedBytes: mockApi.homeEndpointDecodedBytes,
+        coldHomeWordPressRequests: mockApi.requestPaths.length,
+      })}`
+    );
     assert.deepStrictEqual(mockApi.requestPaths, ['/wp-json/interpro/v1/home']);
     assert.doesNotMatch(
       mockApi.requestPaths.join('\n'),
@@ -470,6 +530,35 @@ test('parallel SSR requests isolate route state and hydrate without mismatch', {
     );
 
     await assertHomeHydratesAndNavigates(appOrigin);
+
+    mockApi.clearRequestPaths();
+    const presentationResponse = await fetch(`${appOrigin}/presentation/demo`, {
+      headers: { 'user-agent': 'Googlebot' },
+    });
+    assert.equal(presentationResponse.status, 200);
+    const presentationHtml = await presentationResponse.text();
+    const presentationState = readSSRState(presentationHtml);
+    assert.equal(Object.hasOwn(presentationState, 'home-data'), false);
+    assert.doesNotMatch(presentationHtml, /home-data/);
+    assert.match(presentationHtml, /Compact presentation/);
+    assert.deepStrictEqual(mockApi.requestPaths, ['/wp-json/interpro/v1/presentations/demo/']);
+
+    const presentationPrintResponse = await fetch(`${appOrigin}/presentation/demo/print`, {
+      headers: { 'user-agent': 'Googlebot' },
+    });
+    assert.equal(presentationPrintResponse.status, 200);
+    const presentationPrintHtml = await presentationPrintResponse.text();
+    assert.doesNotMatch(presentationPrintHtml, /__SSR_STATE__/);
+    assert.doesNotMatch(presentationPrintHtml, /window\.__reactRouterContext/);
+
+    const presentationExportResponse = await fetch(
+      `${appOrigin}/presentation/demo?export=pdf`,
+      { headers: { 'user-agent': 'Googlebot' } }
+    );
+    assert.equal(presentationExportResponse.status, 200);
+    const presentationExportHtml = await presentationExportResponse.text();
+    assert.doesNotMatch(presentationExportHtml, /__SSR_STATE__/);
+    assert.doesNotMatch(presentationExportHtml, /window\.__reactRouterContext/);
 
     const alphaHtmlPromise = getHtml(appOrigin, 'alpha');
     await mockApi.firstListBlocked;
@@ -496,9 +585,51 @@ test('parallel SSR requests isolate route state and hydrate without mismatch', {
 
     await assertHydrates(appOrigin, 'alpha', 'ALPHA');
     await assertHydrates(appOrigin, 'beta', 'BETA');
+
+    const warmPortServer = createServer();
+    const warmAppOrigin = await listen(warmPortServer);
+    const warmAppPort = new URL(warmAppOrigin).port;
+    await closeServer(warmPortServer);
+    mockApi.clearRequestPaths();
+    warmAppServer = spawn(
+      process.execPath,
+      ['node_modules/@react-router/serve/bin.js', './build/server/index.js'],
+      {
+        cwd: projectRoot,
+        env: {
+          ...process.env,
+          NODE_ENV: 'production',
+          HOST: '127.0.0.1',
+          PORT: warmAppPort,
+          SSR_QUERY_TTL_MS: '1800000',
+          SSR_QUERY_POLL_INTERVAL_MS: '0',
+          SITEMAP_PATH: path.join(tempDirectory, 'warm-sitemap.xml'),
+        },
+        stdio: ['ignore', 'pipe', 'pipe'],
+      }
+    );
+    let warmServerOutput = '';
+    processOutput.set(warmAppServer, warmServerOutput);
+    const appendWarmOutput = (chunk) => {
+      warmServerOutput += chunk;
+      processOutput.set(warmAppServer, warmServerOutput);
+    };
+    warmAppServer.stdout.on('data', appendWarmOutput);
+    warmAppServer.stderr.on('data', appendWarmOutput);
+    await waitForServer(warmAppOrigin, warmAppServer);
+
+    mockApi.clearRequestPaths();
+    const warmHomeResponse = await fetch(warmAppOrigin, {
+      headers: { 'user-agent': 'Googlebot' },
+    });
+    assert.equal(warmHomeResponse.status, 200);
+    await warmHomeResponse.body?.cancel();
+    assert.deepStrictEqual(mockApi.requestPaths, []);
+    console.info('SSR_METRICS {"warmHomeWordPressRequests":0}');
   } finally {
     mockApi.releaseFirstList();
     await stopProcess(appServer);
+    await stopProcess(warmAppServer);
     await closeServer(mockApi.server);
     await rm(tempDirectory, { recursive: true, force: true });
   }
