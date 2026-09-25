@@ -90,7 +90,7 @@
     .Feed_header-reading {
       display: inline-flex;
       align-items: center;
-      gap: 0.125rem;
+      gap: 0.25rem;
       white-space: nowrap;
     }
 
@@ -144,7 +144,6 @@
 
       .Feed_header-reading {
         order: -1;
-        gap: 0.25rem;
         font-size: 0.875rem;
       }
 
@@ -268,6 +267,21 @@
     gap: clamp(2.75rem, calc(1.917rem + 1.736vw), 4rem);
     /* min: 44px, max: 64px */
     /* viewPort: 768-1920 */
+
+    .Feed_intro {
+      display: flex;
+      flex-direction: column;
+      gap: 2rem;
+
+      @media (max-width: 768px) {
+        gap: 5rem;
+      }
+
+      @media (max-width: 540px) {
+        gap: 3.75rem;
+      }
+    }
+
     .Block-wrapper_desc_imgs {
       display: flex;
       flex-direction: column;
