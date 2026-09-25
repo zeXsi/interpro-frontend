@@ -13,7 +13,7 @@ import ContactForm from 'shared/components/ContactForm';
 
 import MediaSection from 'shared/sections/MediaSection';
 import Footer from 'shared/sections/Footer';
-import { type ComponentProps, useEffect, useRef, useState } from 'react';
+import { type ComponentProps, type RefObject, useEffect, useRef, useState } from 'react';
 import useBreakpoints from '@qtpy/use-breakpoints';
 
 import ParallaxFooter from 'shared/components/ParallaxFooter';
@@ -428,7 +428,7 @@ const DetailInfoSeo = () => {
 };
 
 function useElementInView(
-  ref: React.RefObject<Element | null>,
+  ref: RefObject<Element | null>,
   rootMargin = '-33% 0px -33% 0px'
 ) {
   const [isInView, setIsInView] = useState(false);
