@@ -15,17 +15,29 @@ export interface FAQItem {
 interface Props {
   qntyPreview?: number;
   items?: FAQItem[];
+  showAllLink?: boolean;
 }
 
-export default function FAQSection({ qntyPreview = Infinity, items }: Props) {
+export default function FAQSection({ qntyPreview = Infinity, items, showAllLink = false }: Props) {
+  if (items) {
+    return <FAQContent items={items} showAllLink={showAllLink} />;
+  }
+
+  return <FAQSignalContent qntyPreview={qntyPreview} />;
+}
+
+function FAQSignalContent({ qntyPreview }: { qntyPreview: number }) {
   useSignalValue(sgFaqs);
 
-  const list: FAQItem[] = items
-    ?? sgFaqs.v.slice(0, qntyPreview).map(({ payload }) => ({
-      question: payload.question,
-      answer: payload.answer,
-    }));
+  const items = sgFaqs.v.slice(0, qntyPreview).map(({ payload }) => ({
+    question: payload.question,
+    answer: payload.answer,
+  }));
 
+  return <FAQContent items={items} showAllLink={qntyPreview !== Infinity} />;
+}
+
+function FAQContent({ items, showAllLink }: { items: FAQItem[]; showAllLink: boolean }) {
   return (
     <div className="FAQSection px" id="FAQSection">
       <div className="FAQSection-left">
@@ -42,7 +54,7 @@ export default function FAQSection({ qntyPreview = Infinity, items }: Props) {
       </div>
       <div className="FAQSection_right">
         <div className="FAQSection_right-items">
-          {list.map((item, index) => (
+          {items.map((item, index) => (
             <Accordion key={index}>
               <Accordion.Header>
                 <span className="Accordion_header-title">{item.question}</span>
@@ -59,7 +71,7 @@ export default function FAQSection({ qntyPreview = Infinity, items }: Props) {
         </div>
         {
           //prettier-ignore
-          !items && qntyPreview !== Infinity && (
+          showAllLink && (
             <Link to="/faq">
               <Button.Arrow direction='right' className='FAQSection_right-btn' >
                 Все вопросы

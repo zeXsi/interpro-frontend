@@ -11,6 +11,16 @@ import { sgServiceCategories } from 'api/services/services.api';
 import { sgProjects } from 'api/projects/projects.api';
 import { signal } from 'shared/utils/_stm';
 import { useSignalValue } from 'shared/utils/_stm/react/react';
+import { sgHomeData } from 'api/home/home.api';
+import type { HomeServiceNavigationNode } from 'api/home/home.types';
+import { useLocation } from 'react-router';
+
+type NavigationCategory = {
+  slug: string;
+  name: string;
+  posts: Array<{ slug: string; title: string }>;
+  children: NavigationCategory[];
+};
 
 type NavItem = {
   label: string;
@@ -20,7 +30,7 @@ type NavItem = {
   children?: NavItem[];
 };
 
-function buildTree(data: any[], parentPath: string = '/services'): NavItem[] {
+function buildTree(data: NavigationCategory[], parentPath: string = '/services'): NavItem[] {
   return data.map((category) => {
     const categoryPath = `${parentPath}/${category.slug}`;
 
@@ -31,8 +41,8 @@ function buildTree(data: any[], parentPath: string = '/services'): NavItem[] {
     };
 
     // Добавляем посты как children
-    if (category.payload?.posts?.length) {
-      const postNodes = category.payload.posts.map((post: any) => ({
+    if (category.posts.length) {
+      const postNodes = category.posts.map((post) => ({
         label: post.title,
         link: `${categoryPath}/${post.slug}`,
         parentLabel: category.name,
@@ -41,8 +51,8 @@ function buildTree(data: any[], parentPath: string = '/services'): NavItem[] {
     }
 
     // Рекурсивно добавляем подкатегории
-    if (category.payload?.children?.length) {
-      const childNodes = buildTree(category.payload.children, categoryPath);
+    if (category.children.length) {
+      const childNodes = buildTree(category.children, categoryPath);
       node.children = [...(node.children || []), ...childNodes];
     }
 
@@ -50,10 +60,10 @@ function buildTree(data: any[], parentPath: string = '/services'): NavItem[] {
   });
 }
 
-function buildServicesTree(data: any[]): NavItem[] {
+function buildServicesTree(data: NavigationCategory[]): NavItem[] {
   if (data.length === 1) {
     return (
-      data[0].payload?.posts?.map((post: any) => ({
+      data[0].posts.map((post) => ({
         label: post.title,
         link: `/services/${post.slug}`,
       })) ?? []
@@ -61,6 +71,27 @@ function buildServicesTree(data: any[]): NavItem[] {
   }
 
   return buildTree(data);
+}
+
+function compactNavigation(nodes: HomeServiceNavigationNode[]): NavigationCategory[] {
+  return nodes.map((node) => ({
+    slug: node.slug,
+    name: node.name,
+    posts: node.posts,
+    children: compactNavigation(node.children),
+  }));
+}
+
+function fullNavigation(): NavigationCategory[] {
+  const convert = (categories: typeof sgServiceCategories.v): NavigationCategory[] =>
+    categories.map((category) => ({
+      slug: category.slug,
+      name: category.name,
+      posts: category.payload?.posts ?? [],
+      children: convert(category.payload?.children ?? []),
+    }));
+
+  return convert(sgServiceCategories.v);
 }
 
 type unionTypes = 'nav' | 'contacts';
@@ -85,6 +116,12 @@ const getNextMWNavHostId = () => {
 };
 
 export default function useMWNav() {
+  const location = useLocation();
+  const isHome = location.pathname === '/';
+  const navigation = isHome
+    ? compactNavigation(sgHomeData.v.services_navigation)
+    : fullNavigation();
+  const projectCount = isHome ? sgHomeData.v.projects.total : sgProjects.v.length;
   const instanceIdRef = useRef(0);
   if (!instanceIdRef.current) {
     mwNavControllerId += 1;
@@ -192,12 +229,18 @@ export default function useMWNav() {
 
         return (
           <PopupRoot className="MWNav" isOnCloseBG={true} eventCloseBG="onMouseMove">
-            <Switcher type={MWNavMode.v} toClosePopup={_toClosePopup} changeChildren={setType} />
+            <Switcher
+              type={MWNavMode.v}
+              toClosePopup={_toClosePopup}
+              changeChildren={setType}
+              navigation={navigation}
+              projectCount={projectCount}
+            />
           </PopupRoot>
         );
       },
     },
-    [isHost]
+    [isHost, navigation, projectCount]
   );
 }
 
@@ -205,17 +248,30 @@ function Switcher({
   type,
   toClosePopup,
   changeChildren,
+  navigation,
+  projectCount,
 }: {
   type: unionTypes;
   toClosePopup: () => void;
   changeChildren: (_type: unionTypes) => void;
+  navigation: NavigationCategory[];
+  projectCount: number;
 }) {
   switch (type) {
     case 'nav':
       return (
         <>
-          <Desktop toClosePopup={toClosePopup} changeChildren={changeChildren} />
-          <Mobile toClosePopup={toClosePopup} changeChildren={changeChildren} />
+          <Desktop
+            toClosePopup={toClosePopup}
+            changeChildren={changeChildren}
+            navigation={navigation}
+          />
+          <Mobile
+            toClosePopup={toClosePopup}
+            changeChildren={changeChildren}
+            navigation={navigation}
+            projectCount={projectCount}
+          />
         </>
       );
     case 'contacts':
@@ -265,12 +321,14 @@ function Contacts({ toClosePopup }: ContactsProps) {
 }
 function Desktop({
   toClosePopup,
+  navigation,
 }: {
   changeChildren: (v: unionTypes) => void;
   toClosePopup: () => void;
+  navigation: NavigationCategory[];
 }) {
   const { goTo } = useNavigate();
-  const servicesTree = useMemo(() => buildServicesTree(sgServiceCategories.v), []);
+  const servicesTree = useMemo(() => buildServicesTree(navigation), [navigation]);
 
   const columns = [
     {
@@ -395,9 +453,13 @@ export function ThreeLevelNav({ columns, onNavigate }: ThreeLevelNavProps) {
 function Mobile({
   toClosePopup,
   changeChildren,
+  navigation,
+  projectCount,
 }: {
   changeChildren: (v: unionTypes) => void;
   toClosePopup: () => void;
+  navigation: NavigationCategory[];
+  projectCount: number;
 }) {
   const { goTo } = useNavigate();
   const [isOpenNested, setIsOpenNested] = useState(false);
@@ -425,7 +487,7 @@ function Mobile({
           direction="right"
           className="MWNav_list-li __projects"
           //prettier-ignore
-          children={ <p>Проекты <span>{ sgProjects.v.length }</span></p> }
+          children={ <p>Проекты <span>{ projectCount }</span></p> }
         />
         <Button.Arrow
           variant="link"
@@ -480,7 +542,7 @@ function Mobile({
 
         <div className="MWNav_container-list ">
           {typeNav === 'services' ? (
-            <ServicesNavTable toNavigate={toNavigate} />
+            <ServicesNavTable toNavigate={toNavigate} navigation={navigation} />
           ) : (
             <AboutUs toNavigate={toNavigate} />
           )}
@@ -515,10 +577,13 @@ function AboutUs({ toNavigate }: Props) {
   );
 }
 
-function ServicesNavTable({ toNavigate }: Props) {
-  const tree = useMemo(() => buildTree(sgServiceCategories.v), []);
-  const servicesTree = useMemo(() => buildServicesTree(sgServiceCategories.v), []);
-  const hasSingleCategory = sgServiceCategories.v.length === 1;
+function ServicesNavTable({
+  toNavigate,
+  navigation,
+}: Props & { navigation: NavigationCategory[] }) {
+  const tree = useMemo(() => buildTree(navigation), [navigation]);
+  const servicesTree = useMemo(() => buildServicesTree(navigation), [navigation]);
+  const hasSingleCategory = navigation.length === 1;
   const [selectedIndex, setSelectedIndex] = useState<null | number>(null);
   const toClick = (val: boolean, index: number) => {
     setSelectedIndex(val ? index : null);

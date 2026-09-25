@@ -34,11 +34,10 @@ import {
   getFeedbackReviewSchemas,
   getHomePageSchema,
 } from 'shared/seo/schemas';
-import { sgFaqs } from 'api/faq/faq.api';
-import { sgFeedbacks } from 'api/feedbacks/feedbacks.api';
 import { useSignalValue } from 'shared/utils/_stm/react/react';
 import { getOpenGraphMeta } from 'shared/seo/meta';
 import { toCdnMediaUrl } from 'shared/utils/toCdnMediaUrl';
+import { sgHomeData } from 'api/home/home.api';
 
 // HLS видео пути
 const srcVideo2 = toCdnMediaUrl('/videos/video_2/hls/video.m3u8');
@@ -430,8 +429,7 @@ const DetailInfoSeo = () => {
 };
 
 export default function Home() {
-  useSignalValue(sgFaqs);
-  useSignalValue(sgFeedbacks);
+  const homeData = useSignalValue(sgHomeData);
 
   const refProjects = useRef<HTMLDivElement>(null);
   const refFAQSection = useRef<HTMLDivElement>(null);
@@ -473,13 +471,15 @@ export default function Home() {
       <JsonLd data={getHomePageSchema({ title: HOME_TITLE, description: HOME_DESCRIPTION })} />
       <JsonLd
         data={getFaqSchema(
-          sgFaqs.v.slice(0, 4).map(({ payload }) => ({
-            question: payload.question,
-            answer: payload.answer,
+          homeData.faqs.map((item) => ({
+            question: item.question,
+            answer: item.answer,
           }))
         )}
       />
-      <JsonLd data={getFeedbackReviewSchemas(sgFeedbacks.v)} />
+      <JsonLd data={getFeedbackReviewSchemas(homeData.feedbacks.map((item) => ({
+        payload: item,
+      })))} />
       
       <div className="Home">
         {/* <h1 className="Home-title" style={{ opacity: 0 }}>
@@ -502,7 +502,7 @@ export default function Home() {
             }}
           />
           <div ref={refProjects}>
-            <Projects />
+            <Projects items={homeData.projects.items} total={homeData.projects.total} />
           </div>
           <WorkflowSection />
 
@@ -521,11 +521,26 @@ export default function Home() {
               type: 'application/x-mpegURL',
             }}
           />
-          <TeamBoostSection />
-          <DocOverview />
+          <TeamBoostSection items={homeData.services_navigation} />
+          <DocOverview
+            items={homeData.feedbacks.map((item) => ({
+              company: item.company,
+              text: item.text,
+              pdfUrl: item.pdf,
+              personName: item.person?.name,
+              personPosition: item.person?.position,
+            }))}
+          />
           <AboutUsMedia />
           <div ref={refFAQSection}>
-            <FAQSection qntyPreview={4} />
+            <FAQSection
+              qntyPreview={4}
+              showAllLink
+              items={homeData.faqs.map((item) => ({
+                question: item.question,
+                answer: item.answer,
+              }))}
+            />
           </div>
 
           <div className="DetailInfo px">

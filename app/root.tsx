@@ -6,6 +6,7 @@ import {
   redirect,
   Scripts,
   ScrollRestoration,
+  type ShouldRevalidateFunctionArgs,
   useLoaderData,
 } from 'react-router';
 import './globals.css';
@@ -51,6 +52,7 @@ import {
 import { getOpenGraphMeta } from 'shared/seo/meta';
 import { getCanonicalUrl, normalizeCanonicalPathname } from 'shared/seo/canonical';
 import { runWithSSRRequestState } from 'shared/utils/_stm/ssr.server';
+import { getHomeData } from 'api/home/home.api';
 
 export const middleware: Route.MiddlewareFunction[] = [
   (_args, next) => runWithSSRRequestState(next),
@@ -114,9 +116,12 @@ export function Layout({ children }: { children: React.ReactNode }) {
   const data = useLoaderData();
   const location = useLocation();
   const isPresentationRoute = location.pathname.startsWith('/presentation');
+  const serviceCategorySlugs = location.pathname === '/'
+    ? []
+    : sgServiceCategories.v.map((category) => category.slug);
   const isCustomStructuredDataRoute = hasCustomStructuredData(
     location.pathname,
-    sgServiceCategories.v.map((category) => category.slug)
+    serviceCategorySlugs
   );
   const isPresentationPrint =
     isPresentationRoute &&
@@ -235,12 +240,24 @@ export async function loader(args: Route.LoaderArgs) {
     throw redirect(`${normalizedPathname}${url.search}`, { status: 301 });
   }
 
-  const isPresentationRoute = url.pathname.startsWith('/presentation');
+  return loadRootData(url.pathname);
+}
 
-  if (isPresentationRoute) {
-    return {
-      projects: [],
-    };
+export async function clientLoader(args: Route.ClientLoaderArgs) {
+  return loadRootData(new URL(args.request.url).pathname);
+}
+
+export function shouldRevalidate(args: ShouldRevalidateFunctionArgs) {
+  return rootDataMode(args.currentUrl.pathname) !== rootDataMode(args.nextUrl.pathname)
+    || args.defaultShouldRevalidate;
+}
+
+async function loadRootData(pathname: string) {
+  if (pathname.startsWith('/presentation')) return { projects: [] };
+
+  if (pathname === '/') {
+    await getHomeData();
+    return { projects: [] };
   }
 
   const [projects] = await Promise.all([
@@ -258,6 +275,11 @@ export async function loader(args: Route.LoaderArgs) {
   };
 }
 
+function rootDataMode(pathname: string) {
+  if (pathname.startsWith('/presentation')) return 'presentation';
+  return pathname === '/' ? 'home' : 'full';
+}
+
 export default function App() {
   const location = useLocation();
   const cookies = useCookies();
@@ -268,9 +290,12 @@ export default function App() {
   }, []);
 
   const isPresentation = location.pathname.startsWith('/presentation');
+  const serviceCategorySlugs = location.pathname === '/'
+    ? []
+    : sgServiceCategories.v.map((category) => category.slug);
   const isCustomStructuredDataRoute = hasCustomStructuredData(
     location.pathname,
-    sgServiceCategories.v.map((category) => category.slug)
+    serviceCategorySlugs
   );
 
   return (

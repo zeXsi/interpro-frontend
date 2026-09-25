@@ -93,6 +93,7 @@ function sendJson(response, data) {
   response.writeHead(200, {
     'content-type': 'application/json',
     'x-wp-totalpages': '1',
+    'access-control-allow-origin': '*',
   });
   response.end(JSON.stringify(data));
 }
@@ -102,10 +103,102 @@ function createMockApi() {
   const releaseFirstList = deferred();
   let articleRequestCount = 0;
   let listRequestCount = 0;
+  const requestPaths = [];
+
+  const homeData = {
+    schema_version: 1,
+    projects: {
+      total: 12,
+      items: [
+        {
+          id: 501,
+          slug: 'compact-project',
+          title: 'COMPACT PROJECT',
+          exhibition: 'Compact Expo',
+          year: 2026,
+          area: 42,
+          cover: {
+            id: 601,
+            url: 'https://api.interpro.pro/wp-content/uploads/compact-project.webp',
+            width: 1200,
+            height: 800,
+            srcset: '',
+            sizes: '',
+          },
+        },
+      ],
+    },
+    services_navigation: [
+      {
+        id: 701,
+        slug: 'compact-services',
+        name: 'Compact services',
+        children: [],
+        posts: [{ id: 702, slug: 'compact-service', title: 'Compact service' }],
+      },
+    ],
+    feedbacks: [
+      {
+        title: 'Compact person',
+        company: 'Compact company',
+        person: { name: 'Compact person', position: 'Director' },
+        text: 'Compact feedback',
+        pdf: null,
+        date: '2026-01-01T00:00:00+00:00',
+      },
+    ],
+    faqs: [{ id: 801, question: 'Compact question?', answer: 'Compact answer.' }],
+  };
 
   const server = createServer(async (request, response) => {
     const url = new URL(request.url ?? '/', 'http://mock-api');
+    requestPaths.push(`${url.pathname}${url.search}`);
     const slug = url.searchParams.get('slug');
+
+    if (url.pathname.endsWith('/interpro/v1/home')) {
+      sendJson(response, homeData);
+      return;
+    }
+
+    if (url.pathname.endsWith('/projects')) {
+      sendJson(response, [
+        {
+          id: 901,
+          slug: 'full-project',
+          title: { rendered: 'Full project' },
+          payload: { title: 'Full project', seo: { title: 'Full project' } },
+        },
+      ]);
+      return;
+    }
+
+    if (url.pathname.endsWith('/faqs')) {
+      sendJson(response, [
+        {
+          id: 902,
+          slug: 'full-question',
+          payload: { question: 'Full question?', answer: 'Full answer.' },
+        },
+      ]);
+      return;
+    }
+
+    if (url.pathname.endsWith('/service_category')) {
+      sendJson(response, [
+        {
+          id: 903,
+          slug: 'full-services',
+          name: 'Full services',
+          payload: {
+            name: 'Full services',
+            description: 'Full services description',
+            children: [],
+            posts: [{ id: 904, slug: 'full-service', title: 'Full service' }],
+          },
+        },
+      ]);
+      return;
+    }
 
     if (url.pathname.endsWith('/blog') && slug) {
       articleRequestCount += 1;
@@ -137,6 +230,8 @@ function createMockApi() {
     server,
     firstListBlocked: firstListBlocked.promise,
     releaseFirstList: releaseFirstList.resolve,
+    requestPaths,
+    clearRequestPaths: () => requestPaths.splice(0),
   };
 }
 
@@ -252,6 +347,60 @@ async function assertHydrates(origin, slug, title) {
   }
 }
 
+async function assertHomeHydratesAndNavigates(origin) {
+  const browser = await chromium.launch({ headless: true });
+  try {
+    const page = await browser.newPage({ serviceWorkers: 'block' });
+    const hydrationErrors = [];
+    const hydrationPattern =
+      /hydration|hydrated|server rendered html|did not match|Minified React error #(418|423|425)/i;
+
+    page.on('console', (message) => {
+      if (message.type() === 'error' && hydrationPattern.test(message.text())) {
+        hydrationErrors.push(message.text());
+      }
+    });
+    page.on('pageerror', (error) => {
+      if (hydrationPattern.test(error.message)) hydrationErrors.push(error.message);
+    });
+    await page.route('**/*', async (route) => {
+      const requestOrigin = new URL(route.request().url()).origin;
+      if (requestOrigin === origin || requestOrigin.startsWith('http://127.0.0.1:')) {
+        await route.continue();
+      } else {
+        await route.abort();
+      }
+    });
+
+    await page.goto(origin, { waitUntil: 'load' });
+    await page.locator('.Header .qntyProjects').waitFor();
+    assert.equal(await page.locator('.Header .qntyProjects').textContent(), '12');
+    assert.equal(await page.locator('.Project-title').first().textContent(), 'COMPACT PROJECT');
+    await page.locator('.Header .__menu-self').hover();
+    const desktopMenu = page.locator('.MWNav_desktop');
+    await desktopMenu.getByText('Услуги', { exact: true }).hover();
+    await desktopMenu.getByText('Compact service', { exact: true }).waitFor();
+    await page.locator('.Header .__menu-self').click();
+
+    await page.locator('a[href="/faq"]').first().click();
+    await page.waitForURL(`${origin}/faq`);
+    await page.waitForFunction(
+      () => document.querySelectorAll('.FAQSection_right-items .Accordion').length > 0
+    );
+    assert.notEqual(await page.locator('.Header .qntyProjects').textContent(), '0');
+    assert.match(await page.locator('.FAQSection').textContent(), /Full question\?/);
+    await page.locator('.Header_list-li.__logo svg').click();
+    await page.waitForURL(`${origin}/`);
+    await page.waitForFunction(
+      () => document.querySelector('.Header .qntyProjects')?.textContent === '12'
+    );
+    assert.equal(await page.locator('.Header .qntyProjects').textContent(), '12');
+    assert.deepStrictEqual(hydrationErrors, []);
+  } finally {
+    await browser.close();
+  }
+}
+
 test('parallel SSR requests isolate route state and hydrate without mismatch', { timeout: 120_000 }, async () => {
   const mockApi = createMockApi();
   const mockOrigin = await listen(mockApi.server);
@@ -297,6 +446,30 @@ test('parallel SSR requests isolate route state and hydrate without mismatch', {
     appServer.stdout.on('data', append);
     appServer.stderr.on('data', append);
     await waitForServer(appOrigin, appServer);
+
+    mockApi.clearRequestPaths();
+    const homeResponse = await fetch(appOrigin, { headers: { 'user-agent': 'Googlebot' } });
+    assert.equal(homeResponse.status, 200);
+    const homeHtml = await homeResponse.text();
+    const homeState = readSSRState(homeHtml);
+    assert.deepStrictEqual(Object.keys(homeState), ['home-data']);
+    assert.equal(homeState['home-data'].projects.total, 12);
+    assert.equal(homeState['home-data'].projects.items.length, 1);
+    assert.equal(
+      homeState['home-data'].projects.items[0].cover.url,
+      'https://cdn.interpro.pro/wp-content/uploads/compact-project.webp'
+    );
+    assert.equal((homeHtml.match(/"schema_version":1/g) ?? []).length, 1);
+    assert.match(homeHtml, /qntyProjects[^>]*>12</);
+    assert.match(homeHtml, /Compact question\?/);
+    assert.match(homeHtml, /Compact company/);
+    assert.deepStrictEqual(mockApi.requestPaths, ['/wp-json/interpro/v1/home']);
+    assert.doesNotMatch(
+      mockApi.requestPaths.join('\n'),
+      /\/wp-json\/wp\/v2\/(projects|service(?:_category)?|news|blog|licenses)/
+    );
+
+    await assertHomeHydratesAndNavigates(appOrigin);
 
     const alphaHtmlPromise = getHtml(appOrigin, 'alpha');
     await mockApi.firstListBlocked;

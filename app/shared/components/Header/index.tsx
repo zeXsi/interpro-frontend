@@ -9,9 +9,15 @@ import { useNavigate } from '../NavigationTracker';
 import { memo, useEffect, useRef } from 'react';
 import { useSignalValue } from 'shared/utils/_stm/react/react';
 import { sgProjects } from 'api/projects/projects.api';
+import { sgHomeData } from 'api/home/home.api';
+import { useLocation } from 'react-router';
 
 function Header() {
   const { goTo } = useNavigate();
+  const location = useLocation();
+  const projectCount = location.pathname === '/'
+    ? sgHomeData.v.projects.total
+    : sgProjects.v.length;
   const { clIsHidePreload } = useHidePreloader();
   const mode = useSignalValue(MWNavMode);
   const { Popup, toOpenPopup, toClosePopup, showWithData, isShowed } = useMWNav();
@@ -80,12 +86,12 @@ function Header() {
             children={name}
           />
           <span
-            data-qnty={sgProjects.v.length}
+            data-qnty={projectCount}
             className="__projects"
             onClick={() => goTo('/projects')}
           >
             <span>{'\u041f\u0440\u043e\u0435\u043a\u0442\u044b'}</span>
-            <span className="qntyProjects">{sgProjects.v.length}</span>
+            <span className="qntyProjects">{projectCount}</span>
           </span>
         </li>
         <li

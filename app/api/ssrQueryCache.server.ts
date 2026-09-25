@@ -11,6 +11,7 @@ import {
 } from 'api/feed/feed.api';
 import { primeFilters } from 'api/filters';
 import { primeLicenses } from 'api/licenses/license.api';
+import { homeDataEndpoint, primeHomeData } from 'api/home/home.api';
 import {
   primeProjects,
   primeProjectsBySlugs,
@@ -48,6 +49,7 @@ type WarmupQuery = {
 };
 
 const startupWarmupQueries: WarmupQuery[] = [
+  { name: '/interpro/v1/home', prime: () => primeHomeData(false, true) },
   { name: '/projects', prime: () => primeProjects(false, true) },
   {
     name: '/service_category?per_page=100',
@@ -62,6 +64,11 @@ const startupWarmupQueries: WarmupQuery[] = [
 ];
 
 const pollingFamilies: PollingFamily[] = [
+  {
+    family: QUERY_FAMILIES.home,
+    marker: () => valueMarker(homeDataEndpoint),
+    prime: () => [primeHomeData(true)],
+  },
   {
     family: QUERY_FAMILIES.projects,
     marker: async () => ({
