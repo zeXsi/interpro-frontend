@@ -132,9 +132,11 @@ function ProjectItem({ ref, id, slug, title, nameCompany, year, square, cover }:
           <img
             src={cover?.url}
             srcSet={cover?.srcset || undefined}
-            sizes={cover?.sizes || undefined}
+            sizes="(max-width: 1000px) calc(100vw - 16px), 60vw"
             width={cover?.width || undefined}
             height={cover?.height || undefined}
+            loading="lazy"
+            decoding="async"
             alt={`Проект: ${projectTitle}, выставка ${nameCompany}, ${year} год`}
           />
         </div>
