@@ -66,6 +66,18 @@ export interface FeedItem {
     slug: string;
     date: string;
     title: string;
+    author?: {
+      name: string;
+      about: string;
+      image: {
+        id: number;
+        url: string;
+        width: number;
+        height: number;
+        alt: string;
+      } | null;
+    } | null;
+    reading_time?: string;
     seo?: {
       title: string;
       description: string;
