@@ -1,31 +1,39 @@
 
-import Lenis from 'lenis';
+import type Lenis from 'lenis';
 import { signal } from 'shared/utils/_stm';
 
 export class LenisManager {
   private lenis: Lenis | null = null;
   private rafId: number | null = null;
+  private initPromise: Promise<void> | null = null;
   state = signal<Lenis | null>(null);
 
   init() {
-    if (typeof window === 'undefined') return;
-    if (this.lenis) return;
+    if (typeof window === 'undefined' || this.lenis) return;
+    if (this.initPromise) return this.initPromise;
 
-    this.lenis = new Lenis({
-      lerp: 0.95,
-      duration: 1.1,
-      smoothWheel: true,
-      wheelMultiplier: 1,
+    this.initPromise = import('lenis')
+      .then(({ default: Lenis }) => {
+        if (this.lenis) return;
 
-      prevent: ((node: HTMLElement) => {
-        return Boolean(node.closest('[data-lenis-prevent]'));
-      }) as (node: HTMLElement) => boolean,
-    });
+        this.lenis = new Lenis({
+          lerp: 0.95,
+          duration: 1.1,
+          smoothWheel: true,
+          wheelMultiplier: 1,
+          prevent: ((node: HTMLElement) => {
+            return Boolean(node.closest('[data-lenis-prevent]'));
+          }) as (node: HTMLElement) => boolean,
+        });
 
+        this.state.v = this.lenis;
+        this.startRaf();
+      })
+      .finally(() => {
+        this.initPromise = null;
+      });
 
-
-    this.state.v = this.lenis;
-    this.startRaf();
+    return this.initPromise;
   }
 
   private onRaf = (t: number) => {
