@@ -56,7 +56,7 @@ export default function useMWForm() {
         if (!isShowed.v) {
           MWForm.v.toOpenPopup?.();
         }
-      }, 10_000);
+      }, 5_000);
     };
 
     window.addEventListener('pointerdown', armAutoPopup, { passive: true, once: true });
@@ -94,6 +94,17 @@ export default function useMWForm() {
       },
     },
     []
+  );
+}
+
+
+export function BGLinks() {
+  return (
+    <>
+      <link rel="prefetch" as="image" href={srcDesk} />
+      <link rel="prefetch" as="image" href={srcTable} />
+      <link rel="prefetch" as="image" href={srcMob} />
+    </>
   );
 }
 
