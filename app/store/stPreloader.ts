@@ -51,8 +51,7 @@ export const usePreloader = (mediaUrls: string[] = []) => {
     sgPercent.v = 0;
     window.scrollTo(0, 0);
 
-    let interval: NodeJS.Timeout;
-    let maxDurationTimeout: NodeJS.Timeout;
+    let maxDurationTimeout: ReturnType<typeof setTimeout>;
     let isFinished = false;
 
     const finishPreloader = () => {
@@ -60,7 +59,6 @@ export const usePreloader = (mediaUrls: string[] = []) => {
       isFinished = true;
 
       sgPercent.v = 100;
-      if (interval) clearInterval(interval);
       if (maxDurationTimeout) clearTimeout(maxDurationTimeout);
 
       toHidePreloader();
@@ -98,15 +96,7 @@ export const usePreloader = (mediaUrls: string[] = []) => {
 
     Promise.all(loadPromises).then(() => {
       if (isFinished) return;
-
-      interval = setInterval(() => {
-        const next = sgPercent.v + 2;
-        if (next >= 100) {
-          finishPreloader();
-        } else {
-          sgPercent.v = next;
-        }
-      }, delayPercent);
+      finishPreloader();
     });
 
     maxDurationTimeout = setTimeout(() => {
@@ -114,7 +104,6 @@ export const usePreloader = (mediaUrls: string[] = []) => {
     }, PRELOADER_MAX_DURATION);
 
     return () => {
-      if (interval) clearInterval(interval);
       if (maxDurationTimeout) clearTimeout(maxDurationTimeout);
     };
   }, [...mediaUrls, delayPercent]);

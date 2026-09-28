@@ -53,6 +53,7 @@ import { getOpenGraphMeta } from 'shared/seo/meta';
 import { getCanonicalUrl, normalizeCanonicalPathname } from 'shared/seo/canonical';
 import { runWithSSRRequestState } from 'shared/utils/_stm/ssr.server';
 import { getHomeData } from 'api/home/home.api';
+import heroCover from 'assets/imgs/hero.webp';
 
 export const middleware: Route.MiddlewareFunction[] = [
   (_args, next) => runWithSSRRequestState(next),
@@ -75,41 +76,67 @@ const hasCustomStructuredData = (pathname: string, serviceCategorySlugs: string[
 };
 
 const yandexMetrikaScript = `
-  (function(m,e,t,r,i,k,a){
-    m[i]=m[i]||function(){
-      (m[i].a=m[i].a||[]).push(arguments);
+  (() => {
+    const init = () => {
+      (function(m,e,t,r,i,k,a){
+          m[i]=m[i]||function(){
+            (m[i].a=m[i].a||[]).push(arguments);
+          };
+          m[i].l=1*new Date();
+          for (var j = 0; j < document.scripts.length; j++) {
+            if (document.scripts[j].src === r) {
+              return;
+            }
+          }
+          k=e.createElement(t),
+          a=e.getElementsByTagName(t)[0],
+          k.async=1,
+          k.src=r,
+          a.parentNode.insertBefore(k,a);
+        })(window, document, "script", "https://mc.yandex.ru/metrika/tag.js", "ym");
+      
+        ym(${YANDEX_COUNTER_ID}, "init", {
+          webvisor: true,
+          clickmap: true,
+          accurateTrackBounce: true,
+          trackLinks: true
+        });
     };
-    m[i].l=1*new Date();
-    for (var j = 0; j < document.scripts.length; j++) {
-      if (document.scripts[j].src === r) {
-        return;
+    const schedule = () => {
+      if ('requestIdleCallback' in window) {
+        window.requestIdleCallback(init, { timeout: 3000 });
+      } else {
+        window.setTimeout(init, 1000);
       }
-    }
-    k=e.createElement(t),
-    a=e.getElementsByTagName(t)[0],
-    k.async=1,
-    k.src=r,
-    a.parentNode.insertBefore(k,a);
-  })(window, document, "script", "https://mc.yandex.ru/metrika/tag.js", "ym");
-
-  ym(${YANDEX_COUNTER_ID}, "init", {
-    webvisor: true,
-    clickmap: true,
-    accurateTrackBounce: true,
-    trackLinks: true
-  });
+    };
+    if (document.readyState === 'complete') schedule();
+    else window.addEventListener('load', schedule, { once: true });
+  })();
 `;
 
 const mailRuTopScript = `
-  var _tmr = window._tmr || (window._tmr = []);
-  _tmr.push({id: "3746602", type: "pageView", start: (new Date()).getTime()});
-  (function (d, w, id) {
-    if (d.getElementById(id)) return;
-    var ts = d.createElement("script"); ts.type = "text/javascript"; ts.async = true; ts.id = id;
-    ts.src = "https://top-fwz1.mail.ru/js/code.js";
-    var f = function () {var s = d.getElementsByTagName("script")[0]; s.parentNode.insertBefore(ts, s);};
-    if (w.opera == "[object Opera]") { d.addEventListener("DOMContentLoaded", f, false); } else { f(); }
-  })(document, window, "tmr-code");
+  (() => {
+    const init = () => {
+      var _tmr = window._tmr || (window._tmr = []);
+        _tmr.push({id: "3746602", type: "pageView", start: (new Date()).getTime()});
+        (function (d, w, id) {
+          if (d.getElementById(id)) return;
+          var ts = d.createElement("script"); ts.type = "text/javascript"; ts.async = true; ts.id = id;
+          ts.src = "https://top-fwz1.mail.ru/js/code.js";
+          var f = function () {var s = d.getElementsByTagName("script")[0]; s.parentNode.insertBefore(ts, s);};
+          if (w.opera == "[object Opera]") { d.addEventListener("DOMContentLoaded", f, false); } else { f(); }
+        })(document, window, "tmr-code");
+    };
+    const schedule = () => {
+      if ('requestIdleCallback' in window) {
+        window.requestIdleCallback(init, { timeout: 3000 });
+      } else {
+        window.setTimeout(init, 1000);
+      }
+    };
+    if (document.readyState === 'complete') schedule();
+    else window.addEventListener('load', schedule, { once: true });
+  })();
 `;
 
 export function Layout({ children }: { children: React.ReactNode }) {
@@ -138,6 +165,9 @@ export function Layout({ children }: { children: React.ReactNode }) {
         <Meta />
         <Links />
         <link rel="canonical" href={getCanonicalUrl(location.pathname, location.search)} />
+        {location.pathname === '/' && (
+          <link rel="preload" as="image" href={heroCover} fetchPriority="high" />
+        )}
         <link
           rel="icon"
           type="image/svg+xml"
