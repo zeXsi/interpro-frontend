@@ -64,6 +64,12 @@ export default defineConfig(({ command }) => {
         generateScopedName: '[local]-[hash:base64:8]',
       },
     },
+    build: {
+      // Lighthouse showed many tiny render-blocking stylesheets. The total CSS
+      // footprint is small enough that a single production stylesheet is cheaper
+      // than the request waterfall on the critical path.
+      cssCodeSplit: false,
+    },
     resolve: {
       alias: {
         app: setPath('./app/app'),

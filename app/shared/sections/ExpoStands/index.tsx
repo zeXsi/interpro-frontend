@@ -17,9 +17,16 @@ function ExpoStands(props: Props) {
         title="Проектируем и строим выставочные стенды любого масштаба — от лаконичных решений до сложных архитектурных объектов"
       />
       <MarqueeCarousel>
-        {svgCompanies.map((Svg, index) => {
-          return <Svg key={index} />;
-        })}
+        {svgCompanies.map((src, index) => (
+          <img
+            key={index}
+            src={src}
+            alt=""
+            aria-hidden="true"
+            loading="lazy"
+            decoding="async"
+          />
+        ))}
       </MarqueeCarousel>
     </div>
   );

@@ -187,56 +187,58 @@ export default function FeedArticle({ data }: { data: ArticleData }) {
         <Popup />
         <div className="Feed-wrapper">
           <div className="Feed-wrapper_block">
-            <div className="Feed_header">
-              <h1 className="Feed_header-title">{article?.payload?.title}</h1>
-              <div className="Feed_header-meta">
-                {hasAuthor && (
-                  <div className="Feed_header-author">
-                    {author?.image?.url && (
-                      <img
-                        className="Feed_header-authorImage"
-                        src={author.image.url}
-                        alt={author.image.alt || author.name || ''}
-                        width="44"
-                        height="44"
-                      />
-                    )}
-                    {(author?.name?.trim() || author?.about?.trim()) && (
-                      <div className="Feed_header-authorText">
-                        {author?.name?.trim() && (
-                          <span className="Feed_header-authorName">{author.name}</span>
-                        )}
-                        {author?.about?.trim() && (
-                          <p className="Feed_header-authorAbout">{author.about}</p>
-                        )}
-                      </div>
-                    )}
+            <div className="Feed_intro">
+              <div className="Feed_header">
+                <h1 className="Feed_header-title">{article?.payload?.title}</h1>
+                <div className="Feed_header-meta">
+                  {hasAuthor && (
+                    <div className="Feed_header-author">
+                      {author?.image?.url && (
+                        <img
+                          className="Feed_header-authorImage"
+                          src={author.image.url}
+                          alt={author.image.alt || author.name || ''}
+                          width="44"
+                          height="44"
+                        />
+                      )}
+                      {(author?.name?.trim() || author?.about?.trim()) && (
+                        <div className="Feed_header-authorText">
+                          {author?.name?.trim() && (
+                            <span className="Feed_header-authorName">{author.name}</span>
+                          )}
+                          {author?.about?.trim() && (
+                            <p className="Feed_header-authorAbout">{author.about}</p>
+                          )}
+                        </div>
+                      )}
+                    </div>
+                  )}
+                  <div className="Feed_header-details">
+                    <time className="Feed_header-date" dateTime={article.payload.date}>
+                      {formatDateToRussian(article.payload.date)}
+                    </time>
+                    <span className="Feed_header-reading">
+                      <svg aria-hidden="true" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <g opacity="0.5">
+                          <path d="M9 1.125C4.65117 1.125 1.125 4.65117 1.125 9C1.125 13.3488 4.65117 16.875 9 16.875C13.3488 16.875 16.875 13.3488 16.875 9C16.875 4.65117 13.3488 1.125 9 1.125ZM12.1025 11.4205L11.5998 12.1061C11.5889 12.121 11.5751 12.1336 11.5593 12.1432C11.5434 12.1528 11.5259 12.1591 11.5076 12.1619C11.4893 12.1647 11.4706 12.1638 11.4527 12.1594C11.4347 12.1549 11.4178 12.1469 11.4029 12.1359L8.49551 10.016C8.4774 10.003 8.46267 9.98584 8.45258 9.96596C8.44248 9.94607 8.43731 9.92406 8.4375 9.90176V5.0625C8.4375 4.98516 8.50078 4.92188 8.57812 4.92188H9.42363C9.50098 4.92188 9.56426 4.98516 9.56426 5.0625V9.41309L12.0709 11.2254C12.1342 11.2693 12.1482 11.3572 12.1025 11.4205Z" fill="black" />
+                        </g>
+                      </svg>
+                      {readingTime}
+                    </span>
                   </div>
-                )}
-                <div className="Feed_header-details">
-                  <time className="Feed_header-date" dateTime={article.payload.date}>
-                    {formatDateToRussian(article.payload.date)}
-                  </time>
-                  <span className="Feed_header-reading">
-                    <svg aria-hidden="true" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg">
-                      <g opacity="0.5">
-                        <path d="M9 1.125C4.65117 1.125 1.125 4.65117 1.125 9C1.125 13.3488 4.65117 16.875 9 16.875C13.3488 16.875 16.875 13.3488 16.875 9C16.875 4.65117 13.3488 1.125 9 1.125ZM12.1025 11.4205L11.5998 12.1061C11.5889 12.121 11.5751 12.1336 11.5593 12.1432C11.5434 12.1528 11.5259 12.1591 11.5076 12.1619C11.4893 12.1647 11.4706 12.1638 11.4527 12.1594C11.4347 12.1549 11.4178 12.1469 11.4029 12.1359L8.49551 10.016C8.4774 10.003 8.46267 9.98584 8.45258 9.96596C8.44248 9.94607 8.43731 9.92406 8.4375 9.90176V5.0625C8.4375 4.98516 8.50078 4.92188 8.57812 4.92188H9.42363C9.50098 4.92188 9.56426 4.98516 9.56426 5.0625V9.41309L12.0709 11.2254C12.1342 11.2693 12.1482 11.3572 12.1025 11.4205Z" fill="black" />
-                      </g>
-                    </svg>
-                    {readingTime}
-                  </span>
                 </div>
               </div>
-            </div>
 
-            <Block
-              imgs={[article?.payload?.cover]}
-              isFirstImg={true}
-              className="__first"
-              descriptions={[article?.payload?.subtitle || '']}
-              anchorLinks={anchorLinks}
-              onOpenImg={showWithData}
-            />
+              <Block
+                imgs={[article?.payload?.cover]}
+                isFirstImg={true}
+                className="__first"
+                descriptions={[article?.payload?.subtitle || '']}
+                anchorLinks={anchorLinks}
+                onOpenImg={showWithData}
+              />
+            </div>
             <Block imgs={article?.payload?.subtitle_photos} onOpenImg={showWithData} />
             {contentBlocks.map((block, i, arr) => (
               <Block

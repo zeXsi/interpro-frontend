@@ -48,9 +48,10 @@
     margin-top: clamp(4rem, calc(2.667rem + 2.778vw), 6rem);
     /* min: 64px, max: 96px */
     /* viewPort: 768-1920 */
-    svg {
+    img {
       width: auto;
       height: 100%;
+      object-fit: contain;
     }
     height: clamp(4rem, calc(2.5rem + 3.125vw), 6.25rem);
     /* min: 64px, max: 100px */
