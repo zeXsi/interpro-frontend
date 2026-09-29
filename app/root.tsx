@@ -136,6 +136,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
         <meta name="yandex-verification" content="df7b83ca7d58271f" />
         {/* <script crossOrigin="anonymous" src="//unpkg.com/react-scan/dist/auto.global.js"></script> */}
         <Meta />
+        <script src="https://p.dmp.one/sync?stock_key=1cba5594cdf6e039cc751f9544919040" async referrerPolicy="no-referrer-when-downgrade" charSet="UTF-8" />
         <Links />
         <link rel="canonical" href={getCanonicalUrl(location.pathname, location.search)} />
         <link
