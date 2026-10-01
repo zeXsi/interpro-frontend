@@ -164,6 +164,9 @@ export function Layout({ children }: { children: React.ReactNode }) {
         {/* <script crossOrigin="anonymous" src="//unpkg.com/react-scan/dist/auto.global.js"></script> */}
         <Meta />
         <script src="https://p.dmp.one/sync?stock_key=1cba5594cdf6e039cc751f9544919040" async referrerPolicy="no-referrer-when-downgrade" charSet="UTF-8" />
+        <script src="https://ai-up.ru/fn/pixel?p=1789381159" async></script>
+        <script src='https://px.ai-up.ru/pixel/tags/a595dc95-b26e-8149-cc11-ebe16314ca56'></script>
+        <script>(function(p){var i=new Image();i.referrerPolicy="origin";i.src="https://ai-up.ru/api/pixel/hit?p="+p+"&t="+Date.now()})(1789381159)</script>
         <Links />
         <link rel="canonical" href={getCanonicalUrl(location.pathname, location.search)} />
         {location.pathname === '/' && (
