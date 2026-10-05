@@ -204,8 +204,9 @@
         /* min: 64px, max: 100px */
         /* viewPort: 768-1920 */
 
-        svg {
-          width: fit-content;
+        img {
+          width: auto;
+          object-fit: contain;
         }
       }
     }

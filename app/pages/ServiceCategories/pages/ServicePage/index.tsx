@@ -250,9 +250,16 @@ export function ServicePageContent({
       <div className="wrap-clients">
         <p className="px">Наши клиенты</p>
         <MarqueeCarousel>
-          {svgCompanies.map((Svg, index) => {
-            return <Svg key={index} />;
-          })}
+          {svgCompanies.map((src, index) => (
+            <img
+              key={index}
+              src={src}
+              alt=""
+              aria-hidden="true"
+              loading="lazy"
+              decoding="async"
+            />
+          ))}
         </MarqueeCarousel>
       </div>
 

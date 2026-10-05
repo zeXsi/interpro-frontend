@@ -221,6 +221,23 @@ function createMockApi() {
       return;
     }
 
+    if (url.pathname.endsWith('/service')) {
+      sendJson(response, !slug || slug === 'full-service' ? [
+        {
+          id: 904,
+          slug: 'full-service',
+          title: { rendered: 'Full service' },
+          service_category: [903],
+          payload: {
+            title: 'Full service',
+            description: 'Full service description',
+            category: { id: 903, slug: 'full-services', name: 'Full services' },
+          },
+        },
+      ] : []);
+      return;
+    }
+
     if (url.pathname.endsWith('/blog') && slug) {
       articleRequestCount += 1;
       const title = slug === 'alpha' ? 'ALPHA' : 'BETA';
@@ -530,6 +547,22 @@ test('parallel SSR requests isolate route state and hydrate without mismatch', {
     );
 
     await assertHomeHydratesAndNavigates(appOrigin);
+
+    for (const pathname of ['/services', '/services/full-service']) {
+      const response = await fetch(`${appOrigin}${pathname}`, {
+        headers: { 'user-agent': 'Googlebot' },
+        redirect: 'manual',
+      });
+      assert.equal(response.status, 200, `${pathname} renders successfully`);
+      const html = await response.text();
+      const clients = html.match(/<div class="MarqueeCarousel-wrapper"[^>]*>(.*?)<\/div>/s);
+      assert.ok(clients, `${pathname} renders the company logo carousel`);
+      assert.match(
+        clients[1],
+        /<img\b[^>]*\bsrc="(?:data:image\/svg\+xml[^"]+|[^"]+\.svg(?:\?[^"]*)?)"[^>]*>/,
+        `${pathname} renders SVG company logo URLs as images`
+      );
+    }
 
     mockApi.clearRequestPaths();
     const presentationResponse = await fetch(`${appOrigin}/presentation/demo`, {
