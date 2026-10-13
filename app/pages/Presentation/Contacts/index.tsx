@@ -26,20 +26,21 @@ export default function Contacts({ data, id }: any) {
             {fields.ct_tg && (
               <li className="Contacts__list-item">
                 <a href={fields.ct_tg}>
-                  <Button className="Contacts__list-btn" variant="link" children="TELEGRAM" />
+                  <Button as="span" className="Contacts__list-btn" variant="link" children="TELEGRAM" />
                 </a>
               </li>
             )}
             {fields.ct_wa && (
               <li className="Contacts__list-item">
                 <a href={fields.ct_wa}>
-                  <Button className="Contacts__list-btn" variant="link" children="WHATSAPP" />
+                  <Button as="span" className="Contacts__list-btn" variant="link" children="WHATSAPP" />
                 </a>
               </li>
             )}
             <li className="Contacts__list-item">
               <a href={import.meta.env.VITE_PHONE}>
                 <Button
+                  as="span"
                   className="Contacts__list-btn"
                   variant="link"
                   children="+7 (926) 996 25-35"
@@ -49,6 +50,7 @@ export default function Contacts({ data, id }: any) {
             <li className="Contacts__list-item">
               <Link to={import.meta.env.VITE_EMAIL} typeLink="external">
                 <Button
+                  as="span"
                   className="Contacts__list-btn"
                   variant="link"
                   children={import.meta.env.VITE_EMAIL_NAME}
@@ -57,7 +59,7 @@ export default function Contacts({ data, id }: any) {
             </li>
             <li className="Contacts__list-item">
               <a href={discussLink} target="_blank">
-                <button className="Contacts__list-button">Обсудить стенд</button>
+                <span className="Contacts__list-button">Обсудить стенд</span>
               </a>
             </li>
           </ul>
@@ -67,7 +69,7 @@ export default function Contacts({ data, id }: any) {
           <ul className="Contacts__list">
             <li className="Contacts__list-item">
               <RouterLink to="/">
-                <Button className="Contacts__list-btn" variant="link" children="interpro.pro" />
+                <Button as="span" className="Contacts__list-btn" variant="link" children="interpro.pro" />
               </RouterLink>
             </li>
           </ul>

@@ -13,7 +13,7 @@ function ContactMe() {
 
   return (
     <Link to={['/', '#ContactForm']}>
-      <Button className={ `ContactMe btn ${clIsOpenMWCookies} ${clIsHidePreload}`}>связаться</Button>
+      <Button as="span" className={ `ContactMe btn ${clIsOpenMWCookies} ${clIsHidePreload}`}>связаться</Button>
     </Link>
   );
 }

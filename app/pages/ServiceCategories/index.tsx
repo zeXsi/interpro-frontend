@@ -88,7 +88,7 @@ function ItemService({ nameSlag, index, title, desc, link }: ItemServiceProps) {
         <div className="ItemService_container">
           <p className="ItemService_desc">{desc}</p>
           <Link to={link} slug={[nameSlag]}>
-            <Button.Arrow direction="right" className="ItemService_btn">
+            <Button.Arrow as="span" direction="right" className="ItemService_btn">
               узнать больше
             </Button.Arrow>
           </Link>

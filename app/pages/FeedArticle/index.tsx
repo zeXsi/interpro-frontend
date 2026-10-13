@@ -124,7 +124,7 @@ export function _meta(data: ArticleData, pathname: string) {
 
 export default function FeedArticle({ data }: { data: ArticleData }) {
   const { article, articles, slug } = data;
-  const { setCrumbs, goTo, getRouteName } = useNavigate();
+  const { setCrumbs, getRouteName } = useNavigate();
   const { Popup, showWithData } = useMWImage();
   const location = useLocation();
   const contentBlocks = article?.payload?.blocks ?? [];
@@ -255,29 +255,25 @@ export default function FeedArticle({ data }: { data: ArticleData }) {
 
           {relatedServices.length > 0 && (
             <InfoList
-              variant={'custom'}
+              variant="link"
+              isModeSlug
               underline={'center-right'}
               title={`( что делаем )`}
               className="moreServices"
-              onClick={(index) => {
-                const post = relatedServices[index];
-                const category = post?.categories?.[0];
-                if (!post || !category?.slug) return;
-
-                const path = hasSingleServiceCategory
-                  ? `/services/${post.slug}`
-                  : `/services/${category.slug}/${post.slug}`;
-
-                goTo(
-                  path,
-                  ...(hasSingleServiceCategory ? [post.title] : [category.name, post.title])
-                );
-              }}
-              items={relatedServices.map(({ title }) => [title, ''])}
+              items={relatedServices.flatMap((post) => {
+                const category = post.categories?.[0];
+                if (!category?.slug) return [];
+                return [[
+                  hasSingleServiceCategory ? [post.title] : [category.name, post.title],
+                  hasSingleServiceCategory
+                    ? `/services/${post.slug}`
+                    : `/services/${category.slug}/${post.slug}`,
+                ] as [string[], string]];
+              })}
             />
           )}
 
-          <ExampleProjects projects={article?.payload?.related_projects} goTo={goTo} />
+          <ExampleProjects projects={article?.payload?.related_projects} />
 
           <Button.Arrow
             onClick={shareLink}
@@ -300,7 +296,7 @@ export default function FeedArticle({ data }: { data: ArticleData }) {
                     date={formatDateToRussian(payload.date)}
                     title={payload.title}
                     desc={payload.subtitle}
-                    onClick={() => goTo(`/${slug}/${itemSlug}`, payload.title)}
+                    to={`/${slug}/${itemSlug}`}
                   />
                 ))}
               </div>
@@ -455,7 +451,7 @@ function Networks() {
       <Subtitle title="( наши медиа )" />
       <div className="Feed_networks-inner">
         <Link to={import.meta.env.VITE_TELEGRAM_URL_2} typeLink="external">
-          <Button subTitle="Новости и проекты" variant="outline">
+          <Button as="span" subTitle="Новости и проекты" variant="outline">
             Telegram—канал
           </Button>
         </Link>
@@ -465,27 +461,27 @@ function Networks() {
           </Button>
         </Link> */}
         <Link to={import.meta.env.VITE_YOUTUBE_URL} typeLink="external">
-          <Button className="addPadd" variant="outline">
+          <Button as="span" className="addPadd" variant="outline">
             Youtube
           </Button>
         </Link>
         <Link to={import.meta.env.VITE_INSTAGRAM_URL} typeLink="external">
-          <Button className="addPadd" variant="outline">
+          <Button as="span" className="addPadd" variant="outline">
             Instagram*
           </Button>
         </Link>
         <Link to={import.meta.env.VITE_VK_URL} typeLink="external">
-          <Button className="addPadd" variant="outline">
+          <Button as="span" className="addPadd" variant="outline">
             VK
           </Button>
         </Link>
         <Link to={import.meta.env.VITE_BEHANCE_URL} typeLink="external">
-          <Button className="addPadd" variant="outline">
+          <Button as="span" className="addPadd" variant="outline">
             Behance
           </Button>
         </Link>
         <Link to={import.meta.env.VITE_PINTEREST_URL} typeLink="external">
-          <Button className="addPadd" variant="outline">
+          <Button as="span" className="addPadd" variant="outline">
             Pinterest
           </Button>
         </Link>

@@ -31,7 +31,7 @@ export interface ProjectCardProps {
 export default function ProjectCard(props: ProjectCardProps) {
   const projectTitle = decodeUnicodeEscapes(props.title);
 
-  const refButton = useRef<HTMLButtonElement | null>(null);
+  const refButton = useRef<HTMLSpanElement | null>(null);
   useWatch(() => {
     const button = refButton.current;
     if (!button) return;
@@ -55,6 +55,7 @@ export default function ProjectCard(props: ProjectCardProps) {
       <div className="ProjectCard-title_" data-title={projectTitle}>
         <Link to={`/projects/${props.slug}`} slug={[projectTitle]}>
           <Button
+            as="span"
             variant="link"
             underline="left-right"
             className={`ProjectCard-title `}
@@ -123,7 +124,7 @@ export default function ProjectCard(props: ProjectCardProps) {
         </div>
       </Link>
       <Link to={`/projects/${props.slug}`} slug={[projectTitle]}>
-        <Button className="ProjectCard-btn" variant="ghostLink">
+        <Button as="span" className="ProjectCard-btn" variant="ghostLink">
           Смотреть проект
         </Button>
       </Link>

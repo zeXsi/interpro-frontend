@@ -30,7 +30,7 @@ export default function DesktopTemplate({ isNotPage, items }: DocOverviewProps) 
 
           <IsNot value={isNotPage}>
             <Link to="/about-us/feedbacks">
-              <Button className="btn-allFeedbacks" variant="ghostLink" children="Все отзывы" />
+              <Button as="span" className="btn-allFeedbacks" variant="ghostLink" children="Все отзывы" />
             </Link>
           </IsNot>
           <br />

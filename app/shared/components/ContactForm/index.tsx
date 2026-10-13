@@ -1,5 +1,6 @@
 import './styles.css';
 import Button from '../Button';
+import Link from '../Link';
 import Subtitle from '../Subtitle';
 
 import CheckmarkIcon from 'assets/icons/checkmark.svg?react';
@@ -396,12 +397,6 @@ export default function ContactForm({
     });
   };
 
-  const toPrivacy = (e: React.MouseEvent<HTMLSpanElement, MouseEvent>, link: string) => {
-    MWForm.v.toClosePopup?.();
-    e.stopPropagation();
-    goTo?.(link);
-  };
-
   if (type === 'service-landing' && landingPrefix) {
     return (
       <ServiceLandingForm
@@ -455,12 +450,20 @@ export default function ContactForm({
           </Button.Arrow>
           <ConsentCheckbox form={form} name="consent">
             Отправляя данные, Вы соглашаетесь с{' '}
-            <span onClick={(e) => toPrivacy(e, '/privacy')}>политикой конфиденциальности</span> и
+            <span onClick={(e) => e.stopPropagation()}>
+              <Link to="/privacy" onClick={() => MWForm.v.toClosePopup?.()}>
+                политикой конфиденциальности
+              </Link>
+            </span> и
             даете согласие на обработку персональных данных.
           </ConsentCheckbox>
           <ConsentCheckbox form={form} name="ad" className="ad" isCheckSubmitted={false}>
             Соглашаюсь получать{' '}
-            <span onClick={(e) => toPrivacy(e, '/advertising-privacy')}>рекламные материалы</span>
+            <span onClick={(e) => e.stopPropagation()}>
+              <Link to="/advertising-privacy" onClick={() => MWForm.v.toClosePopup?.()}>
+                рекламные материалы
+              </Link>
+            </span>
           </ConsentCheckbox>
         </div>
       </div>

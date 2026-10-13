@@ -5,7 +5,6 @@ import '@qtpy/use-popup/index.css';
 import Button from 'shared/components/Button';
 import Accordion from 'shared/components/Accordion';
 import { IconPlus } from 'shared/components/IconPlus';
-import { useNavigate } from 'shared/components/NavigationTracker';
 import Link from 'shared/components/Link';
 import { sgServiceCategories } from 'api/services/services.api';
 import { sgProjects } from 'api/projects/projects.api';
@@ -289,29 +288,29 @@ function Contacts({ toClosePopup }: ContactsProps) {
   }
   return (
     <div className="Contacts px">
-      <Link to={['/', '#ContactForm']}>
-        <Button variant="link" className="Contacts-title" onClick={toClosePopupYM}>
+      <Link to={['/', '#ContactForm']} onClick={toClosePopupYM}>
+        <Button as="span" variant="link" className="Contacts-title">
           оставить контакты
         </Button>
       </Link>
       <div className="Contacts-wrapper">
         <Link to={import.meta.env.VITE_PHONE} typeLink="external">
-          <Button variant="link" underline="left-right" className="Contacts-items">
+          <Button as="span" variant="link" underline="left-right" className="Contacts-items">
             +7 (499) 390 03-75
           </Button>
         </Link>
         <Link to={import.meta.env.VITE_TELEGRAM_URL_1} typeLink="external">
-          <Button variant="link" underline="left-right" className="Contacts-items">
+          <Button as="span" variant="link" underline="left-right" className="Contacts-items">
             Telegram
           </Button>
         </Link>
         <Link to={import.meta.env.VITE_WHATSAPP_URL} typeLink="external">
-          <Button variant="link" underline="left-right" className="Contacts-items">
+          <Button as="span" variant="link" underline="left-right" className="Contacts-items">
             Whatsapp
           </Button>
         </Link>
         <Link to={import.meta.env.VITE_EMAIL} typeLink="external">
-          <Button variant="link" underline="left-right" className="Contacts-items add-line-height">
+          <Button as="span" variant="link" underline="left-right" className="Contacts-items add-line-height">
             {import.meta.env.VITE_EMAIL_NAME}
           </Button>
         </Link>
@@ -327,7 +326,6 @@ function Desktop({
   toClosePopup: () => void;
   navigation: NavigationCategory[];
 }) {
-  const { goTo } = useNavigate();
   const servicesTree = useMemo(() => buildServicesTree(navigation), [navigation]);
 
   const columns = [
@@ -356,7 +354,6 @@ function Desktop({
   ];
 
   const toNavigate = (route: string, ...names: string[]) => {
-    goTo(route, ...names);
     setTimeout(() => toClosePopup(), 500);
   };
 
@@ -397,9 +394,16 @@ export function ThreeLevelNav({ columns, onNavigate }: ThreeLevelNavProps) {
               setActiveItem(item);
               setActiveSubItem(null);
             }}
-            onClick={() => item.link && onNavigate(item.link, item.label)}
           >
-            {item.label}
+            {item.link ? (
+              <Link
+                to={item.link}
+                slug={item.label}
+                onClick={() => onNavigate(item.link!, item.label)}
+              >
+                <span>{item.label}</span>
+              </Link>
+            ) : item.label}
           </li>
         ))}
       </ul>
@@ -419,15 +423,19 @@ export function ThreeLevelNav({ columns, onNavigate }: ThreeLevelNavProps) {
                 setActiveSubItem(null);
               }
             }}
-            onClick={() =>
-              child.link &&
-              onNavigate(
-                child.link,
-                ...(child.parentLabel ? [child.parentLabel, child.label] : [child.label])
-              )
-            }
           >
-            {child.label}
+            {child.link ? (
+              <Link
+                to={child.link}
+                slug={child.parentLabel ? [child.parentLabel, child.label] : [child.label]}
+                onClick={() => onNavigate(
+                  child.link!,
+                  ...(child.parentLabel ? [child.parentLabel, child.label] : [child.label])
+                )}
+              >
+                <span>{child.label}</span>
+              </Link>
+            ) : child.label}
           </li>
         ))}
       </ul>
@@ -438,11 +446,16 @@ export function ThreeLevelNav({ columns, onNavigate }: ThreeLevelNavProps) {
           <li
             key={subChild.label}
             className="ThreeLevelNav_subList-li"
-            onClick={() =>
-              subChild.link && onNavigate(subChild.link, activeSubItem!.label, subChild.label)
-            }
           >
-            {subChild.label}
+            {subChild.link ? (
+              <Link
+                to={subChild.link}
+                slug={[activeSubItem!.label, subChild.label]}
+                onClick={() => onNavigate(subChild.link!, activeSubItem!.label, subChild.label)}
+              >
+                <span>{subChild.label}</span>
+              </Link>
+            ) : subChild.label}
           </li>
         ))}
       </ul>
@@ -461,7 +474,6 @@ function Mobile({
   navigation: NavigationCategory[];
   projectCount: number;
 }) {
-  const { goTo } = useNavigate();
   const [isOpenNested, setIsOpenNested] = useState(false);
   const clIsActiveNested = isOpenNested ? 'isActiveNested' : '';
   const [typeNav, setTypeNav] = useState<'services' | 'about-us'>();
@@ -470,7 +482,6 @@ function Mobile({
     setTypeNav(str);
   };
   const toNavigate = (route: string, ...names: string[]) => {
-    goTo(route, ...names);
     setTimeout(() => {
       toClosePopup();
       changeChildren('nav');
@@ -480,15 +491,11 @@ function Mobile({
   return (
     <div className="MWNav_table px">
       <div className="MWNav_list" data-lenis-prevent>
-        <Button.Arrow
-          variant="link"
-          underline={false}
-          onClick={() => toNavigate('/projects')}
-          direction="right"
-          className="MWNav_list-li __projects"
-          //prettier-ignore
-          children={ <p>Проекты <span>{ projectCount }</span></p> }
-        />
+        <Link to="/projects" onClick={() => toNavigate('/projects')}>
+          <span className="ButtonArrow isHideUnderline MWNav_list-li __projects normal right link">
+            <span className="Button link">Проекты <span>{projectCount}</span></span>
+          </span>
+        </Link>
         <Button.Arrow
           variant="link"
           underline={false}
@@ -497,22 +504,16 @@ function Mobile({
           direction="right"
           className="MWNav_list-li nested"
         />
-        <Button.Arrow
-          variant="link"
-          underline={false}
-          onClick={() => toNavigate('/blog')}
-          children="Блог"
-          direction="right"
-          className="MWNav_list-li"
-        />
-        <Button.Arrow
-          variant="link"
-          underline={false}
-          onClick={() => toNavigate('/news')}
-          children="Новости"
-          direction="right"
-          className="MWNav_list-li"
-        />
+        <Link to="/blog" onClick={() => toNavigate('/blog')}>
+          <span className="ButtonArrow isHideUnderline MWNav_list-li normal right link">
+            <span className="Button link">Блог</span>
+          </span>
+        </Link>
+        <Link to="/news" onClick={() => toNavigate('/news')}>
+          <span className="ButtonArrow isHideUnderline MWNav_list-li normal right link">
+            <span className="Button link">Новости</span>
+          </span>
+        </Link>
         <Button.Arrow
           variant="link"
           underline={false}
@@ -521,14 +522,11 @@ function Mobile({
           direction="right"
           className="MWNav_list-li nested"
         />
-        <Button.Arrow
-          variant="link"
-          underline={false}
-          onClick={() => toNavigate('/contacts')}
-          children="контакты"
-          direction="right"
-          className="MWNav_list-li "
-        />
+        <Link to="/contacts" onClick={() => toNavigate('/contacts')}>
+          <span className="ButtonArrow isHideUnderline MWNav_list-li normal right link">
+            <span className="Button link">контакты</span>
+          </span>
+        </Link>
       </div>
       <div className={`MWNav_container  ${clIsActiveNested}`} data-lenis-prevent>
         <Button.Arrow
@@ -558,20 +556,20 @@ interface Props {
 function AboutUs({ toNavigate }: Props) {
   return (
     <ul className="AboutUs_list">
-      <li onClick={() => toNavigate('/about-us')} className="AboutUs_list-item">
-        {'О компании'}
+      <li className="AboutUs_list-item">
+        <Link to="/about-us" onClick={() => toNavigate('/about-us')}><span>О компании</span></Link>
       </li>
-      <li onClick={() => toNavigate('/about-us/feedbacks')} className="AboutUs_list-item">
-        {'Отзывы'}
+      <li className="AboutUs_list-item">
+        <Link to="/about-us/feedbacks" onClick={() => toNavigate('/about-us/feedbacks')}><span>Отзывы</span></Link>
       </li>
-      <li onClick={() => toNavigate('/faq')} className="AboutUs_list-item">
-        {'Частые вопросы'}
+      <li className="AboutUs_list-item">
+        <Link to="/faq" onClick={() => toNavigate('/faq')}><span>Частые вопросы</span></Link>
       </li>
-      <li onClick={() => toNavigate('/about-us/clients')} className="AboutUs_list-item">
-        {'Клиенты'}
+      <li className="AboutUs_list-item">
+        <Link to="/about-us/clients" onClick={() => toNavigate('/about-us/clients')}><span>Клиенты</span></Link>
       </li>
-      <li onClick={() => toNavigate('/about-us/certificates')} className="AboutUs_list-item">
-        {'Лицензии и сертификаты'}
+      <li className="AboutUs_list-item">
+        <Link to="/about-us/certificates" onClick={() => toNavigate('/about-us/certificates')}><span>Лицензии и сертификаты</span></Link>
       </li>
     </ul>
   );
@@ -591,8 +589,8 @@ function ServicesNavTable({
 
   return (
     <>
-      <li className="MWNav_title __services" onClick={() => toNavigate('/services')}>
-        Все услуги
+      <li className="MWNav_title __services">
+        <Link to="/services" onClick={() => toNavigate('/services')}><span>Все услуги</span></Link>
       </li>
       {hasSingleCategory && (
         <ul className="AboutUs_list">
@@ -600,9 +598,10 @@ function ServicesNavTable({
             <li
               key={item.link ?? item.label}
               className="AboutUs_list-item"
-              onClick={() => item.link && toNavigate(item.link, item.label)}
             >
-              {item.label}
+              <Link to={item.link!} slug={item.label} onClick={() => toNavigate(item.link!, item.label)}>
+                <span>{item.label}</span>
+              </Link>
             </li>
           ))}
         </ul>
@@ -620,19 +619,19 @@ function ServicesNavTable({
                 <ul className="Accordion_list">
                   <li
                     className="Accordion_list-item"
-                    onClick={() => toNavigate(item.link!, item.label)}
-                    children="все"
-                  />
+                  >
+                    <Link to={item.link!} slug={item.label} onClick={() => toNavigate(item.link!, item.label)}><span>все</span></Link>
+                  </li>
                   {item.children?.map((childItem) => {
                     return (
                       <li
                         key={childItem.link ?? childItem.label}
-                        onClick={() => {
-                          toNavigate(childItem.link!, item.label, childItem.label);
-                        }}
                         className="Accordion_list-item"
-                        children={childItem.label}
-                      />
+                      >
+                        <Link to={childItem.link!} slug={[item.label, childItem.label]} onClick={() => toNavigate(childItem.link!, item.label, childItem.label)}>
+                          <span>{childItem.label}</span>
+                        </Link>
+                      </li>
                     );
                   })}
                 </ul>

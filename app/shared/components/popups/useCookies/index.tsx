@@ -2,14 +2,13 @@ import './styles.css';
 import usePopup from '@qtpy/use-popup';
 import { useEffect } from 'react';
 import Button from 'shared/components/Button';
-import { useNavigate } from 'shared/components/NavigationTracker';
+import Link from 'shared/components/Link';
 import { sgIsOpenMWCookies } from 'store/stGlobal';
 
 import { useHidePreloader } from 'store/stPreloader';
 
 export default function useCookies() {
   const { Popup, ...props } = usePopup(0.4);
-  const { goTo } = useNavigate();
   const toClosePopup = () => {
     localStorage.setItem('cookies', 'saved');
     props.toClosePopup();
@@ -31,7 +30,9 @@ export default function useCookies() {
           <Popup className={`Cookies ${clIsHidePreload} opacityBeforePreloader`}>
             <p className="Cookies-text">
               Мы используем cookies. Продолжая использовать сайт, вы соглашаетесь с нашей{' '}
-              <span onClick={() => goTo('/privacy')}>Политикой конфиденциальности</span>
+              <Link to="/privacy">
+                <span>Политикой конфиденциальности</span>
+              </Link>
             </p>
             <Button onClick={toClosePopup} className="Cookies-btn" variant="secondary">
               Хорошо

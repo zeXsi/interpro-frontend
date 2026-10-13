@@ -69,7 +69,7 @@ function Template({ title, tags, link }: TemplateProps) {
       </div>
       <div className="Template_footer">
         <Link to={link}>
-          <Button variant="ghostLink">Узнать больше</Button>
+          <Button as="span" variant="ghostLink">Узнать больше</Button>
         </Link>
       </div>
     </div>

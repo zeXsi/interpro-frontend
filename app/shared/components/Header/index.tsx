@@ -4,7 +4,7 @@ import { useHidePreloader } from 'store/stPreloader';
 import useMWNav, { MWNavMode } from '../popups/useMWNav';
 
 import LogoIcon from 'assets/icons/logo.svg?react';
-import { useNavigate } from '../NavigationTracker';
+import Link from '../Link';
 
 import { memo, useEffect, useRef } from 'react';
 import { useSignalValue } from 'shared/utils/_stm/react/react';
@@ -13,7 +13,6 @@ import { sgHomeData } from 'api/home/home.api';
 import { useLocation } from 'react-router';
 
 function Header() {
-  const { goTo } = useNavigate();
   const location = useLocation();
   const projectCount = location.pathname === '/'
     ? sgHomeData.v.projects.total
@@ -76,7 +75,11 @@ function Header() {
         className={`Header px ${clIsOpenNav} ${clIsHidePreload} opacityBeforePreloader`}
       >
         <li className="Header_list-li __logo">
-          <LogoIcon className="__logo-dark" onClick={() => goTo('/')} />
+          <Link to="/">
+            <span aria-label="Interpro — главная" style={{ display: 'contents' }}>
+              <LogoIcon className="__logo-dark" />
+            </span>
+          </Link>
         </li>
         <li className="Header_list-li __menu">
           <span
@@ -85,14 +88,12 @@ function Header() {
             onClick={onClickMenu}
             children={name}
           />
-          <span
-            data-qnty={projectCount}
-            className="__projects"
-            onClick={() => goTo('/projects')}
-          >
-            <span>{'\u041f\u0440\u043e\u0435\u043a\u0442\u044b'}</span>
-            <span className="qntyProjects">{projectCount}</span>
-          </span>
+          <Link to="/projects">
+            <span data-qnty={projectCount} className="__projects">
+              <span>{'\u041f\u0440\u043e\u0435\u043a\u0442\u044b'}</span>
+              <span className="qntyProjects">{projectCount}</span>
+            </span>
+          </Link>
         </li>
         <li
           className="Header_list-li __contacts"

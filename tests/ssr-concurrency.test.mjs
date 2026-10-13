@@ -37,7 +37,7 @@ async function closeServer(server) {
   await once(server, 'close');
 }
 
-function article(slug, title, id) {
+function article(slug, title, id, type = 'blog') {
   const date = '2026-01-01T00:00:00';
   return {
     id,
@@ -47,10 +47,10 @@ function article(slug, title, id) {
     modified: date,
     modified_gmt: date,
     status: 'publish',
-    type: 'blog',
-    link: `/blog/${slug}`,
+    type,
+    link: `/${type}/${slug}`,
     title: { rendered: title },
-    guid: { rendered: `/blog/${slug}` },
+    guid: { rendered: `/${type}/${slug}` },
     featured_media: 0,
     template: '',
     news_category: [],
@@ -232,16 +232,18 @@ function createMockApi() {
             title: 'Full service',
             description: 'Full service description',
             category: { id: 903, slug: 'full-services', name: 'Full services' },
+            projects: [{ id: 905, slug: 'service-project', title: 'Service project' }],
           },
         },
       ] : []);
       return;
     }
 
-    if (url.pathname.endsWith('/blog') && slug) {
+    if ((url.pathname.endsWith('/blog') || url.pathname.endsWith('/news')) && slug) {
       articleRequestCount += 1;
-      const title = slug === 'alpha' ? 'ALPHA' : 'BETA';
-      sendJson(response, [article(slug, title, articleRequestCount)]);
+      const type = url.pathname.endsWith('/blog') ? 'blog' : 'news';
+      const title = slug === 'alpha' ? 'ALPHA' : slug === 'beta' ? 'BETA' : 'Fixture story';
+      sendJson(response, [article(slug, title, articleRequestCount, type)]);
       return;
     }
 
@@ -257,7 +259,12 @@ function createMockApi() {
         firstListBlocked.resolve();
         await releaseFirstList.promise;
       }
-      sendJson(response, []);
+      sendJson(response, [article('fixture-story', 'Fixture story', 2001)]);
+      return;
+    }
+
+    if (url.pathname.endsWith('/news') && !slug) {
+      sendJson(response, [article('fixture-news', 'Fixture news', 2002, 'news')]);
       return;
     }
 
@@ -335,6 +342,16 @@ function readSSRState(html) {
   return JSON.parse(match[1]);
 }
 
+function assertSSRLink(html, href, contentPattern, label) {
+  const links = [...html.matchAll(/<a\b([^>]*)>(.*?)<\/a>/gs)];
+  assert.ok(
+    links.some(([, attributes, content]) =>
+      attributes.match(/\bhref="([^"]*)"/)?.[1] === href && contentPattern.test(content)
+    ),
+    `${label} renders an anchor with href="${href}"`
+  );
+}
+
 async function getHtml(origin, slug) {
   const response = await fetch(`${origin}/blog/${slug}`, {
     headers: { 'user-agent': 'Googlebot' },
@@ -361,7 +378,8 @@ async function assertHydrates(origin, slug, title) {
     });
 
     await page.route('**/*', async (route) => {
-      if (new URL(route.request().url()).origin === origin) {
+      const requestOrigin = new URL(route.request().url()).origin;
+      if (requestOrigin === origin || requestOrigin.startsWith('http://127.0.0.1:')) {
         await route.continue();
       } else {
         await route.abort();
@@ -380,6 +398,21 @@ async function assertHydrates(origin, slug, title) {
     );
 
     assert.equal(await page.locator('h1.Feed_header-title').textContent(), title);
+    assert.equal(await page.locator('.NavigationTracker a[href="/"]').count(), 1);
+    assert.equal(await page.locator('.NavigationTracker a[href="/blog"]').count(), 1);
+    assert.equal(await page.locator(`.NavigationTracker a[href="/blog/${slug}"]`).count(), 0);
+    await page.evaluate(() => { window.__navigationMarker = 'article-document'; });
+    await page.locator('.NavigationTracker a[href="/blog"]').click();
+    await page.waitForURL(`${origin}/blog`);
+    assert.equal(await page.evaluate(() => window.__navigationMarker), 'article-document');
+    const storyLink = page.locator('.FeedPage_container a[href="/blog/fixture-story"]');
+    assert.equal(await storyLink.count(), 1);
+    await storyLink.locator('.Article').click();
+    await page.waitForURL(`${origin}/blog/fixture-story`);
+    await page.waitForFunction(
+      () => document.querySelector('h1.Feed_header-title')?.textContent === 'Fixture story'
+    );
+    assert.equal(await page.evaluate(() => window.__navigationMarker), 'article-document');
     assert.deepStrictEqual(hydrationErrors, []);
   } finally {
     await browser.close();
@@ -390,6 +423,9 @@ async function assertHomeHydratesAndNavigates(origin) {
   const browser = await chromium.launch({ headless: true });
   try {
     const page = await browser.newPage({ serviceWorkers: 'block' });
+    await page.addLocatorHandler(page.locator('.MWForm.isVisible'), async (popup) => {
+      await popup.locator('.MWImage-close').click();
+    });
     const hydrationErrors = [];
     const hydrationPattern =
       /hydration|hydrated|server rendered html|did not match|Minified React error #(418|423|425)/i;
@@ -412,28 +448,90 @@ async function assertHomeHydratesAndNavigates(origin) {
     });
 
     await page.goto(origin, { waitUntil: 'load' });
+    await page.waitForFunction(
+      () => window.__SSR_STATE__ && !Object.prototype.hasOwnProperty.call(window.__SSR_STATE__, 'home-data')
+    );
     await page.locator('.Header .qntyProjects').waitFor();
     assert.equal(await page.locator('.Header .qntyProjects').textContent(), '12');
     assert.equal(await page.locator('.Project-title').first().textContent(), 'COMPACT PROJECT');
+    assert.equal(await page.locator('.Header a[href="/projects"]').count(), 1);
+    assert.equal(await page.locator('.Project a[href="/projects/compact-project"]').count(), 1);
+    for (const href of ['/', '/mapping', '/privacy', '/advertising-privacy']) {
+      assert.equal(await page.locator(`.Footer_bottom a[href="${href}"]`).count(), 1);
+    }
+    assert.equal(await page.locator('a button').count(), 0);
+    await page.evaluate(() => { window.__navigationMarker = 'home-document'; });
+    const originalUrl = page.url();
+    const [popup] = await Promise.all([
+      page.context().waitForEvent('page'),
+      page.locator('.Header a[href="/projects"] .__projects').click({ modifiers: ['Control'] }),
+    ]);
+    try {
+      await popup.waitForURL(`${origin}/projects`);
+      assert.equal(page.url(), originalUrl);
+      assert.equal(await page.evaluate(() => window.__navigationMarker), 'home-document');
+    } finally {
+      await popup.close();
+    }
     await page.locator('.Header .__menu-self').hover();
     const desktopMenu = page.locator('.MWNav_desktop');
-    await desktopMenu.getByText('Услуги', { exact: true }).hover();
-    await desktopMenu.getByText('Compact service', { exact: true }).waitFor();
-    await page.locator('.Header .__menu-self').click();
+    await desktopMenu.locator('a[href="/services"] span').hover();
+    await desktopMenu.locator('a[href="/services/compact-service"]').waitFor();
+    for (const href of ['/blog', '/news', '/about-us', '/contacts']) {
+      assert.equal(await desktopMenu.locator(`a[href="${href}"]`).count(), 1);
+    }
+    await desktopMenu.locator('a[href="/services"] span').click();
+    await page.waitForURL(`${origin}/services`);
+    assert.equal(await page.evaluate(() => window.__navigationMarker), 'home-document');
+    assert.equal(await page.locator('a[href="/services/full-service"]').first().getAttribute('href'), '/services/full-service');
+    await desktopMenu.waitFor({ state: 'hidden' });
+    const serviceLink = page.locator('.moreServices a[href="/services/full-service"]');
+    assert.equal(await serviceLink.locator('button').count(), 0);
+    const servicesUrl = page.url();
+    const [servicePopup] = await Promise.all([
+      page.context().waitForEvent('page'),
+      serviceLink.locator('.Button').click({ modifiers: ['Control'] }),
+    ]);
+    try {
+      await servicePopup.waitForURL(`${origin}/services/full-service`);
+      assert.equal(page.url(), servicesUrl);
+      assert.equal(await page.evaluate(() => window.__navigationMarker), 'home-document');
+    } finally {
+      await servicePopup.close();
+    }
+    await page.locator('.NavigationTracker a[href="/"]').click();
+    await page.waitForURL(`${origin}/`);
+    await page.waitForFunction(
+      () => document.querySelector('.Project-title')?.textContent === 'COMPACT PROJECT'
+    );
 
-    await page.locator('a[href="/faq"]').first().evaluate((link) => link.click());
+    await page.locator('.Footer a[href="/faq"] .Button').click();
     await page.waitForURL(`${origin}/faq`);
+    assert.equal(await page.evaluate(() => window.__navigationMarker), 'home-document');
     await page.waitForFunction(
       () => document.querySelectorAll('.FAQSection_right-items .Accordion').length > 0
     );
     assert.notEqual(await page.locator('.Header .qntyProjects').textContent(), '0');
     assert.match(await page.locator('.FAQSection').textContent(), /Full question\?/);
-    await page.locator('.Header_list-li.__logo svg').click();
+    await page.locator('.Header_list-li.__logo a[href="/"] svg').click();
     await page.waitForURL(`${origin}/`);
     await page.waitForFunction(
       () => document.querySelector('.Header .qntyProjects')?.textContent === '12'
     );
     assert.equal(await page.locator('.Header .qntyProjects').textContent(), '12');
+    assert.equal(await page.evaluate(() => window.__navigationMarker), 'home-document');
+    await page.setViewportSize({ width: 390, height: 844 });
+    // Avoid desktop mouseenter opening the menu before the mobile click toggles it.
+    await page.locator('.Header .__menu-self').dispatchEvent('click');
+    const mobileMenu = page.locator('.MWNav_table');
+    await mobileMenu.waitFor({ state: 'visible' });
+    for (const href of ['/projects', '/blog', '/news', '/contacts']) {
+      assert.equal(await mobileMenu.locator(`a[href="${href}"]`).count(), 1);
+    }
+    await mobileMenu.getByRole('button', { name: 'О нас', exact: true }).click();
+    await mobileMenu.locator('a[href="/faq"] span').click();
+    await page.waitForURL(`${origin}/faq`);
+    assert.equal(await page.evaluate(() => window.__navigationMarker), 'home-document');
     assert.deepStrictEqual(hydrationErrors, []);
   } finally {
     await browser.close();
@@ -503,6 +601,14 @@ test('parallel SSR requests isolate route state and hydrate without mismatch', {
     assert.match(homeHtml, /qntyProjects[^>]*>12</);
     assert.match(homeHtml, /Compact question\?/);
     assert.match(homeHtml, /Compact company/);
+    assertSSRLink(homeHtml, '/', /__logo-dark/, 'header logo');
+    assertSSRLink(homeHtml, '/projects', /qntyProjects/, 'header projects');
+    assertSSRLink(homeHtml, '/projects/compact-project', /Project_img/, 'home project cover');
+    assertSSRLink(homeHtml, '/projects', /Все проекты/, 'all projects');
+    assertSSRLink(homeHtml, '/', /Footer_bottom-logo/, 'footer logo');
+    assertSSRLink(homeHtml, '/mapping', /карта сайта/, 'footer sitemap');
+    assertSSRLink(homeHtml, '/privacy', /политика конфиденциальности/, 'footer privacy');
+    assertSSRLink(homeHtml, '/advertising-privacy', /Политика рекламных материалов/, 'footer advertising privacy');
     const bodyIndex = homeHtml.indexOf('<body>');
     const homeContentIndex = homeHtml.indexOf('Compact question?');
     const stateScriptIndex = homeHtml.indexOf("window['__SSR_STATE__']");
@@ -555,6 +661,11 @@ test('parallel SSR requests isolate route state and hydrate without mismatch', {
       });
       assert.equal(response.status, 200, `${pathname} renders successfully`);
       const html = await response.text();
+      if (pathname === '/services') {
+        assertSSRLink(html, '/services/full-service', /Full service/, 'service list item');
+      } else {
+        assertSSRLink(html, '/projects/service-project', /title-project[^>]*>Service project/, 'service project slide');
+      }
       const clients = html.match(/<div class="MarqueeCarousel-wrapper"[^>]*>(.*?)<\/div>/s);
       assert.ok(clients, `${pathname} renders the company logo carousel`);
       assert.match(
@@ -615,6 +726,20 @@ test('parallel SSR requests isolate route state and hydrate without mismatch', {
     assert.match(alphaHtml, /https:\/\/cdn\.interpro\.pro\/wp-content\/uploads\/alpha\.webp/);
     assert.doesNotMatch(JSON.stringify(alphaState), /BETA|"beta"/);
     assert.doesNotMatch(JSON.stringify(betaState), /ALPHA|"alpha"/);
+    assertSSRLink(alphaHtml, '/blog/fixture-story', /class="Article"/, 'related blog article');
+    assertSSRLink(betaHtml, '/blog/fixture-story', /class="Article"/, 'related blog article');
+
+    // Keep list requests after the blocked concurrent SSR scenario above.
+    for (const [type, slug] of [['blog', 'fixture-story'], ['news', 'fixture-news']]) {
+      const response = await fetch(`${appOrigin}/${type}`, {
+        headers: { 'user-agent': 'Googlebot' },
+      });
+      assert.equal(response.status, 200);
+      const html = await response.text();
+      assertSSRLink(html, `/${type}/${slug}`, /class="Article"/, `${type} article card`);
+      const otherType = type === 'blog' ? 'news' : 'blog';
+      assertSSRLink(html, `/${otherType}`, new RegExp(otherType === 'blog' ? 'Блог' : 'Новости'), `${type} feed tab`);
+    }
 
     await assertHydrates(appOrigin, 'alpha', 'ALPHA');
     await assertHydrates(appOrigin, 'beta', 'BETA');
