@@ -8,7 +8,6 @@ import Link from 'shared/components/Link';
 
 import { useRef, useState } from 'react';
 
-import { useNavigate } from 'shared/components/NavigationTracker';
 import IsNot from 'shared/components/IsNot';
 
 import { FeedCategory, FeedItem } from 'api/feed/feed.types';
@@ -116,7 +115,6 @@ export default function FeedPage({ data }: { data: Props }) {
 
   const [currPage, setPage] = useState(qparams.page ?? 1);
   const refItemId = useRef(qparams.blog_category ?? 0);
-  const { goTo } = useNavigate();
 
   const setParams = (qparams: QParams & { category?: number }) => {
     const next = new URLSearchParams(searchParams);
@@ -194,7 +192,7 @@ export default function FeedPage({ data }: { data: Props }) {
               date={formatDateToRussian(payload.date)}
               title={payload.title}
               desc={payload.subtitle}
-              onClick={() => goTo(`/${typeFeed}/${slug}`, payload.title)}
+              to={`/${typeFeed}/${slug}`}
             />
           ))}
         </div>

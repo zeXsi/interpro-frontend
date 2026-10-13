@@ -57,7 +57,7 @@ export default function PresentationHeader() {
           </li>
           <li className="PresentationHeader__item">
             <a href={pdfHref} target="_blank" rel="noopener noreferrer">
-              <button className="PresentationHeader__item-button">
+              <span className="PresentationHeader__item-button">
                 Cкачать .pdf{' '}
                 <svg
                   width="11"
@@ -75,10 +75,10 @@ export default function PresentationHeader() {
                     fill="black"
                   />
                 </svg>
-              </button>
+              </span>
             </a>
             <a href={discussLink} target="_blank" rel="noopener noreferrer">
-              <button className="PresentationHeader__item-button">Обсудить стенд</button>
+              <span className="PresentationHeader__item-button">Обсудить стенд</span>
             </a>
           </li>
         </ul>

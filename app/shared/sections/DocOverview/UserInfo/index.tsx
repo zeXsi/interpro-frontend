@@ -32,7 +32,7 @@ export default function UserInfo(props: UserInfoProps) {
           <div className="UserInfo_footer">
             <span>Благодарственное письмо:</span>
             <a href={normalizedDocLink} rel="noopener noreferrer nofollow" target="_blank">
-              <Button variant="ghostLink">{`${props.docName}${fileExtension}`}</Button>
+              <Button as="span" variant="ghostLink">{`${props.docName}${fileExtension}`}</Button>
             </a>
           </div>
         ) : (

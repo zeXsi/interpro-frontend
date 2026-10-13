@@ -140,7 +140,7 @@ export function ServiceCategoryContent({
   directServiceLinks = false,
 }: ServiceCategoryContentProps) {
   const clIsImg = !!data?.payload.cover ? 'with-img' : '';
-  const { goTo, setCrumbs } = useNavigate();
+  const { setCrumbs } = useNavigate();
   const contactFormRef = useRef<HTMLDivElement>(null);
 
   useLayoutEffect(() => {
@@ -202,24 +202,17 @@ export function ServiceCategoryContent({
 
         {data?.payload?.posts?.length > 0 && (
           <InfoList
-            variant={'custom'}
+            variant={'link'}
             underline={'center-right'}
             title={`( что делаем )`}
             className='moreServices'
-            onClick={(index) => {
-              const post = data?.payload?.posts[index];
-              if (!post) return;
-
-              const path = directServiceLinks
-                ? `/services/${post.slug}`
-                : `/services/${categorySlug}/${post.slug}`;
-
-              goTo(
-                path,
-                ...(directServiceLinks ? [post.title] : [data?.payload.name, post.title])
-              );
-            }}
-            items={data?.payload?.posts?.map(({ title }) => [title, '']) || []}
+            isModeSlug
+            items={data?.payload?.posts?.map(({ title, slug }) => [
+              directServiceLinks ? title : [data.payload.name, title],
+              directServiceLinks
+                ? `/services/${slug}`
+                : `/services/${categorySlug}/${slug}`,
+            ]) || []}
           />
         )}
 
@@ -273,7 +266,7 @@ export function ServiceCategoryContent({
               to={`/services/${data.nextItem.slug}`}
               slug={data.nextItem.title}
             >
-              <Button.Arrow variant="link" direction="right" className="ItemService_btn">
+              <Button.Arrow as="span" variant="link" direction="right" className="ItemService_btn">
                 {data.nextItem.title}
               </Button.Arrow>
             </Link>
@@ -281,7 +274,7 @@ export function ServiceCategoryContent({
         )}
       </div>
 
-      <ExampleProjects projects={data?.payload.projects} goTo={goTo} />
+      <ExampleProjects projects={data?.payload.projects} />
 
       {(data?.payload.reviews?.length ?? 0) > 0 && (
         <DocOverview
@@ -353,19 +346,16 @@ export function ServiceCategoryContent({
             className="News__swiper"
           >
             {data?.payload.news?.map((item) => (
-              <SwiperSlide
-                key={item.id}
-                onClick={() =>
-                  goTo(
-                    `/${item?.permalink.indexOf('blog') < 0 ? 'news' : 'blog'}/${item.slug}`,
-                    item.title
-                  )
-                }
-              >
-                {item.full_image?.url && (
-                  <img src={item.full_image?.url} alt={`Новость: ${item.name}`} />
-                )}
-                {item.name && <p className="title-news">{item.name}</p>}
+              <SwiperSlide key={item.id}>
+                <Link
+                  to={`/${item?.permalink.indexOf('blog') < 0 ? 'news' : 'blog'}/${item.slug}`}
+                  slug={item.title}
+                >
+                  {item.full_image?.url && (
+                    <img src={item.full_image?.url} alt={`Новость: ${item.name}`} />
+                  )}
+                  {item.name && <p className="title-news">{item.name}</p>}
+                </Link>
               </SwiperSlide>
             ))}
           </Swiper>

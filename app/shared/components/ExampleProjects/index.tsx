@@ -3,6 +3,7 @@ import { Swiper, SwiperSlide } from 'swiper/react';
 import { Navigation, Pagination } from 'swiper/modules';
 import ArrowIcon from 'assets/icons/arrow.svg?react';
 import { decodeUnicodeEscapes } from 'shared/utils/decodeUnicodeEscapes';
+import Link from 'shared/components/Link';
 
 type ProjectItem = {
   id: number;
@@ -14,10 +15,9 @@ type ProjectItem = {
 
 interface ExampleProjectsProps {
   projects?: ProjectItem[];
-  goTo: (path: string, ...customNames: string[]) => void;
 }
 
-export default function ExampleProjects({ projects = [], goTo }: ExampleProjectsProps) {
+export default function ExampleProjects({ projects = [] }: ExampleProjectsProps) {
   if (projects.length === 0) {
     return null;
   }
@@ -46,14 +46,16 @@ export default function ExampleProjects({ projects = [], goTo }: ExampleProjects
             const projectName = decodeUnicodeEscapes(item.name ?? item.title ?? '');
 
             return (
-              <SwiperSlide key={item.id} onClick={() => goTo(`/projects/${item.slug}`, projectName)}>
-                {projectName && <p className="title-project">{projectName}</p>}
-                {item.full_image?.url && (
-                  <img
-                    src={item.full_image.url}
-                    alt={projectName ? `Проект ${projectName}` : 'Проект'}
-                  />
-                )}
+              <SwiperSlide key={item.id}>
+                <Link to={`/projects/${item.slug}`} slug={projectName}>
+                  {projectName && <p className="title-project">{projectName}</p>}
+                  {item.full_image?.url && (
+                    <img
+                      src={item.full_image.url}
+                      alt={projectName ? `Проект ${projectName}` : 'Проект'}
+                    />
+                  )}
+                </Link>
               </SwiperSlide>
             );
           })}

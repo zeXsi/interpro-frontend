@@ -73,7 +73,7 @@ function FAQContent({ items, showAllLink }: { items: FAQItem[]; showAllLink: boo
           //prettier-ignore
           showAllLink && (
             <Link to="/faq">
-              <Button.Arrow direction='right' className='FAQSection_right-btn' >
+              <Button.Arrow as="span" direction='right' className='FAQSection_right-btn' >
                 Все вопросы
               </Button.Arrow> 
             </Link>

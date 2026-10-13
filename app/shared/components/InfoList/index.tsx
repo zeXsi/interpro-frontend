@@ -58,7 +58,7 @@ export default function InfoList({
       : [];
 
     const button = (
-      <Button variant="link" className="InfoList-item" underline={underline}>
+      <Button as={src && variant === 'link' ? 'span' : 'button'} variant="link" className="InfoList-item" underline={underline}>
         {renderLabel(label)}
       </Button>
     );

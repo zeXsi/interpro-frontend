@@ -1,6 +1,6 @@
-import Button from 'shared/components/Button';
+import 'shared/components/Button/styles.css';
 import './styles.css';
-import { useNavigate } from 'shared/components/NavigationTracker';
+import Link from 'shared/components/Link';
 import StartPage from 'shared/components/StartPage';
 
 export function loader() {
@@ -8,8 +8,6 @@ export function loader() {
 }
 
 export default function ErrorNotFound() {
-  const { goTo } = useNavigate();
-
   return (
     <>
       <StartPage>
@@ -19,9 +17,9 @@ export default function ErrorNotFound() {
             <p className="ErrorNotFound-desc">
               Такой страницы нет — возможно, она ещё не построена
             </p>
-            <Button variant="ghostLink" onClick={() => goTo('/')}>
-              На главную
-            </Button>
+            <Link to="/">
+              <span className="Button ghostLink center-right">На главную</span>
+            </Link>
           </div>
         </div>
       </StartPage>

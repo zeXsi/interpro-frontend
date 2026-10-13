@@ -16,7 +16,7 @@ export default function AboutUsMedia() {
       </div>
       <div className="AboutUsMedia-networks ">
         <Link to={import.meta.env.VITE_TELEGRAM_URL_2} typeLink="external">
-          <Button subTitle="Новости и проекты" variant="outline">
+          <Button as="span" subTitle="Новости и проекты" variant="outline">
             Telegram—канал
           </Button>
         </Link>
@@ -26,27 +26,27 @@ export default function AboutUsMedia() {
           </Button>
         </Link> */}
         <Link to={import.meta.env.VITE_YOUTUBE_URL} typeLink="external">
-          <Button className="addPadd" variant="outline">
+          <Button as="span" className="addPadd" variant="outline">
             Youtube
           </Button>
         </Link>
         <Link to={import.meta.env.VITE_INSTAGRAM_URL} typeLink="external">
-          <Button className="addPadd" variant="outline">
+          <Button as="span" className="addPadd" variant="outline">
             Instagram*
           </Button>
         </Link>
         <Link to={import.meta.env.VITE_VK_URL} typeLink="external">
-          <Button className="addPadd" variant="outline">
+          <Button as="span" className="addPadd" variant="outline">
             VK
           </Button>
         </Link>
         <Link to={import.meta.env.VITE_BEHANCE_URL} typeLink="external">
-          <Button className="addPadd" variant="outline">
+          <Button as="span" className="addPadd" variant="outline">
             Behance
           </Button>
         </Link>
         <Link to={import.meta.env.VITE_PINTEREST_URL} typeLink="external">
-          <Button className="addPadd" variant="outline">
+          <Button as="span" className="addPadd" variant="outline">
             Pinterest
           </Button>
         </Link>

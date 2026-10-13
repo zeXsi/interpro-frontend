@@ -1,4 +1,4 @@
-import { useLocation, useNavigate as _useNavigate } from 'react-router';
+import { Link as RouterLink, useLocation, useNavigate as _useNavigate } from 'react-router';
 import './styles.css';
 
 import React, { useEffect, useImperativeHandle, useRef } from 'react';
@@ -141,7 +141,7 @@ interface Props {
 export default function NavigationTracker({ ref }: Props) {
   useSignalValue(isCrumbs);
   const location = useLocation();
-  const { goTo, getRouteName } = useNavigate();
+  const { getRouteName } = useNavigate();
 
   const pathnames = location.pathname.split('/').filter(Boolean);
   const refNv = useRef<HTMLDivElement>(null);
@@ -165,11 +165,15 @@ export default function NavigationTracker({ ref }: Props) {
             const shouldRenderLineResult = shouldRenderLine(index, pathnames, getRouteName);
             return (
               <React.Fragment key={to}>
-                <span
-                  onClick={isLastItem ? () => goTo(to) : undefined}
-                  className={`NavigationTracker-item ${isActive ? 'active' : ''}`}
-                  children={label}
-                />
+                {isLastItem ? (
+                  <RouterLink to={to} className="NavigationTracker-item">
+                    {label}
+                  </RouterLink>
+                ) : (
+                  <span className={`NavigationTracker-item ${isActive ? 'active' : ''}`}>
+                    {label}
+                  </span>
+                )}
                 {isLastItem && shouldRenderLineResult && (
                   <span className="NavigationTracker-line line">-</span>
                 )}

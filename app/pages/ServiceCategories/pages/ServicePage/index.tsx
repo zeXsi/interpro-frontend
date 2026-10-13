@@ -114,7 +114,7 @@ export function ServicePageContent({
   serviceSlug,
   isDirectPath = false,
 }: ServicePageContentProps) {
-  const { setCrumbs, goTo } = useNavigate();
+  const { setCrumbs } = useNavigate();
   const contactFormRef = useRef<HTMLDivElement>(null);
 
   useLayoutEffect(() => {
@@ -224,7 +224,7 @@ export function ServicePageContent({
                   : [data?.payload.category.name ?? '', data.nextItem.title ?? '']
               }
             >
-              <Button.Arrow variant="link" direction="right" className="ItemService_btn">
+              <Button.Arrow as="span" variant="link" direction="right" className="ItemService_btn">
                 {data.nextItem.title}
               </Button.Arrow>
             </Link>
@@ -232,7 +232,7 @@ export function ServicePageContent({
         )}
       </div>
 
-      <ExampleProjects projects={data?.payload.projects} goTo={goTo} />
+      <ExampleProjects projects={data?.payload.projects} />
 
       {(data?.payload.reviews?.length ?? 0) > 0 && (
         <DocOverview
@@ -304,19 +304,16 @@ export function ServicePageContent({
             className="News__swiper"
           >
             {data?.payload.news?.map((item) => (
-              <SwiperSlide
-                key={item.id}
-                onClick={() =>
-                  goTo(
-                    `/${item?.permalink.indexOf('blog') < 0 ? 'news' : 'blog'}/${item.slug}`,
-                    item.title
-                  )
-                }
-              >
-                {item.full_image?.url && (
-                  <img src={item.full_image?.url} alt={`Новость: ${item.name}`} />
-                )}
-                {item.name && <p className="title-news">{item.name}</p>}
+              <SwiperSlide key={item.id}>
+                <Link
+                  to={`/${item?.permalink.indexOf('blog') < 0 ? 'news' : 'blog'}/${item.slug}`}
+                  slug={item.title}
+                >
+                  {item.full_image?.url && (
+                    <img src={item.full_image?.url} alt={`Новость: ${item.name}`} />
+                  )}
+                  {item.name && <p className="title-news">{item.name}</p>}
+                </Link>
               </SwiperSlide>
             ))}
           </Swiper>
