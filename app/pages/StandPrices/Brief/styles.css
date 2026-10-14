@@ -1,0 +1,1655 @@
+/* Бриф. Значения из Figma: десктоп 1096×650, планшет 600×704, мобилка — на весь экран.
+   Fluid-интерполяция: 768–1920 и 375–768. */
+
+.Popup.Brief {
+  &::before {
+    backdrop-filter: blur(30px);
+  }
+
+  .Popup_container {
+    align-items: center;
+    justify-content: center;
+  }
+}
+
+.Brief-dialog {
+  display: flex;
+  align-items: flex-start;
+  gap: 1rem;
+  /* модалка + кнопка закрытия справа, по центру экрана */
+  margin-left: 4rem;
+}
+
+.Brief-close {
+  order: 2;
+  flex-shrink: 0;
+  width: 3rem;
+  height: 3rem;
+  border-radius: 100px;
+  background: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: opacity 0.3s ease-out;
+
+  @media (hover: hover) {
+    &:hover {
+      opacity: 0.7;
+    }
+  }
+}
+
+.Brief-modal {
+  width: 68.5rem;
+  max-width: calc(100vw - 10rem);
+  height: 40.625rem;
+  max-height: calc(100svh - 2rem);
+  overflow-x: hidden;
+  overflow-y: auto;
+  background: #fff;
+
+  .Brief-modalInner {
+    display: contents;
+  }
+}
+
+.Brief-step {
+  min-height: 100%;
+  padding: clamp(1.5rem, calc(1.167rem + 0.694vw), 2rem); /* 24px @768 → 32px @1920 */
+  display: flex;
+  flex-direction: column;
+  gap: clamp(1.5rem, calc(0.5rem + 2.083vw), 3rem); /* 24px @768 → 48px @1920 */
+}
+
+/* ---------- Прогресс ---------- */
+
+.Brief-progress {
+  display: flex;
+  gap: 6px;
+
+  span {
+    flex: 1;
+    height: 2px;
+    display: flex;
+    background: #ebebeb;
+    overflow: hidden;
+  }
+
+  /* чёрная полоска заполняет сегмент слева направо */
+  i {
+    flex: 1;
+    background: #000;
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform 0.5s ease;
+  }
+
+  .isActive i {
+    transform: scaleX(1);
+  }
+}
+
+/* ---------- Раскладка шага ---------- */
+
+.Brief-body {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.Brief-layout {
+  flex: 1;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  column-gap: 1rem;
+  align-items: start;
+
+  &.isStacked {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+  }
+}
+
+.Brief-question {
+  max-width: 25.75rem;
+  font-family: var(--font-family);
+  font-weight: 400;
+  font-size: clamp(2rem, calc(1.833rem + 0.347vw), 2.25rem); /* 32px @768 → 36px @1920 */
+  line-height: 110%;
+  letter-spacing: -0.04em;
+  color: #000;
+}
+
+/* перенос только на планшете и мобилке */
+.Brief-compactBreak {
+  display: none;
+}
+
+.Brief-content {
+  min-width: 0;
+}
+
+.is-area .Brief-content,
+.is-contacts .Brief-content {
+  padding-top: 1rem;
+}
+
+.is-budget .Brief-content,
+.is-exhibition .Brief-content {
+  padding-top: 9rem;
+}
+
+.is-zones .Brief-layout {
+  gap: 3rem;
+}
+
+.is-contacts {
+  .Brief-layout {
+    grid-template-rows: auto 1fr;
+    align-items: stretch;
+  }
+
+  .Brief-content {
+    grid-column: 2;
+    grid-row: 1 / 3;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .Brief-contacts {
+    flex: 1;
+  }
+}
+
+.Brief-aside {
+  grid-column: 1;
+  grid-row: 2;
+  align-self: end;
+}
+
+/* ---------- Навигация ---------- */
+
+.Brief-nav {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
+  .Brief-next {
+    margin-left: auto;
+  }
+}
+
+.Brief-navButton {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  width: fit-content;
+  cursor: pointer;
+  color: #000;
+  transition: opacity 0.3s ease-out;
+
+  span {
+    font-family: var(--font-family);
+    font-weight: 400;
+    font-size: 1.125rem;
+    line-height: 120%;
+    letter-spacing: -0.04em;
+    text-decoration: underline;
+    text-decoration-skip-ink: none;
+    text-decoration-thickness: 1px;
+    text-underline-offset: 0.25em;
+  }
+
+  svg {
+    width: 1rem;
+    height: 1rem;
+    flex-shrink: 0;
+
+    &.isBack {
+      transform: rotate(180deg);
+    }
+  }
+
+  &.isMuted {
+    opacity: 0.5;
+  }
+
+  &:disabled {
+    cursor: default;
+  }
+}
+
+/* ---------- Общие подписи карточек ---------- */
+
+.Brief-cardTitle {
+  font-family: var(--font-family);
+  font-weight: 400;
+  font-size: 1.125rem;
+  line-height: 136%;
+  letter-spacing: -0.04em;
+  color: #000;
+}
+
+.Brief-cardText {
+  font-family: var(--font-family);
+  font-weight: 400;
+  font-size: 0.875rem;
+  line-height: 110%;
+  letter-spacing: -0.04em;
+  color: #000;
+  opacity: 0.5;
+}
+
+.Brief-radio {
+  width: 1rem;
+  height: 1rem;
+  flex-shrink: 0;
+  border-radius: 50%;
+  border: 1px solid rgb(0 0 0 / 0.6);
+  transition:
+    background 0.2s ease-out,
+    border-color 0.2s ease-out;
+}
+
+/* ---------- 1. Тип стенда ---------- */
+
+.Brief-types {
+  display: grid;
+  grid-template-columns: repeat(3, 9.938rem);
+  gap: 1rem;
+}
+
+.Brief-typeCard {
+  position: relative;
+  height: 13.313rem;
+  padding: 0 1rem 1rem;
+  background: rgb(0 0 0 / 0.03);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  text-align: center;
+  cursor: pointer;
+
+  input {
+    position: absolute;
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  .Brief-radio {
+    position: absolute;
+    top: 0.5rem;
+    left: 0.5rem;
+  }
+
+  &.isActive .Brief-radio {
+    background: #000;
+    border-color: #000;
+  }
+
+  &:has(input:focus-visible) {
+    outline: 1px solid #000;
+  }
+}
+
+.Brief-typeImage {
+  width: 7.75rem;
+  height: 7.75rem;
+  flex-shrink: 0;
+
+  svg {
+    width: 100%;
+    height: 100%;
+  }
+}
+
+/* ---------- 2. Площадь ---------- */
+
+.Brief-area {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 3rem;
+}
+
+/* поля и чекбокс «второй этаж» стоят ближе друг к другу, чем блоки шага */
+.Brief-areaGroup {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 1.5rem;
+}
+
+.Brief-range {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.Brief-rangeTrack {
+  position: relative;
+  height: 1rem;
+  background: linear-gradient(
+      to right,
+      transparent calc(var(--from)),
+      #000 calc(var(--from)),
+      #000 calc(var(--to)),
+      transparent calc(var(--to))
+    )
+    center / calc(100% - 1rem) 2px no-repeat,
+    linear-gradient(#eee, #eee) center / 100% 2px no-repeat;
+
+  input {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    margin: 0;
+    background: none;
+    appearance: none;
+    pointer-events: none;
+
+    &::-webkit-slider-thumb {
+      width: 1rem;
+      height: 1rem;
+      border-radius: 50%;
+      background: #000;
+      appearance: none;
+      pointer-events: auto;
+      cursor: grab;
+    }
+
+    &::-moz-range-thumb {
+      width: 1rem;
+      height: 1rem;
+      border: none;
+      border-radius: 50%;
+      background: #000;
+      pointer-events: auto;
+      cursor: grab;
+    }
+
+    &::-moz-range-track {
+      background: none;
+    }
+  }
+}
+
+.Brief-rangeLabels {
+  display: flex;
+  justify-content: space-between;
+
+  span {
+    padding: 0.5rem;
+    border-radius: 0.5rem;
+    background: #eee;
+    font-family: var(--font-family);
+    font-weight: 400;
+    font-size: 0.875rem;
+    line-height: 136%;
+    letter-spacing: -0.04em;
+    color: #000;
+  }
+}
+
+.Brief-range.isDefault .Brief-rangeLabels span {
+  color: rgb(0 0 0 / 0.4);
+}
+
+.Brief-fields {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 2.25rem;
+
+  &.isNarrow {
+    width: 20.813rem;
+    gap: 1rem;
+
+    .Brief-field input {
+      padding-top: 0.5rem;
+    }
+  }
+}
+
+.Brief-hint {
+  max-width: 20.813rem;
+  font-family: var(--font-family);
+  font-weight: 400;
+  font-size: 0.75rem;
+  line-height: 136%;
+  letter-spacing: -0.04em;
+  color: #000;
+  opacity: 0.4;
+}
+
+/* ---------- Поле и чекбокс ---------- */
+
+.Brief-field {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  width: 100%;
+
+  input {
+    width: 100%;
+    padding: 0 0 0.5rem;
+    border: none;
+    border-bottom: 1px solid rgb(0 0 0 / 0.1);
+    border-radius: 0;
+    background: none;
+    outline: none;
+    font-family: var(--font-family);
+    font-weight: 400;
+    font-size: 1.125rem;
+    line-height: 136%;
+    letter-spacing: -0.04em;
+    color: #000;
+
+    &::placeholder {
+      color: rgb(0 0 0 / 0.6);
+      transition: color 0.3s ease;
+    }
+
+    /* при фокусе подпись бледнеет до 20% */
+    &:focus::placeholder {
+      color: rgb(0 0 0 / 0.2);
+    }
+  }
+}
+
+/* «13 (м)»: суффикс стоит за значением, сам текст поля невидим в копии */
+.Brief-field:has(.Brief-fieldSuffix) {
+  position: relative;
+}
+
+.Brief-fieldSuffix {
+  position: absolute;
+  left: 0;
+  bottom: calc(0.5rem + 1px); /* над нижней линией поля, вровень с текстом */
+  pointer-events: none;
+  white-space: pre;
+  font-family: var(--font-family);
+  font-weight: 400;
+  font-size: 1.125rem;
+  line-height: 136%;
+  letter-spacing: -0.04em;
+  color: #000;
+
+  span {
+    visibility: hidden;
+  }
+}
+
+.Brief-fieldError,
+.Brief-filesError,
+.Brief-consentError {
+  font-family: var(--font-family);
+  font-weight: 400;
+  font-size: 0.75rem;
+  line-height: 136%;
+  letter-spacing: -0.04em;
+  color: #ff3b30;
+}
+
+.Brief-checkbox {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+  font-family: var(--font-family);
+  font-weight: 400;
+  font-size: 0.875rem;
+  line-height: 136%;
+  letter-spacing: -0.04em;
+  color: #000;
+
+  input {
+    position: absolute;
+    opacity: 0;
+    pointer-events: none;
+  }
+}
+
+.Brief-checkboxBox {
+  width: 1rem;
+  height: 1rem;
+  margin: 4px;
+  flex-shrink: 0;
+  border-radius: 4px;
+  background: #eee;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.2s ease-out;
+
+  svg {
+    opacity: 0;
+  }
+
+  input:checked + & {
+    background: #000;
+
+    svg {
+      opacity: 1;
+    }
+  }
+
+  input:focus-visible + & {
+    outline: 1px solid #000;
+  }
+}
+
+/* ---------- 3. Зоны ---------- */
+
+.Brief-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.Brief-chip {
+  height: 3.25rem;
+  padding: 0.5rem 1rem 0.5rem 0.5rem;
+  border-radius: 100px;
+  background: #f7f7f7;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  cursor: pointer;
+  font-family: var(--font-family);
+  font-weight: 400;
+  font-size: 1.125rem;
+  line-height: 136%;
+  letter-spacing: -0.04em;
+  color: rgb(0 0 0 / 0.8);
+  transition:
+    background 0.2s ease-out,
+    color 0.2s ease-out;
+
+  svg {
+    width: 1.75rem;
+    height: 1.75rem;
+    flex-shrink: 0;
+  }
+
+  &.isActive {
+    background: #000;
+    color: #fff;
+  }
+}
+
+/* ---------- 4. Бюджет ---------- */
+
+.Brief-budgetWrap {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 2.75rem;
+}
+
+.Brief-budget {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.Brief-budgetTrack {
+  position: relative;
+  height: 1.5rem;
+  /* серая линия + чёрная до бегунка */
+  background:
+    linear-gradient(#000, #000) left center / calc(0.75rem + (100% - 1.5rem) * var(--value-ratio, 0)) 2px no-repeat,
+    linear-gradient(#eee, #eee) center / 100% 2px no-repeat;
+
+  input {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    margin: 0;
+    background: none;
+    appearance: none;
+    cursor: pointer;
+
+    &::-webkit-slider-thumb {
+      width: 1.5rem;
+      height: 1.5rem;
+      border-radius: 50%;
+      background: #000;
+      appearance: none;
+      transition: background 0.2s ease-out;
+    }
+
+    &::-moz-range-thumb {
+      width: 1.5rem;
+      height: 1.5rem;
+      border: none;
+      border-radius: 50%;
+      background: #000;
+    }
+
+    &::-moz-range-track {
+      background: none;
+    }
+  }
+}
+
+.Brief-budgetTicks {
+  position: absolute;
+  inset: 0 0.75rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  pointer-events: none;
+
+  span {
+    width: 2px;
+    height: 0.5rem;
+    background: #eee;
+
+    &.isActive {
+      background: #000;
+    }
+  }
+}
+
+.Brief-budgetValue {
+  font-family: var(--font-family);
+  font-weight: 400;
+  font-size: 2.25rem;
+  line-height: 136%;
+  letter-spacing: -0.04em;
+  color: #000;
+  transition: opacity 0.2s ease-out;
+}
+
+.Brief-budget.isDisabled {
+  .Brief-budgetTrack {
+    background: linear-gradient(#eee, #eee) center / 100% 2px no-repeat;
+
+    input {
+      cursor: default;
+
+      &::-webkit-slider-thumb {
+        background: #bdbdbd;
+      }
+
+      &::-moz-range-thumb {
+        background: #bdbdbd;
+      }
+    }
+  }
+
+  .Brief-budgetTicks span {
+    background: #eee;
+  }
+
+  .Brief-budgetValue {
+    opacity: 0.4;
+  }
+}
+
+/* ---------- 5. Выставка ---------- */
+
+.Brief-exhibition {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.Brief-exhibitionName {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.Brief-suggests {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.Brief-suggest {
+  padding: 0.5rem;
+  border-radius: 100px;
+  background: rgb(0 0 0 / 0.03);
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  cursor: pointer;
+  font-family: var(--font-family);
+  font-weight: 400;
+  font-size: 0.875rem;
+  line-height: 136%;
+  letter-spacing: -0.04em;
+  color: rgb(0 0 0 / 0.6);
+  transition: background 0.2s ease-out;
+
+  svg {
+    width: 1rem;
+    height: 1rem;
+    padding: 2.5px;
+    opacity: 0.6;
+  }
+
+  @media (hover: hover) {
+    &:hover {
+      background: rgb(0 0 0 / 0.06);
+    }
+  }
+}
+
+.Brief-exhibitionDate {
+  display: flex;
+  flex-direction: column;
+  gap: 2.75rem;
+}
+
+.Brief-dateHint {
+  font-family: var(--font-family);
+  font-weight: 400;
+  font-size: 0.875rem;
+  line-height: 136%;
+  letter-spacing: -0.04em;
+  color: #000;
+}
+
+.Brief-date {
+  position: relative;
+}
+
+/* Календарь: react-day-picker + стили shadcn Calendar (new-york-v4),
+   классы Tailwind переведены 1:1. --cell-size уменьшен до макета (в shadcn — 2rem). */
+.Brief-calendar {
+  --cell-size: 1.5rem;
+  --muted-foreground: #737373;
+  --accent: #f5f5f5;
+
+  position: absolute;
+  z-index: 2;
+  top: calc(100% + 0.5rem);
+  left: 0;
+  width: max-content;
+  overflow: hidden;
+  border: 1px solid #ebebeb; /* PopoverContent: rounded-md border shadow-md */
+  border-radius: 0.375rem;
+  background: #fff;
+  box-shadow:
+    0 4px 6px -1px rgb(0 0 0 / 0.1),
+    0 2px 4px -2px rgb(0 0 0 / 0.1);
+  font-family: var(--font-family);
+  color: #000;
+
+  .rdp-root {
+    padding: 0.5rem;
+    width: fit-content;
+  }
+
+  .rdp-months {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  .rdp-month {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+
+  .rdp-nav {
+    position: absolute;
+    inset: 0 0 auto;
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.25rem;
+  }
+
+  .rdp-button_previous,
+  .rdp-button_next {
+    width: var(--cell-size);
+    height: var(--cell-size);
+    padding: 0;
+    border-radius: 0.375rem;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    user-select: none;
+    color: #000;
+    transition: background 0.2s ease;
+
+    &[aria-disabled='true'] {
+      opacity: 0.5;
+      cursor: default;
+    }
+
+    @media (hover: hover) {
+      &:not([aria-disabled='true']):hover {
+        background: var(--accent);
+      }
+    }
+
+    .rdp-chevron {
+      width: 1rem;
+      height: 1rem;
+    }
+  }
+
+  .rdp-month_caption {
+    height: var(--cell-size);
+    width: 100%;
+    padding: 0 var(--cell-size);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .rdp-dropdowns {
+    height: var(--cell-size);
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.375rem;
+    font-size: 0.75rem;
+    font-weight: 500;
+  }
+
+  .rdp-dropdown_root {
+    position: relative;
+    border-radius: 0.375rem;
+  }
+
+  .rdp-dropdown {
+    position: absolute;
+    inset: 0;
+    opacity: 0;
+    cursor: pointer;
+    font: inherit;
+  }
+
+  .rdp-caption_label {
+    height: var(--cell-size);
+    padding: 0 0.25rem 0 0.25rem;
+    border-radius: 0.375rem;
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+    font-size: 0.75rem;
+    font-weight: 500;
+    user-select: none;
+
+    .rdp-chevron {
+      width: 0.75rem;
+      height: 0.75rem;
+      color: var(--muted-foreground);
+    }
+  }
+
+  .rdp-month_grid {
+    width: 100%;
+    border-collapse: collapse;
+  }
+
+  .rdp-weekdays {
+    display: flex;
+  }
+
+  .rdp-weekday {
+    flex: 1;
+    border-radius: 0.375rem;
+    font-size: 0.625rem;
+    font-weight: 400;
+    color: var(--muted-foreground);
+    user-select: none;
+  }
+
+  .rdp-week {
+    width: 100%;
+    margin-top: 0.375rem;
+    display: flex;
+  }
+
+  .rdp-day {
+    position: relative;
+    width: 100%;
+    padding: 0;
+    text-align: center;
+    user-select: none;
+  }
+
+  .rdp-day_button {
+    width: 100%;
+    min-width: var(--cell-size);
+    aspect-ratio: 1;
+    border-radius: 0.375rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    font-family: var(--font-family);
+    font-size: 0.75rem;
+    font-weight: 400;
+    line-height: 1;
+    color: inherit;
+    cursor: pointer;
+    transition: background 0.2s ease;
+
+    @media (hover: hover) {
+      &:hover {
+        background: var(--accent);
+      }
+    }
+  }
+
+  .rdp-today .rdp-day_button {
+    background: var(--accent);
+  }
+
+  .rdp-outside {
+    color: var(--muted-foreground);
+  }
+
+  .rdp-disabled {
+    color: var(--muted-foreground);
+    opacity: 0.5;
+  }
+
+  .rdp-selected .rdp-day_button {
+    background: #000;
+    color: #fff;
+  }
+
+  .rdp-hidden {
+    visibility: hidden;
+  }
+}
+
+/* ---------- 6. Стиль ---------- */
+
+.Brief-styles {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.Brief-styleCard {
+  position: relative;
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  cursor: pointer;
+
+  input {
+    position: absolute;
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  &.isActive .Brief-radio {
+    background: #000;
+    border-color: #000;
+  }
+}
+
+.Brief-styleBody {
+  width: 100%;
+  height: 14.875rem;
+  padding: 0.5rem;
+  background: #f7f7f7;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+
+  img {
+    width: 100%;
+    height: 7.5rem;
+    object-fit: cover;
+  }
+}
+
+.Brief-styleText {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.Brief-styleLinks {
+  width: 31.75rem;
+  max-width: 100%;
+  padding-top: 2rem; /* 32 от карточек, как в макете */
+
+  p {
+    display: none;
+  }
+
+  .Brief-field input {
+    padding-top: 0.5rem;
+    font-size: 0.875rem;
+  }
+}
+
+/* ---------- 7. Комментарий и файлы ---------- */
+
+.Brief-comment {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+
+  .Brief-field {
+    width: 42.688rem;
+    max-width: 100%;
+    padding-top: 3rem; /* описание → поле: 64 = gap 16 + 48 */
+  }
+}
+
+.Brief-description {
+  max-width: 31.75rem;
+  font-family: var(--font-family);
+  font-weight: 400;
+  font-size: 1.125rem;
+  line-height: 136%;
+  letter-spacing: -0.04em;
+  color: #000;
+}
+
+.Brief-files {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.Brief-filesHead {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.Brief-filesAdd {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  width: fit-content;
+  cursor: pointer;
+  font-family: var(--font-family);
+  font-weight: 400;
+  font-size: 0.875rem;
+  line-height: 136%;
+  letter-spacing: -0.04em;
+  color: #000;
+  transition: opacity 0.3s ease;
+
+  /* прикреплено максимум файлов */
+  &:disabled {
+    opacity: 0.5;
+    cursor: default;
+  }
+}
+
+.Brief-filesAddIcon {
+  width: 1.5rem;
+  height: 1.5rem;
+  border-radius: 0.5rem;
+  background: #f7f7f7;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  svg {
+    width: 0.875rem;
+    height: 0.875rem;
+  }
+}
+
+.Brief-filesError {
+  padding-left: 1.875rem;
+}
+
+.Brief-filesList {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  list-style: none;
+}
+
+.Brief-file {
+  position: relative;
+  height: 3.5rem;
+
+  &.isImage {
+    width: 3.5rem;
+
+    img {
+      width: 100%;
+      height: 100%;
+      border-radius: 0.75rem;
+      object-fit: cover;
+    }
+  }
+
+  &.isDocument {
+    width: 13.563rem;
+    padding: 0 1.75rem 0 0.5rem;
+    border-radius: 0.75rem;
+    background: rgb(0 0 0 / 0.03);
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+}
+
+.Brief-fileIcon {
+  width: 2.688rem;
+  height: 2.688rem;
+  flex-shrink: 0;
+  border-radius: 0.625rem;
+  background: #ff3b3b;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  svg {
+    width: 1.75rem;
+    height: 1.75rem;
+  }
+}
+
+.Brief-fileText {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.Brief-fileName,
+.Brief-fileType {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-family: var(--font-family);
+  font-weight: 400;
+  line-height: 126%;
+  letter-spacing: -0.02em;
+  color: #000;
+}
+
+.Brief-fileName {
+  font-size: 0.875rem;
+}
+
+.Brief-fileType {
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  opacity: 0.6;
+}
+
+.Brief-fileRemove {
+  position: absolute;
+  top: 0.25rem;
+  right: 0.25rem;
+  width: 1rem;
+  height: 1rem;
+  cursor: pointer;
+
+  svg {
+    display: block;
+    width: 100%;
+    height: 100%;
+  }
+}
+
+/* ---------- 8. Контакты ---------- */
+
+.Brief-contacts {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 3rem;
+}
+
+.Brief-submit {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+/* Согласие — квадратная галочка как в форме обратной связи (ConsentCheckbox) */
+.Brief-consent {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.Brief-consentRow {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  cursor: pointer;
+
+  input {
+    position: absolute;
+    opacity: 0;
+    pointer-events: none;
+  }
+}
+
+.Brief-consentBox {
+  width: 1.5rem;
+  height: 1.5rem;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid rgb(0 0 0 / 0.3);
+  background: #fff;
+  transition: background 0.3s ease-out, border-color 0.3s ease-out;
+
+  svg {
+    width: 80%;
+    height: 80%;
+    opacity: 0;
+    transition: opacity 0.3s ease-out;
+
+    path {
+      fill: #fff;
+    }
+  }
+}
+
+.Brief-consent.isActive .Brief-consentBox {
+  border-color: #000;
+  background: #000;
+
+  svg {
+    opacity: 1;
+  }
+}
+
+.Brief-consentRow input:focus-visible + .Brief-consentBox {
+  outline: 1px solid #000;
+  outline-offset: 2px;
+}
+
+.Brief-consentText {
+  max-width: 15rem;
+  font-family: var(--font-family);
+  font-weight: 400;
+  font-size: 0.75rem;
+  line-height: 136%;
+  letter-spacing: -0.04em;
+  color: rgb(0 0 0 / 0.3);
+  user-select: none;
+
+  a {
+    color: inherit;
+    text-decoration: underline;
+  }
+}
+
+/* ---------- Заявка отправлена ---------- */
+
+.Brief-step.isDone {
+  justify-content: center;
+}
+
+.Brief-done {
+  width: 50%;
+  margin-left: auto;
+  padding-right: 1.25rem;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.75rem;
+
+  .Brief-question {
+    max-width: 30.5rem;
+  }
+
+  .Brief-navButton {
+    margin-top: 3.5rem;
+  }
+}
+
+.Brief-doneLabel {
+  font-family: var(--font-family);
+  font-weight: 400;
+  font-size: 0.875rem;
+  line-height: 136%;
+  letter-spacing: -0.04em;
+  text-transform: uppercase;
+  color: rgb(0 0 0 / 0.6);
+}
+
+/* ---------- Планшет (≤1000) ---------- */
+
+@media (max-width: 1000px) {
+  .Brief-compactBreak {
+    display: inline;
+  }
+
+  .Brief-dialog {
+    flex-direction: column;
+    align-items: center;
+    margin-left: 0;
+  }
+
+  .Brief-close {
+    order: -1;
+  }
+
+  .Brief-modal {
+    width: 37.5rem;
+    max-width: calc(100vw - 2rem);
+    height: 44rem;
+    max-height: calc(100svh - 6rem);
+  }
+
+  /* Значения из макета 768: ширина вопроса и отступ до контента — по шагам */
+  .Brief-layout,
+  .Brief-layout.isStacked {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    gap: var(--content-gap, 2.75rem);
+  }
+
+  .Brief-question {
+    max-width: var(--question-width, 23.438rem);
+  }
+
+  .is-type { --question-width: 18.625rem; --content-gap: 6rem; }
+  .is-area { --question-width: 20.75rem; }
+  .is-zones { --question-width: 20.75rem; }
+  .is-budget { --question-width: 28.875rem; --content-gap: 6rem; }
+  .is-exhibition { --content-gap: 6rem; }
+  .is-comment { --content-gap: 1rem; }
+  .is-contacts { --content-gap: 2.75rem; }
+
+  .Brief-nav {
+    padding: 1rem 0 0;
+  }
+
+  .Brief-exhibition {
+    gap: 2rem;
+
+    .Brief-field {
+      width: 26.25rem;
+      max-width: 100%;
+    }
+  }
+
+  .Brief-suggests {
+    flex-wrap: nowrap;
+  }
+
+  .Brief-styleCard .Brief-radio {
+    width: 1.5rem;
+    height: 1.5rem;
+  }
+
+  .Brief-exhibitionName {
+    gap: 0.75rem;
+  }
+
+  .Brief-description {
+    max-width: 21.875rem;
+  }
+
+  /* описание → поле: 96 = gap 24 + 72; поле → файлы: 24 */
+  .Brief-comment .Brief-field {
+    padding-top: 4.5rem;
+  }
+
+  .Brief-comment {
+    gap: 1.5rem;
+  }
+
+  .Brief-contacts .Brief-fields {
+    width: 31.75rem;
+    max-width: 100%;
+  }
+
+  .Brief-chip {
+    height: 2.75rem;
+    font-size: 1rem;
+  }
+
+  .is-area .Brief-content,
+  .is-contacts .Brief-content,
+  .is-budget .Brief-content,
+  .is-exhibition .Brief-content {
+    padding-top: 0;
+  }
+
+
+
+  /* горизонтальные ленты карточек — до краёв модалки */
+  .Brief-types,
+  .Brief-styles {
+    display: flex;
+    gap: 0.5rem;
+    margin: 0 calc(-1 * clamp(1.5rem, calc(1.167rem + 0.694vw), 2rem) /* 24px @768 → 32px @1920 */);
+    padding: 0 clamp(1.5rem, calc(1.167rem + 0.694vw), 2rem); /* 24px @768 → 32px @1920 */
+    overflow-x: auto;
+    scrollbar-width: none;
+
+    &::-webkit-scrollbar {
+      display: none;
+    }
+  }
+
+  .Brief-typeCard {
+    width: 9.938rem;
+    flex-shrink: 0;
+  }
+
+  .Brief-styleCard {
+    width: 12.5rem;
+    flex: none;
+  }
+
+  .Brief-styleLinks {
+    width: 13.5rem;
+    padding-top: 2rem;
+
+    p {
+      display: block;
+      padding-bottom: 1rem;
+      font-family: var(--font-family);
+      font-size: 0.875rem;
+      line-height: 136%;
+      letter-spacing: -0.04em;
+      color: #000;
+    }
+  }
+
+  .Brief-comment .Brief-field {
+    width: 100%;
+  }
+
+  .Brief-aside {
+    order: -1;
+    align-self: flex-start;
+    margin-bottom: calc(1rem - var(--content-gap)); /* «Назад» → вопрос: 16 */
+  }
+
+  .Brief-done {
+    width: 100%;
+    padding-right: 0;
+  }
+}
+
+/* ---------- Мобилка (≤540) ---------- */
+
+@media (max-width: 540px) {
+  .Popup.Brief .Popup_container {
+    align-items: stretch;
+  }
+
+  .Brief-dialog {
+    width: 100%;
+    height: 100svh;
+    padding-top: 3.688rem;
+    gap: 0.938rem;
+  }
+
+  .Brief-close {
+    width: 2.25rem;
+    height: 2.25rem;
+
+    svg {
+      width: 1.125rem;
+      height: 1.125rem;
+    }
+  }
+
+  .Brief-modal {
+    width: 100%;
+    max-width: none;
+    height: auto;
+    max-height: none;
+    flex: 1;
+  }
+
+  .Brief-step {
+    padding: 1rem 1rem 3rem;
+  }
+
+  .Brief-question {
+    font-size: 1.75rem;
+  }
+
+  /* Значения из макета 375 */
+  .Brief-step { --question-width: 19.063rem; }
+  .is-type { --question-width: 15.5rem; --content-gap: 8rem; }
+  .is-area { --question-width: 15.5rem; --content-gap: 4rem; }
+  .is-zones { --question-width: 15.5rem; --content-gap: 2rem; }
+  .is-budget { --content-gap: 12.5rem; }
+  .is-style { --content-gap: 4rem; }
+  .is-comment { --content-gap: 1.5rem; }
+  .is-contacts { --content-gap: 2.5rem; }
+
+  .Brief-aside {
+    margin-bottom: calc(1.5rem - var(--content-gap)); /* «Назад» → вопрос: 24 */
+  }
+
+  .Brief-area {
+    gap: 3rem;
+  }
+
+  .Brief-areaGroup {
+    gap: 2rem; /* поля → чекбокс: 32 */
+  }
+
+  .Brief-range {
+    gap: 1.5rem;
+  }
+
+  .Brief-rangeTrack {
+    height: 1.5rem;
+
+    input::-webkit-slider-thumb {
+      width: 1.5rem;
+      height: 1.5rem;
+    }
+
+    input::-moz-range-thumb {
+      width: 1.5rem;
+      height: 1.5rem;
+    }
+  }
+
+  .Brief-rangeLabels span {
+    padding: 0.625rem 0.75rem;
+    font-size: 1rem;
+  }
+
+  .Brief-hint {
+    max-width: 17.375rem;
+    font-size: 0.875rem;
+  }
+
+  .Brief-budgetWrap {
+    gap: 4rem;
+  }
+
+  .Brief-exhibition {
+    gap: 2.25rem;
+  }
+
+  /* подсказки выставок — лента со скроллом до краёв экрана */
+  .Brief-suggests {
+    margin: 0 -1rem;
+    padding: 0 1rem;
+    overflow-x: auto;
+    scrollbar-width: none;
+
+    &::-webkit-scrollbar {
+      display: none;
+    }
+  }
+
+  .Brief-suggest {
+    flex-shrink: 0;
+  }
+
+  .Brief-budget {
+    gap: 1.5rem;
+  }
+
+  .Brief-styleLinks {
+    padding-top: 2.75rem;
+  }
+
+  .Brief-contacts {
+    gap: 2.25rem;
+  }
+
+  .Brief-contacts .Brief-fields {
+    gap: 2rem;
+  }
+
+  .Brief-submit {
+    gap: 0.75rem;
+  }
+
+  .Brief-types,
+  .Brief-styles {
+    margin: 0 -1rem;
+    padding: 0 1rem;
+  }
+
+  .Brief-typeCard {
+    width: 11.25rem;
+    height: 14.813rem;
+  }
+
+  .Brief-typeCard .Brief-radio,
+  .Brief-styleCard .Brief-radio {
+    width: 1.5rem;
+    height: 1.5rem;
+  }
+
+  .Brief-typeImage {
+    width: 9.25rem;
+    height: 9.25rem;
+  }
+
+
+
+  .Brief-fields.isNarrow {
+    width: 100%;
+  }
+}
