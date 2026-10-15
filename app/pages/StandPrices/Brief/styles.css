@@ -6,9 +6,21 @@
     backdrop-filter: blur(30px);
   }
 
+  /* Контейнер на весь экран гасит клики — пропускаем их к фону,
+     чтобы попап закрывался кликом по пустому месту */
   .Popup_container {
     align-items: center;
     justify-content: center;
+    pointer-events: none;
+  }
+
+  .Brief-dialog {
+    pointer-events: none;
+  }
+
+  .Brief-close,
+  .Brief-modal {
+    pointer-events: auto;
   }
 }
 
@@ -24,7 +36,6 @@
 
     &.isRemove {
       opacity: 0;
-      pointer-events: none;
     }
   }
 }
@@ -49,8 +60,6 @@
     }
 
     &.isRemove {
-      pointer-events: none;
-
       .Brief-dialog {
         transform: translateY(100%);
       }

@@ -80,22 +80,28 @@ export default function useBriefPopup() {
   const [stepIndex, setStepIndex] = useState(0);
   const [isSendFailed, setIsSendFailed] = useState(false);
 
-  const close = () => {
-    toClosePopup();
-    if (STEPS[stepIndex] !== 'done') return;
-    // После ошибки ответы сохраняем — при следующем открытии можно отправить ещё раз
-    if (isSendFailed) {
-      setIsSendFailed(false);
-      setStepIndex(STEPS.indexOf('contacts'));
-      return;
+  // Сброс — при открытии, а не при закрытии: попап закрывается и крестиком, и кликом по фону
+  // (его обрабатывает сама библиотека), а итог должен быть одинаковым.
+  const open = () => {
+    if (STEPS[stepIndex] === 'done') {
+      // После ошибки ответы сохраняем — можно отправить ещё раз
+      if (isSendFailed) {
+        setIsSendFailed(false);
+        setStepIndex(STEPS.indexOf('contacts'));
+      } else {
+        setState(initialState);
+        setStepIndex(0);
+      }
     }
-    setState(initialState);
-    setStepIndex(0);
+    toOpenPopup();
   };
+  const close = toClosePopup;
 
   // Элемент, а не компонент: иначе при каждом вводе дерево пересоздавалось бы и поля теряли фокус.
+  // Фон закрывает по onPointerDown, а не onClick: если зажать внутри модалки (ползунок,
+  // выделение текста) и отпустить на фоне, onClick засчитался бы фону и закрыл бриф.
   const popup = (
-    <Popup className="Brief" isOnCloseBG eventCloseBG="onClick">
+    <Popup className="Brief" isOnCloseBG eventCloseBG="onPointerDown">
       <div className="Brief-dialog">
         <button type="button" className="Brief-close" aria-label="Закрыть бриф" onClick={close}>
           <svg width="24" height="24" viewBox="0 0 24 24" fill="none" aria-hidden="true">
@@ -117,7 +123,7 @@ export default function useBriefPopup() {
     </Popup>
   );
 
-  return { open: toOpenPopup, popup };
+  return { open, popup };
 }
 
 interface StepsProps {
