@@ -432,7 +432,7 @@ interface StepLayoutProps {
 function StepLayout({ question, stacked = false, aside, children }: StepLayoutProps) {
   return (
     <div className={`Brief-layout ${stacked ? 'isStacked' : ''}`}>
-      <h2 className="Brief-question">{question}</h2>
+      <div className="Brief-question">{question}</div>
       {aside && <div className="Brief-aside">{aside}</div>}
       <div className="Brief-content">{children}</div>
     </div>

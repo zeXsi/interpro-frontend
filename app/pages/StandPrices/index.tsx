@@ -166,7 +166,7 @@ function PriceFactorsSection() {
   return (
     <section className="StandPrices-factors">
       <div className="StandPrices-factorsHead px">
-        <h2 className="StandPrices-sectionTitle">Почему нельзя назвать точную цену сразу</h2>
+        <div className="StandPrices-sectionTitle">Почему нельзя назвать точную цену сразу</div>
         <p className="StandPrices-factorsText">
           Стенд&nbsp;— не&nbsp;типовой продукт. Два стенда одной площади могут отличаться в&nbsp;цене
           в&nbsp;3&nbsp;раза: один&nbsp;— базовая конструкция с&nbsp;печатью, другой&nbsp;—
@@ -229,11 +229,11 @@ function ProjectsSection({ projects }: { projects: StandProject[] }) {
   return (
     <section className="StandPrices-projects">
       <div className="StandPrices-projectsHead px">
-        <h2 className="StandPrices-sectionTitle">
+        <div className="StandPrices-sectionTitle">
           Реализованные
           <br />
           проекты
-        </h2>
+        </div>
         <div className="StandPrices-projectsControls">
           <button
             type="button"
@@ -289,7 +289,7 @@ function ProjectCard({ project }: { project: StandProject }) {
       </Link>
       <div className="StandPrices-projectInfo">
         <div className="StandPrices-projectMeta">
-          <h3 className="StandPrices-projectTitle">{project.title}</h3>
+          <div className="StandPrices-projectTitle">{project.title}</div>
           <div className="StandPrices-projectTags">
             {project.area > 0 && <span>{project.area} м²</span>}
             <span>{project.finish}</span>
@@ -306,10 +306,10 @@ function ProjectCard({ project }: { project: StandProject }) {
 function PriceFaqSection() {
   return (
     <section className="StandPrices-faq px">
-      <h2 className="StandPrices-faqTitle">
+      <div className="StandPrices-faqTitle">
         Вопросы <br className="StandPrices-desktopBreak" />
         о стоимости
-      </h2>
+      </div>
       <div className="StandPrices-faqItems">
         {priceFaqItems.map((item) => (
           <Accordion key={item.question}>
@@ -333,9 +333,9 @@ function PriceFaqSection() {
 function BriefSection({ onBrief }: { onBrief: () => void }) {
   return (
     <section className="StandPrices-brief px">
-      <h2 className="StandPrices-sectionTitle">
+      <div className="StandPrices-sectionTitle">
         Получите бесплатный <span className="StandPrices-nowrap">дизайн-проект</span> и&nbsp;расчёт
-      </h2>
+      </div>
       <div className="StandPrices-briefBody">
         <p className="StandPrices-briefText">
           Заполните короткий бриф&nbsp;— 7&nbsp;вопросов, 3&nbsp;минуты. Этого достаточно чтобы наш
