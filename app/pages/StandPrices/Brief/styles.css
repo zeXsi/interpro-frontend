@@ -12,6 +12,52 @@
   }
 }
 
+/* Открытие и закрытие. usePopup(0.3) снимает попап через 300 мс после класса isRemove.
+   Десктоп и планшет — плавно по opacity, как попап дизайн-проекта (MWForm) */
+@media (min-width: 541px) {
+  .Popup.Brief {
+    transition: opacity 150ms ease-out;
+
+    @starting-style {
+      opacity: 0;
+    }
+
+    &.isRemove {
+      opacity: 0;
+      pointer-events: none;
+    }
+  }
+}
+
+/* Мобилка — шторка выезжает снизу, фон проявляется 0 → 0.8 и обратно */
+@media (max-width: 540px) {
+  .Popup.Brief {
+    &::before {
+      transition: opacity 0.3s ease-out;
+
+      @starting-style {
+        opacity: 0;
+      }
+    }
+
+    .Brief-dialog {
+      transition: transform 0.3s ease-out;
+
+      @starting-style {
+        transform: translateY(100%);
+      }
+    }
+
+    &.isRemove {
+      pointer-events: none;
+
+      .Brief-dialog {
+        transform: translateY(100%);
+      }
+    }
+  }
+}
+
 .Brief-dialog {
   display: flex;
   align-items: flex-start;
@@ -131,9 +177,13 @@
   min-width: 0;
 }
 
-.is-area .Brief-content,
 .is-contacts .Brief-content {
   padding-top: 1rem;
+}
+
+/* ползунок площади — на 148 ниже верха вопроса */
+.is-area .Brief-content {
+  padding-top: 9.25rem;
 }
 
 .is-budget .Brief-content,
@@ -315,8 +365,9 @@
   gap: 3rem;
 }
 
-/* поля и чекбокс «второй этаж» стоят ближе друг к другу, чем блоки шага */
+/* ползунок и чекбокс «второй этаж» стоят ближе друг к другу, чем блоки шага */
 .Brief-areaGroup {
+  align-self: stretch; /* ползунок на всю ширину колонки */
   display: flex;
   flex-direction: column;
   align-items: flex-start;
@@ -383,21 +434,58 @@
   display: flex;
   justify-content: space-between;
 
+}
+
+/* плашка «от 9 м²»: вся серая зона — label, редактируется только число */
+.Brief-rangeValue {
+  min-width: 4.688rem; /* 75: обе плашки одной ширины, текст по центру */
+  padding: 0.5rem;
+  border-radius: 0.5rem;
+  text-align: center;
+  background: #eee;
+  cursor: text;
+  font-family: var(--font-family);
+  font-weight: 400;
+  font-size: 0.875rem;
+  line-height: 136%;
+  letter-spacing: -0.04em;
+  color: #000;
+  white-space: nowrap;
+  transition: color 0.3s ease;
+}
+
+/* поле шириной ровно по числу: ширину задаёт невидимая копия, input лежит поверх */
+.Brief-rangeNumber {
+  position: relative;
+  display: inline-block;
+
   span {
-    padding: 0.5rem;
-    border-radius: 0.5rem;
-    background: #eee;
-    font-family: var(--font-family);
-    font-weight: 400;
-    font-size: 0.875rem;
-    line-height: 136%;
-    letter-spacing: -0.04em;
-    color: #000;
+    visibility: hidden;
+    white-space: pre;
+  }
+
+  input {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    min-width: 0;
+    padding: 0;
+    border: none;
+    background: none;
+    outline: none;
+    font: inherit;
+    letter-spacing: inherit;
+    color: inherit;
   }
 }
 
-.Brief-range.isDefault .Brief-rangeLabels span {
+.Brief-range.isDefault .Brief-rangeValue {
   color: rgb(0 0 0 / 0.4);
+}
+
+/* при вводе число становится чёрным, даже если ползунки не трогали */
+.Brief-range .Brief-rangeValue:focus-within {
+  color: #000;
 }
 
 .Brief-fields {
@@ -406,14 +494,6 @@
   flex-direction: column;
   gap: 2.25rem;
 
-  &.isNarrow {
-    width: 20.813rem;
-    gap: 1rem;
-
-    .Brief-field input {
-      padding-top: 0.5rem;
-    }
-  }
 }
 
 .Brief-hint {
@@ -462,29 +542,6 @@
   }
 }
 
-/* «13 (м)»: суффикс стоит за значением, сам текст поля невидим в копии */
-.Brief-field:has(.Brief-fieldSuffix) {
-  position: relative;
-}
-
-.Brief-fieldSuffix {
-  position: absolute;
-  left: 0;
-  bottom: calc(0.5rem + 1px); /* над нижней линией поля, вровень с текстом */
-  pointer-events: none;
-  white-space: pre;
-  font-family: var(--font-family);
-  font-weight: 400;
-  font-size: 1.125rem;
-  line-height: 136%;
-  letter-spacing: -0.04em;
-  color: #000;
-
-  span {
-    visibility: hidden;
-  }
-}
-
 .Brief-fieldError,
 .Brief-filesError,
 .Brief-consentError {
@@ -499,7 +556,7 @@
 .Brief-checkbox {
   display: inline-flex;
   align-items: center;
-  gap: 6px;
+  gap: 2px;
   cursor: pointer;
   font-family: var(--font-family);
   font-weight: 400;
@@ -515,31 +572,42 @@
   }
 }
 
+/* 24×24, внутри квадрат 16 со скруглением 4 и галочка 11.3×8.2 поверх */
 .Brief-checkboxBox {
-  width: 1rem;
-  height: 1rem;
-  margin: 4px;
+  width: 1.5rem;
+  height: 1.5rem;
   flex-shrink: 0;
-  border-radius: 4px;
-  background: #eee;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: background 0.2s ease-out;
+  display: grid;
+  place-items: center;
+
+  > * {
+    grid-area: 1 / 1;
+  }
 
   svg {
+    width: 0.706rem;
+    height: 0.514rem;
     opacity: 0;
+    transition: opacity 0.2s ease-out;
   }
 
-  input:checked + & {
+  input:checked + & svg {
+    opacity: 1;
+  }
+}
+
+.Brief-checkboxMark {
+  width: 1rem;
+  height: 1rem;
+  border-radius: 4px;
+  background: #eee;
+  transition: background 0.2s ease-out;
+
+  input:checked + .Brief-checkboxBox & {
     background: #000;
-
-    svg {
-      opacity: 1;
-    }
   }
 
-  input:focus-visible + & {
+  input:focus-visible + .Brief-checkboxBox & {
     outline: 1px solid #000;
   }
 }
@@ -669,12 +737,12 @@
   transition: opacity 0.2s ease-out;
 }
 
+/* «Бюджет пока не определён»: слайдер серый, но живой — касание снимает галочку */
 .Brief-budget.isDisabled {
   .Brief-budgetTrack {
     background: linear-gradient(#eee, #eee) center / 100% 2px no-repeat;
 
     input {
-      cursor: default;
 
       &::-webkit-slider-thumb {
         background: #bdbdbd;
@@ -1377,8 +1445,19 @@
   .is-comment { --content-gap: 1rem; }
   .is-contacts { --content-gap: 2.75rem; }
 
+  /* Низкий экран: модалка прокручивается, а «Назад / Далее» прибиты к низу
+     белой полосой на всю ширину (кадр 1055:4766). Нижний отступ шага уходит в панель. */
+  .Brief-step:has(.Brief-nav) {
+    padding-bottom: 0;
+  }
+
   .Brief-nav {
-    padding: 1rem 0 0;
+    position: sticky;
+    bottom: 0;
+    z-index: 1;
+    padding: 1rem 0 clamp(1.5rem, calc(1.167rem + 0.694vw), 2rem); /* 24px @768 → 32px @1920 */
+    background: #fff;
+    box-shadow: calc(-1 * clamp(1.5rem, calc(1.167rem + 0.694vw), 2rem) /* 24px @768 → 32px @1920 */) 0 #fff, clamp(1.5rem, calc(1.167rem + 0.694vw), 2rem) /* 24px @768 → 32px @1920 */ 0 #fff;
   }
 
   .Brief-exhibition {
@@ -1419,11 +1498,6 @@
   .Brief-contacts .Brief-fields {
     width: 31.75rem;
     max-width: 100%;
-  }
-
-  .Brief-chip {
-    height: 2.75rem;
-    font-size: 1rem;
   }
 
   .is-area .Brief-content,
@@ -1494,6 +1568,21 @@
 /* ---------- Мобилка (≤540) ---------- */
 
 @media (max-width: 540px) {
+  /* чекбоксы «второй этаж» и «бюджет не определён»: текст 18, отступ 4 */
+  .Brief-checkbox {
+    gap: 4px;
+    font-size: 1.125rem;
+  }
+
+  /* крестик у файла: иконка на месте, область клика 38×38 */
+  .Brief-fileRemove {
+    top: calc(0.25rem - 0.688rem);
+    right: calc(0.25rem - 0.688rem);
+    width: 2.375rem;
+    height: 2.375rem;
+    padding: 0.688rem;
+  }
+
   .Popup.Brief .Popup_container {
     align-items: stretch;
   }
@@ -1527,6 +1616,22 @@
     padding: 1rem 1rem 3rem;
   }
 
+  .Brief-nav {
+    padding-bottom: 3rem;
+    box-shadow: -1rem 0 #fff, 1rem 0 #fff;
+  }
+
+  /* чипсы зон: на планшете как на десктопе (52 / 18), на мобилке 44 / 16, иконка 24 */
+  .Brief-chip {
+    height: 2.75rem;
+    font-size: 1rem;
+
+    svg {
+      width: 1.5rem;
+      height: 1.5rem;
+    }
+  }
+
   .Brief-question {
     font-size: 1.75rem;
   }
@@ -1534,7 +1639,7 @@
   /* Значения из макета 375 */
   .Brief-step { --question-width: 19.063rem; }
   .is-type { --question-width: 15.5rem; --content-gap: 8rem; }
-  .is-area { --question-width: 15.5rem; --content-gap: 4rem; }
+  .is-area { --question-width: 15.5rem; --content-gap: 8rem; }
   .is-zones { --question-width: 15.5rem; --content-gap: 2rem; }
   .is-budget { --content-gap: 12.5rem; }
   .is-style { --content-gap: 4rem; }
@@ -1550,7 +1655,7 @@
   }
 
   .Brief-areaGroup {
-    gap: 2rem; /* поля → чекбокс: 32 */
+    gap: 2.5rem; /* плашки → чекбокс: 40 */
   }
 
   .Brief-range {
@@ -1571,9 +1676,9 @@
     }
   }
 
-  .Brief-rangeLabels span {
-    padding: 0.625rem 0.75rem;
-    font-size: 1rem;
+  .Brief-rangeValue {
+    min-width: 5.688rem; /* 91×40, текст 18 по центру */
+    font-size: 1.125rem;
   }
 
   .Brief-hint {
@@ -1648,8 +1753,4 @@
   }
 
 
-
-  .Brief-fields.isNarrow {
-    width: 100%;
-  }
 }

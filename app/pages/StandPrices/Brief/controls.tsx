@@ -21,19 +21,11 @@ interface FieldProps {
   autoComplete?: string;
   error?: string;
   className?: string;
-  /** Дописывается сразу за введённым значением, например «(м)». */
-  suffix?: string;
 }
 
-export function Field({ label, value, onChange, type = 'text', inputMode, autoComplete, error, className = '', suffix }: FieldProps) {
+export function Field({ label, value, onChange, type = 'text', inputMode, autoComplete, error, className = '' }: FieldProps) {
   return (
     <label className={`Brief-field ${error ? 'isError' : ''} ${className}`}>
-      {suffix && value && (
-        // Невидимая копия значения сдвигает суффикс ровно за текст
-        <span className="Brief-fieldSuffix" aria-hidden="true">
-          <span>{value}</span> {suffix}
-        </span>
-      )}
       <input
         type={type}
         inputMode={inputMode}
@@ -54,9 +46,11 @@ export function Checkbox({ checked, onChange, children }: { checked: boolean; on
   return (
     <label className="Brief-checkbox">
       <input type="checkbox" checked={checked} onChange={(event) => onChange(event.target.checked)} />
+      {/* 24×24: внутри квадрат 16 и галочка поверх, как в макете */}
       <span className="Brief-checkboxBox" aria-hidden="true">
-        <svg width="10" height="8" viewBox="0 0 10 8" fill="none">
-          <path d="M1 4l2.667 2.667L9 1.333" stroke="#fff" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+        <span className="Brief-checkboxMark" />
+        <svg viewBox="2.293 5.293 19.414 14.121" fill="none">
+          <path d="M8.99997 19.414L2.29297 12.707L3.70697 11.293L8.99997 16.586L20.293 5.29297L21.707 6.70697L8.99997 19.414Z" fill="#fff" />
         </svg>
       </span>
       <span>{children}</span>
@@ -136,16 +130,93 @@ export function AreaRange({ value, onChange }: { value: [number, number]; onChan
         />
       </div>
       <div className="Brief-rangeLabels">
-        <span>от {min}&nbsp;м²</span>
-        <span>до {max}&nbsp;м²</span>
+        <AreaInput
+          prefix="от"
+          label="Минимальная площадь"
+          value={min}
+          // Ввели больше «до» — упираемся в «до», меньше 9 — в 9
+          toValid={(area) => Math.min(Math.max(area, AREA_MIN), max)}
+          onChange={(area) => onChange([area, max])}
+        />
+        <AreaInput
+          prefix="до"
+          label="Максимальная площадь"
+          value={max}
+          toValid={(area) => Math.max(Math.min(area, AREA_MAX), min)}
+          onChange={(area) => onChange([min, area])}
+        />
       </div>
     </div>
   );
 }
 
+interface AreaInputProps {
+  prefix: string;
+  label: string;
+  value: number;
+  /** Приводит введённое число к допустимому — применяется, когда ввод закончен. */
+  toValid: (area: number) => number;
+  onChange: (area: number) => void;
+}
+
+/**
+ * Плашка «от 9 м²»: редактируется только число, «от» и «м²» — обычный текст.
+ * Вся плашка — label, поэтому клик по серой зоне ставит курсор в поле.
+ */
+function AreaInput({ prefix, label, value, toValid, onChange }: AreaInputProps) {
+  // Черновик, пока поле в фокусе: можно стереть число целиком и набрать новое
+  const [draft, setDraft] = useState<string | null>(null);
+  const text = draft ?? String(value);
+
+  const type = (rawValue: string) => {
+    const nextDraft = rawValue.replace(/\D/g, '').slice(0, String(AREA_MAX).length);
+    setDraft(nextDraft);
+    // Ползунок двигаем сразу, если число уже допустимое
+    const area = Number(nextDraft);
+    if (nextDraft && toValid(area) === area) onChange(area);
+  };
+
+  const commit = () => {
+    if (draft) onChange(toValid(Number(draft)));
+    setDraft(null);
+  };
+
+  return (
+    <label className="Brief-rangeValue">
+      {prefix}{' '}
+      <span className="Brief-rangeNumber">
+        {/* невидимая копия задаёт полю ширину ровно по числу */}
+        <span aria-hidden="true">{text || ' '}</span>
+        <input
+          type="text"
+          inputMode="numeric"
+          // без size поле шириной ~20 символов распирает плашку
+          size={1}
+          aria-label={label}
+          value={text}
+          onFocus={(event) => event.target.select()}
+          onChange={(event) => type(event.target.value)}
+          onBlur={commit}
+          onKeyDown={(event) => event.key === 'Enter' && event.currentTarget.blur()}
+        />
+      </span>
+      &nbsp;м²
+    </label>
+  );
+}
+
 /* ---------- Бюджет: слайдер по фиксированным значениям ---------- */
 
-export function BudgetRange({ value, disabled, onChange }: { value: number; disabled: boolean; onChange: (value: number) => void }) {
+interface BudgetRangeProps {
+  value: number;
+  /** Галочка «Бюджет пока не определён»: слайдер серый, но на касание реагирует. */
+  disabled: boolean;
+  onChange: (value: number) => void;
+  /** Слайдер тронули — галочку снимаем, значение ставится туда, куда кликнули. */
+  onTouch: () => void;
+}
+
+export function BudgetRange({ value, disabled, onChange, onTouch }: BudgetRangeProps) {
   const lastIndex = BUDGETS.length - 1;
 
   return (
@@ -162,10 +233,14 @@ export function BudgetRange({ value, disabled, onChange }: { value: number; disa
           max={lastIndex}
           step={1}
           value={value}
-          disabled={disabled}
           aria-label="Бюджет"
           aria-valuetext={formatRub(BUDGETS[value])}
-          onChange={(event) => onChange(Number(event.target.value))}
+          // pointerdown — на случай клика в текущее значение: change тогда не придёт
+          onPointerDown={() => disabled && onTouch()}
+          onChange={(event) => {
+            if (disabled) onTouch();
+            onChange(Number(event.target.value));
+          }}
         />
       </div>
       <p className="Brief-budgetValue">
@@ -217,7 +292,14 @@ export function timeUntil(date: Date) {
   return `До выставки ${months} ${plural(months, ['месяц', 'месяца', 'месяцев'])}`;
 }
 
-export function DateField({ value, onChange }: { value: Date | null; onChange: (value: Date | null) => void }) {
+interface DateFieldProps {
+  value: Date | null;
+  onChange: (value: Date | null) => void;
+  /** Планшет и мобилка: дату не печатают, по клику открывается календарь. */
+  isPickOnly?: boolean;
+}
+
+export function DateField({ value, onChange, isPickOnly = false }: DateFieldProps) {
   const [text, setText] = useState(value ? formatDate(value) : '');
   const [isOpen, setIsOpen] = useState(false);
   const [month, setMonth] = useState(() => value ?? new Date());
@@ -254,11 +336,14 @@ export function DateField({ value, onChange }: { value: Date | null; onChange: (
       <label className="Brief-field">
         <input
           type="text"
-          inputMode="numeric"
-          placeholder={isOpen ? 'дд.мм.гг' : 'Дата открытия выставки'}
+          inputMode={isPickOnly ? 'none' : 'numeric'}
+          readOnly={isPickOnly}
+          placeholder={isOpen && !isPickOnly ? 'дд.мм.гг' : 'Дата открытия выставки'}
           aria-label="Дата открытия выставки"
           value={text}
           onFocus={() => setIsOpen(true)}
+          // повторный клик по уже сфокусированному полю снова открывает календарь
+          onClick={() => setIsOpen(true)}
           onChange={handleInput}
         />
       </label>

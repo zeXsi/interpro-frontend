@@ -7,8 +7,8 @@ import { useEffect, useState, type ReactNode } from 'react';
 import { GlobalScrollLock } from 'shared/components/_helpers/GlobalScrollLock';
 import Link from 'shared/components/Link';
 
-// AreaRange и timeUntil пока не используются: ползунок площади и подсказка «До выставки…» на согласовании
-import { BudgetRange, Checkbox, Consent, DateField, Field, FileField, formatDate } from './controls';
+// timeUntil пока не используется: подсказка «До выставки…» на согласовании
+import { AreaRange, BudgetRange, Checkbox, Consent, DateField, Field, FileField, formatDate } from './controls';
 import {
   AREA_MAX,
   AREA_MIN,
@@ -24,9 +24,6 @@ import {
 interface BriefState {
   type: string;
   area: [number, number];
-  width: string;
-  depth: string;
-  height: string;
   secondFloor: boolean;
   zones: string[];
   budget: number;
@@ -49,9 +46,6 @@ interface BriefState {
 const initialState: BriefState = {
   type: '',
   area: [AREA_MIN, AREA_MAX],
-  width: '',
-  depth: '',
-  height: '',
   secondFloor: false,
   zones: [],
   budget: 0,
@@ -153,24 +147,12 @@ function BriefSteps({ state, setState, stepIndex, setStepIndex, isSendFailed, se
       [key]: prev[key].includes(value) ? prev[key].filter((item) => item !== value) : [...prev[key], value],
     }));
 
-  // Ширина и глубина задают площадь точно — ставим оба ползунка на w × d.
-  // Обратной связи нет: из диапазона размеры не восстановить.
-  const updateDimension = (key: 'width' | 'depth' | 'height', rawValue: string) =>
-    setState((prev) => {
-      const value = rawValue.replace(/[^\d.,]/g, '').slice(0, 6);
-      const nextState = { ...prev, [key]: value };
-      const area = getDimensionsArea(nextState);
-      if (key === 'height' || area === null) return nextState;
-      const clamped = Math.min(Math.max(area, AREA_MIN), AREA_MAX);
-      return { ...nextState, area: [clamped, clamped] };
-    });
-
   const next = () => setStepIndex(stepIndex + 1);
   const back = () => setStepIndex(stepIndex - 1);
 
   const canGoNext: Record<Step, boolean> = {
     type: !!state.type,
-    area: state.area[0] !== AREA_MIN || state.area[1] !== AREA_MAX || !!(state.width || state.depth || state.height),
+    area: state.area[0] !== AREA_MIN || state.area[1] !== AREA_MAX,
     zones: state.zones.length > 0,
     budget: true,
     exhibition: true,
@@ -200,7 +182,7 @@ function BriefSteps({ state, setState, stepIndex, setStepIndex, isSendFailed, se
       email: state.email.trim(),
       consent: false,
       extraInfo: 'Бриф: цены на выставочные стенды',
-      area: getDimensionsArea(state) ?? state.area[1],
+      area: state.area[1],
       project: toProjectText(state),
     });
     setIsSending(false);
@@ -257,15 +239,8 @@ function BriefSteps({ state, setState, stepIndex, setStepIndex, isSendFailed, se
         {step === 'area' && (
           <StepLayout question="Какая площадь вашего стенда?">
             <div className="Brief-area">
-              {/* Ползунок площади на согласовании — пока скрыт
-              <AreaRange value={state.area} onChange={(value) => update('area', value)} />
-              */}
               <div className="Brief-areaGroup">
-                <div className="Brief-fields isNarrow">
-                  <Field label="Ширина (м)" suffix="(м)" inputMode="decimal" value={state.width} onChange={(value) => updateDimension('width', value)} />
-                  <Field label="Глубина (м)" suffix="(м)" inputMode="decimal" value={state.depth} onChange={(value) => updateDimension('depth', value)} />
-                  <Field label="Высота (м)" suffix="(м)" inputMode="decimal" value={state.height} onChange={(value) => updateDimension('height', value)} />
-                </div>
+                <AreaRange value={state.area} onChange={(value) => update('area', value)} />
                 <Checkbox checked={state.secondFloor} onChange={(value) => update('secondFloor', value)}>
                   Планируется второй этаж
                 </Checkbox>
@@ -302,7 +277,12 @@ function BriefSteps({ state, setState, stepIndex, setStepIndex, isSendFailed, se
         {step === 'budget' && (
           <StepLayout question="Какой бюджет вы закладываете на стенд?">
             <div className="Brief-budgetWrap">
-              <BudgetRange value={state.budget} disabled={state.budgetUnknown} onChange={(value) => update('budget', value)} />
+              <BudgetRange
+                value={state.budget}
+                disabled={state.budgetUnknown}
+                onChange={(value) => update('budget', value)}
+                onTouch={() => update('budgetUnknown', false)}
+              />
               <Checkbox checked={state.budgetUnknown} onChange={(value) => update('budgetUnknown', value)}>
                 Бюджет пока не определён
               </Checkbox>
@@ -325,7 +305,11 @@ function BriefSteps({ state, setState, stepIndex, setStepIndex, isSendFailed, se
                 </div>
               </div>
               <div className="Brief-exhibitionDate">
-                <DateField value={state.exhibitionDate} onChange={(value) => update('exhibitionDate', value)} />
+                <DateField
+                  value={state.exhibitionDate}
+                  isPickOnly={isCompact}
+                  onChange={(value) => update('exhibitionDate', value)}
+                />
                 {/* Подсказка «До выставки…» на согласовании — пока скрыта
                 {state.exhibitionDate && timeUntil(state.exhibitionDate) && (
                   <p className="Brief-dateHint">{timeUntil(state.exhibitionDate)}</p>
@@ -489,25 +473,11 @@ function NavButton({ direction, muted = false, disabled = false, className = '',
   );
 }
 
-function parseMeters(value: string) {
-  const number = Number.parseFloat(value.replace(',', '.'));
-  return Number.isFinite(number) && number > 0 ? number : null;
-}
-
-function getDimensionsArea(state: Pick<BriefState, 'width' | 'depth'>) {
-  const width = parseMeters(state.width);
-  const depth = parseMeters(state.depth);
-  return width && depth ? Math.round(width * depth) : null;
-}
-
 function toProjectText(state: BriefState) {
   const lines = [
     'Бриф со страницы «Цены на выставочные стенды»',
     `Тип стенда: ${state.type}`,
     state.area[0] === state.area[1] ? `Площадь: ${state.area[0]} м²` : `Площадь: ${state.area[0]}–${state.area[1]} м²`,
-    [state.width && `ширина ${state.width} м`, state.depth && `глубина ${state.depth} м`, state.height && `высота ${state.height} м`]
-      .filter(Boolean)
-      .join(', '),
     state.secondFloor ? 'Планируется второй этаж' : '',
     state.zones.length ? `Зоны: ${state.zones.join(', ')}` : '',
     `Бюджет: ${state.budgetUnknown ? 'пока не определён' : formatRub(BUDGETS[state.budget]) + (state.budget === BUDGETS.length - 1 ? ' и выше' : '')}`,
