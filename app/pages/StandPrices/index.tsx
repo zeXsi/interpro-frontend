@@ -6,8 +6,9 @@ import HammerIcon from 'assets/icons/stand-prices/hammer.svg?react';
 import MediaIcon from 'assets/icons/stand-prices/media.svg?react';
 import PlanIcon from 'assets/icons/stand-prices/plan.svg?react';
 import TimerIcon from 'assets/icons/stand-prices/timer.svg?react';
+import { getHomeData } from 'api/home/home.api';
 import { getProjectsBySlugs } from 'api/projects/projects.api';
-import type { Project } from 'api/projects/projects.types';
+import type { HomeProject } from 'api/home/home.types';
 import { useLayoutEffect, useRef, useState } from 'react';
 import Accordion from 'shared/components/Accordion';
 import Link from 'shared/components/Link';
@@ -21,14 +22,6 @@ import 'swiper/css';
 import useBriefPopup from './Brief';
 import type { Route } from './+types';
 
-// TODO: уточнить у заказчика список проектов и уровень отделки для каждого.
-const STAND_PROJECTS = [
-  { slug: 'futuruss', finish: 'Индивидуальное исполнение' },
-  { slug: 'lidlab', finish: 'Базовая отделка' },
-  { slug: 'novatek', finish: 'Индивидуальное исполнение' },
-  { slug: 'aurus', finish: 'Базовая отделка' },
-] as const;
-
 const PROJECT_DESCRIPTION_MAX_PARAGRAPHS = 2;
 
 const priceFactors = [
@@ -39,44 +32,53 @@ const priceFactors = [
   { title: 'Сроки — стандартные или срочные', Icon: TimerIcon },
 ];
 
-// TODO: ответы — черновик, финальные тексты должен дать заказчик.
 const priceFaqItems = [
   {
     question: 'Сколько стоит выставочный стенд под ключ?',
     answer:
-      'Ориентир — от 45 000 до 150 000 ₽ за м². Итоговая стоимость зависит от площади, уровня материалов, состава функциональных зон и сроков изготовления.',
+      'Стоимость начинается от\u00a045\u00a0000\u00a0₽ за\u00a0м² для стандартных конструкций. Итоговая цена зависит от\u00a0площади, конфигурации, уровня материалов и\u00a0состава функциональных зон. После заполнения брифа мы\u00a0подготовим точный расчёт.',
   },
   {
     question: 'Что входит в стоимость стенда?',
-    answer: 'Ответ будет добавлен.',
+    answer:
+      'В\u00a0стоимость включены: дизайн-проект, производство конструкций на\u00a0собственном производстве, доставка, монтаж и\u00a0демонтаж. Дополнительно\u00a0— мультимедиа, индивидуальная мебель, подвесные конструкции.',
   },
   {
     question: 'Почему нельзя назвать точную цену сразу?',
     answer:
-      'Стенд — не типовой продукт. Два стенда одной площади могут отличаться в цене в 3 раза, поэтому точная стоимость складывается из нескольких параметров и считается после брифа.',
+      'Стенд\u00a0— индивидуальный продукт. Два стенда одной площади могут отличаться в\u00a0цене в\u00a03\u00a0раза в\u00a0зависимости от\u00a0материалов, зон и\u00a0оборудования. Заполните бриф\u00a0— мы\u00a0рассчитаем стоимость под вашу задачу.',
   },
   {
     question: 'Как быстро вы сделаете расчёт?',
-    answer: 'Ответ будет добавлен.',
+    answer:
+      'После получения брифа\u00a0— в\u00a0течение 2\u00a0рабочих дней. Вместе с\u00a0расчётом пришлём предварительную концепцию стенда.',
   },
   {
     question: 'Можно ли заказать только дизайн-проект?',
-    answer: 'Ответ будет добавлен.',
+    answer: 'Да. Мы\u00a0разрабатываем дизайн-проекты без дальнейшего производства. Стоимость и\u00a0сроки уточняем индивидуально.',
   },
   {
     question: 'Есть ли скидки при повторном заказе?',
-    answer: 'Ответ будет добавлен.',
+    answer: 'Да. Постоянным клиентам предоставляем индивидуальные условия. Обсудим при работе над проектом.',
   },
   {
     question: 'Работаете ли вы в регионах?',
-    answer: 'Ответ будет добавлен.',
+    answer: 'Да. Производим стенды на\u00a0собственном производстве в\u00a0Москве и\u00a0реализуем проекты по\u00a0всей России.',
   },
 ];
 
+// Те же проекты, что в подборке на главной (эндпоинт /home, тот же порядок).
+// В /home нет описания — берём «О проекте (кратко)» из /projects по тем же slug'ам.
 export async function loader() {
-  const projects = await getProjectsBySlugs(STAND_PROJECTS.map(({ slug }) => slug));
+  const home = await getHomeData();
+  const projects = home?.projects?.items ?? [];
+  const details = projects.length ? await getProjectsBySlugs(projects.map(({ slug }) => slug)) : [];
+
   return {
-    projects: projects ?? [],
+    projects: projects.map((project) => ({
+      ...project,
+      about: details?.find(({ slug }) => slug === project.slug)?.payload.about ?? '',
+    })),
   };
 }
 
@@ -198,9 +200,8 @@ interface StandProject {
   slug: string;
   title: string;
   area: number;
-  finish: string;
   description: string;
-  image: string;
+  cover: HomeProject['cover'];
 }
 
 function ProjectsSection({ projects }: { projects: StandProject[] }) {
@@ -284,7 +285,13 @@ function ProjectCard({ project }: { project: StandProject }) {
     <article className="StandPrices-projectCard">
       <Link to={`/projects/${project.slug}`} slug={project.title}>
         <div className="StandPrices-projectImage">
-          <img src={project.image} alt={`Проект ${project.title}`} loading="lazy" />
+          <img
+            src={project.cover?.url}
+            srcSet={project.cover?.srcset || undefined}
+            sizes={project.cover?.sizes || undefined}
+            alt={`Проект ${project.title}`}
+            loading="lazy"
+          />
         </div>
       </Link>
       <div className="StandPrices-projectInfo">
@@ -292,7 +299,6 @@ function ProjectCard({ project }: { project: StandProject }) {
           <div className="StandPrices-projectTitle">{project.title}</div>
           <div className="StandPrices-projectTags">
             {project.area > 0 && <span>{project.area} м²</span>}
-            <span>{project.finish}</span>
           </div>
         </div>
         {project.description && (
@@ -347,21 +353,15 @@ function BriefSection({ onBrief }: { onBrief: () => void }) {
   );
 }
 
-function toStandProjects(projects: Project[]): StandProject[] {
-  return STAND_PROJECTS.flatMap(({ slug, finish }) => {
-    const project = projects.find((item) => item.slug === slug);
-    if (!project) return [];
-
-    return {
-      id: project.id,
-      slug: project.slug,
-      title: decodeUnicodeEscapes(project.payload.title).trim(),
-      area: project.payload.meta.area,
-      finish,
-      description: toProjectDescription(project.payload.about),
-      image: project.payload.cover,
-    };
-  });
+function toStandProjects(projects: (HomeProject & { about: string })[]): StandProject[] {
+  return projects.map((project) => ({
+    id: project.id,
+    slug: project.slug,
+    title: decodeUnicodeEscapes(project.title).trim(),
+    area: project.area,
+    description: toProjectDescription(project.about),
+    cover: project.cover,
+  }));
 }
 
 function toProjectDescription(value = '') {
