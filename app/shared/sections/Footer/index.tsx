@@ -1,15 +1,13 @@
 import './styles.css';
 import InfoList from 'shared/components/InfoList';
-import Button from 'shared/components/Button';
+import 'shared/components/Button/styles.css';
 
 import LogoIcon from 'assets/icons/logo.svg?react';
-import { useNavigate } from 'shared/components/NavigationTracker';
+import Link from 'shared/components/Link';
 
 const date = new Date();
 
 export default function Footer() {
-  const { goTo } = useNavigate();
-
   return (
     <>
       <div className="Footer px">
@@ -90,21 +88,23 @@ export default function Footer() {
         {/* </div> */}
         <div className="Footer_bottom ">
           <div className="Footer-text-year">
-            <span onClick={() => goTo('/')}>
-              <LogoIcon className="Footer_bottom-logo" />
-            </span>{' '}
+            <Link to="/">
+              <span>
+                <LogoIcon className="Footer_bottom-logo" />
+              </span>
+            </Link>{' '}
             <span>© 2017 — {date.getFullYear()} интерпроект</span>
           </div>
           <div className="Footer_bottom-wrapper">
-            <Button size="sm" variant="ghostLink" onClick={() => goTo('/mapping')}>
-              карта сайта
-            </Button>
-            <Button size="sm" variant="ghostLink" onClick={() => goTo('/privacy')}>
-              политика конфиденциальности
-            </Button>
-            <Button size="sm" variant="ghostLink" onClick={() => goTo('/advertising-privacy')}>
-              Политика рекламных материалов
-            </Button>
+            <Link to="/mapping">
+              <span className="Button sm ghostLink center-right">карта сайта</span>
+            </Link>
+            <Link to="/privacy">
+              <span className="Button sm ghostLink center-right">политика конфиденциальности</span>
+            </Link>
+            <Link to="/advertising-privacy">
+              <span className="Button sm ghostLink center-right">Политика рекламных материалов</span>
+            </Link>
           </div>
         </div>
       </div>

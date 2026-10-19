@@ -18,7 +18,6 @@ import ContactForm from 'shared/components/ContactForm';
 
 import ProjectCardTable from './ProjectCardTable';
 
-import { useNavigate } from 'shared/components/NavigationTracker';
 import toFormatNames from 'shared/utils/toFormatNames';
 
 import Link from 'shared/components/Link';
@@ -209,7 +208,6 @@ interface ImgProps {
 }
 
 function Img({ title, cover, id, slug }: ImgProps) {
-  const { goTo } = useNavigate();
   const projectTitle = decodeUnicodeEscapes(title);
 
   const clIsHover = hoveredProject.v == id ? 'isHover' : '';
@@ -221,7 +219,6 @@ function Img({ title, cover, id, slug }: ImgProps) {
           onMouseEnter={() => (hoveredProject.v = id)}
           onMouseLeave={() => (hoveredProject.v = -id)}
           src={cover}
-          onClick={() => goTo(`/projects/${slug}`, projectTitle)}
           alt={`Обложка проекта: ${projectTitle}`}
         />
       </div>

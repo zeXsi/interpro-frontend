@@ -115,7 +115,7 @@
       span {
         display: flex;
       }
-      span:last-child {
+      & > span:last-child {
         opacity: 0.5;
         align-items: end;
       }
@@ -144,23 +144,23 @@
         @media (max-width: 768px) {
           line-height: 150%;
         }
+      }
 
-        &:nth-child(1) {
-          white-space: nowrap;
-        }
+      & > .Link:nth-child(1) > .Button {
+        white-space: nowrap;
+      }
 
-        @media (hover: hover) {
-          &:nth-child(2),
-          &:nth-child(3) {
-            &::before {
-              display: none;
-            }
-
-            text-decoration: underline;
-            text-underline-offset: 2px;
-            text-decoration-thickness: 1px;
-            overflow: unset;
+      @media (hover: hover) {
+        & > .Link:nth-child(2) > .Button,
+        & > .Link:nth-child(3) > .Button {
+          &::before {
+            display: none;
           }
+
+          text-decoration: underline;
+          text-underline-offset: 2px;
+          text-decoration-thickness: 1px;
+          overflow: unset;
         }
       }
 
@@ -250,7 +250,7 @@
           height: 27px;
         }
 
-        span:last-child {
+        & > span:last-child {
           font-size: clamp(0.875rem, calc(0.636rem + 1.018vw), 1.125rem); /* min: 14px, max: 18px */
           letter-spacing: -0.03em;
           line-height: 110%;
@@ -260,7 +260,8 @@
         order: 1;
         grid-template-columns: 1fr 1fr;
         gap: 24px 8px;
-        & > * {
+        & > *,
+        & > .Link > .Button {
           grid-column: 2 / 3;
         }
 

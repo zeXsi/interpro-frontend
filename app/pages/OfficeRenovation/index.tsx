@@ -14,6 +14,7 @@ import FAQSection from 'shared/sections/FAQSection';
 import { scrollToContactForm } from 'shared/utils/scrollToSection';
 import { decodeUnicodeEscapes } from 'shared/utils/decodeUnicodeEscapes';
 import { getOpenGraphMeta } from 'shared/seo/meta';
+import { toCdnMediaUrl } from 'shared/utils/toCdnMediaUrl';
 import { useCycleLineMarker, useStickyStepCycle } from 'shared/hooks/useStickyStepCycle';
 import ContactForm from 'shared/components/ContactForm';
 import ProjectShowcase, { type ShowcaseProject } from 'shared/components/ProjectShowcase';
@@ -201,7 +202,7 @@ export default function OfficeRenovation({ loaderData }: Route.ComponentProps) {
             cover="/images/office-renovation/hero-preview.png"
             videoSources={[
               {
-                src: '/videos/office-renovation/hls/hero.m3u8',
+                src: toCdnMediaUrl('/videos/office-renovation/hls/hero.m3u8'),
                 type: 'application/x-mpegURL',
               },
             ]}
@@ -567,7 +568,9 @@ function getOfficeProjects(projects: Project[]): OfficeProject[] {
       exhibition: '',
       type: '',
       year: '',
-      cover: 'https://api.interpro.pro/wp-content/uploads/2026/07/oblozka-1.jpeg.webp',
+      cover: toCdnMediaUrl(
+        'https://api.interpro.pro/wp-content/uploads/2026/07/oblozka-1.jpeg.webp'
+      ),
       href: '/projects/kontrastnyj-open-space',
     },
     projectToOfficeCard(multiZone) ?? {
@@ -576,7 +579,9 @@ function getOfficeProjects(projects: Project[]): OfficeProject[] {
       exhibition: '',
       type: '',
       year: '',
-      cover: 'https://api.interpro.pro/wp-content/uploads/2026/07/oblozka.jpeg.webp',
+      cover: toCdnMediaUrl(
+        'https://api.interpro.pro/wp-content/uploads/2026/07/oblozka.jpeg.webp'
+      ),
       href: '/projects/mnogozonal-nyj-ofis',
     },
   ];

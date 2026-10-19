@@ -14,7 +14,9 @@ let browserPromise: Promise<Browser> | null = null;
 
 async function getBrowser() {
   if (!browserPromise) {
-    browserPromise = chromium.launch({ headless: true });
+    browserPromise = process.env.PLAYWRIGHT_WS_ENDPOINT
+      ? chromium.connect(process.env.PLAYWRIGHT_WS_ENDPOINT)
+      : chromium.launch({ headless: true });
     browserPromise
       .then((browser) => {
         browser.on('disconnected', () => {
@@ -54,7 +56,7 @@ export async function loader({ params, request }: LoaderFunctionArgs) {
   }
 
   const url = new URL(request.url);
-  const origin = `${url.protocol}//${url.host}`;
+  const origin = process.env.PDF_RENDER_ORIGIN || `${url.protocol}//${url.host}`;
   const token = primePresentation(presentation);
   const target = `${origin}/presentation/${name}/print?export=pdf&token=${encodeURIComponent(
     token

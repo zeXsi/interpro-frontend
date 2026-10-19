@@ -1,5 +1,5 @@
 import './styles.css';
-import { ButtonHTMLAttributes, useEffect, useImperativeHandle, useRef, useState } from 'react';
+import { ButtonHTMLAttributes, HTMLAttributes, useEffect, useImperativeHandle, useRef, useState } from 'react';
 import ArrowIcon from 'assets/icons/arrow.svg?react';
 
 export interface ImperativeButton {
@@ -15,8 +15,11 @@ interface Props {
   isHover?: boolean;
   hoverCallback?: () => void;
   refImp?: React.RefObject<Partial<ImperativeButton>>;
-  ref?: React.RefObject<HTMLButtonElement | null>;
 }
+type ElementProps =
+  | ({ as?: 'button'; ref?: React.RefObject<HTMLButtonElement | null> } & ButtonHTMLAttributes<HTMLButtonElement>)
+  | ({ as: 'span'; ref?: React.RefObject<HTMLSpanElement | null> } & HTMLAttributes<HTMLSpanElement>);
+
 export default function Button({
   variant = 'primary',
   underline = 'center-right',
@@ -26,13 +29,12 @@ export default function Button({
   isHover = false,
   children,
   hoverCallback,
-  ref,
   ...props
-}: Props & ButtonHTMLAttributes<HTMLButtonElement>) {
+}: Props & ElementProps) {
   const clIsSubTitle = !!subTitle ? 'subtitle' : '';
   const clIsHover = isHover ? 'isHover' : '';
   const onLeave = (
-    e: React.MouseEvent<HTMLButtonElement, MouseEvent> | React.TouchEvent<HTMLButtonElement>
+    e: React.MouseEvent<HTMLElement, MouseEvent> | React.TouchEvent<HTMLElement>
   ) => {
     const button = e.currentTarget;
     if (button.classList.contains('left-right')) {
@@ -43,22 +45,39 @@ export default function Button({
     }
   };
 
-  return (
-    <button
-      {...props}
-      onMouseLeave={(e) => (onLeave(e), props.onMouseLeave?.(e))}
-      onTouchEnd={(e) => (onLeave(e), props.onTouchEnd?.(e))}
-      ref={ref}
-      className={`Button  ${clIsHover} ${variant} ${className} ${size} ${underline} ${clIsSubTitle}`}
-    >
-      {subTitle ? (
+  const content = subTitle ? (
         <>
-          <p>{children}</p>
+          {props.as === 'span' ? <span className="Button-title">{children}</span> : <p>{children}</p>}
           <span>{subTitle}</span>
         </>
       ) : (
         children
-      )}
+      );
+  const classes = `Button  ${clIsHover} ${variant} ${className} ${size} ${underline} ${clIsSubTitle}`;
+
+  if (props.as === 'span') {
+    const { as, ...spanProps } = props;
+    return (
+      <span
+        {...spanProps}
+        onMouseLeave={(e) => (onLeave(e), spanProps.onMouseLeave?.(e))}
+        onTouchEnd={(e) => (onLeave(e), spanProps.onTouchEnd?.(e))}
+        className={classes}
+      >
+        {content}
+      </span>
+    );
+  }
+
+  const { as, ...buttonProps } = props;
+  return (
+    <button
+      {...buttonProps}
+      onMouseLeave={(e) => (onLeave(e), buttonProps.onMouseLeave?.(e))}
+      onTouchEnd={(e) => (onLeave(e), buttonProps.onTouchEnd?.(e))}
+      className={classes}
+    >
+      {content}
     </button>
   );
 }
@@ -68,6 +87,7 @@ export interface ImpRef {
 }
 interface ButtonArrowProps
   extends React.DetailedHTMLProps<React.HTMLAttributes<HTMLSpanElement>, HTMLSpanElement> {
+  as?: 'button' | 'span';
   direction?: 'left' | 'right';
   variant?: 'ghostLink' | 'link';
   size?: 'sm' | 'normal';
@@ -78,6 +98,7 @@ interface ButtonArrowProps
 }
 
 Button.Arrow = ({
+  as = 'button',
   variant = 'ghostLink',
   children,
   className = '',
@@ -97,13 +118,15 @@ Button.Arrow = ({
   const [isHover, setIsHover] = useState(false);
   const refSvg = useRef<SVGSVGElement>(null);
   const refButton = useRef<HTMLButtonElement>(null);
+  const refLabel = useRef<HTMLSpanElement>(null);
 
   useEffect(() => {
-    if (!refSvg?.current || !refButton?.current) return;
-    const computedStyle = window.getComputedStyle(refButton.current);
+    const label = as === 'span' ? refLabel.current : refButton.current;
+    if (!refSvg.current || !label) return;
+    const computedStyle = window.getComputedStyle(label);
     const pdBottom = computedStyle.paddingBottom;
     refSvg.current.style.marginTop = `-${pdBottom}`;
-  }, []);
+  }, [as]);
   useImperativeHandle(refImp, () => ({
     setIsHover: (v) => {
       setIsHover(v);
@@ -130,9 +153,15 @@ Button.Arrow = ({
         onTouchEnd?.(e);
       }}
     >
-      <Button ref={refButton} isHover={isHover} disabled={disabled} variant={variant}>
-        {children}
-      </Button>
+      {as === 'span' ? (
+        <Button as="span" ref={refLabel} isHover={isHover} variant={variant}>
+          {children}
+        </Button>
+      ) : (
+        <Button ref={refButton} isHover={isHover} disabled={disabled} variant={variant}>
+          {children}
+        </Button>
+      )}
 
       <ArrowIcon className="ButtonArrow-icon" ref={refSvg} />
     </span>

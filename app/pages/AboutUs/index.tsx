@@ -98,7 +98,7 @@ export default function AboutUs() {
         <div className="AboutUs_companies">
           <CompaniesGrid items={svgCompanies.slice(0, 10)} />
           <Link to={'/about-us/clients'}>
-            <Button.Arrow className="AboutUs_companies-btn" direction="right">
+            <Button.Arrow as="span" className="AboutUs_companies-btn" direction="right">
               Ещё {svgCompanies.length - 10}+ клиентов
             </Button.Arrow>
           </Link>
@@ -109,7 +109,7 @@ export default function AboutUs() {
             <div className="AboutUs_iso-head">
               <TitlePage title={'Лицензии и сертификаты'} className="title-3" as="h2" />
               <Link to={'/about-us/certificates'}>
-                <Button.Arrow className="AboutUs_companies-btn __top" direction="right">
+                <Button.Arrow as="span" className="AboutUs_companies-btn __top" direction="right">
                   Все сертификаты
                 </Button.Arrow>
               </Link>
@@ -117,7 +117,7 @@ export default function AboutUs() {
 
             <Certificates qntyPreview={2} />
             <Link to={'/about-us/certificates'}>
-              <Button.Arrow className="AboutUs_companies-btn __bottom" direction="right">
+              <Button.Arrow as="span" className="AboutUs_companies-btn __bottom" direction="right">
                 Все сертификаты
               </Button.Arrow>
             </Link>

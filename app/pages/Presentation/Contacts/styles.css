@@ -73,6 +73,7 @@
       }
 
       .Contacts__list-button {
+        display: inline-block;
         padding: 20px 12px;
         border-radius: 100px;
         font-family: var(--font-family);

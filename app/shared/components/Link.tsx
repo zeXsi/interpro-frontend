@@ -91,6 +91,15 @@ const Link = ({ slug = [], ...props }: LinkProps) => {
   }, [location.pathname]);
 
   const handleClickInternal = (e: React.MouseEvent<HTMLAnchorElement>) => {
+    if (
+      e.defaultPrevented ||
+      e.button !== 0 ||
+      e.metaKey ||
+      e.ctrlKey ||
+      e.shiftKey ||
+      e.altKey
+    ) return;
+
     e.preventDefault();
     props.onClick?.();
 

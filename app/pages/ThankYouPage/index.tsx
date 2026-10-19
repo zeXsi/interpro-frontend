@@ -1,7 +1,8 @@
-import { useNavigate } from 'shared/components/NavigationTracker';
+import Link from 'shared/components/Link';
 import './styles.css';
 
-import Button from 'shared/components/Button';
+import 'shared/components/Button/styles.css';
+import ArrowIcon from 'assets/icons/arrow.svg?react';
 import StartPage from 'shared/components/StartPage';
 
 export function meta() {
@@ -28,15 +29,16 @@ export function meta() {
 
 
 export default function ThankYouPage() {
-  const { goTo } = useNavigate();
-
   return (
     <StartPage>
       <div className="ThankYouPage px">
         <h1 className="ThankYouPage-title">Спасибо, мы скоро свяжемся с Вами</h1>
-        <Button.Arrow variant="link" onClick={() => goTo('/')}>
-          Назад
-        </Button.Arrow>
+        <Link to="/">
+          <span className="ButtonArrow normal left link">
+            <span className="Button link center-right">Назад</span>
+            <ArrowIcon className="ButtonArrow-icon" />
+          </span>
+        </Link>
       </div>
     </StartPage>
   );

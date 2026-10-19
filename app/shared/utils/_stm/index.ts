@@ -442,6 +442,27 @@ export const effect = (
 
 export const __SSR_STATE__: Record<string, any> = {};
 
+export type SSRRequestState = {
+  values: Map<string, unknown>;
+  usedIds: Set<string>;
+  signalGenerations: Map<string, number>;
+};
+
+const processSignalGenerations = new Map<string, number>();
+let getSSRRequestState: (() => SSRRequestState | undefined) | undefined;
+
+export function createSSRRequestState(): SSRRequestState {
+  return {
+    values: new Map(Object.entries(__SSR_STATE__)),
+    usedIds: new Set(),
+    signalGenerations: new Map(processSignalGenerations),
+  };
+}
+
+export function setSSRRequestStateProvider(provider: () => SSRRequestState | undefined) {
+  getSSRRequestState = provider;
+}
+
 let ssrIdCounter = 0;
 function nextId() {
   ssrIdCounter += 1;
@@ -466,7 +487,16 @@ export function ssrSignal<T>(initial: T, explicitId?: string): SSRSignal<T> {
     return sg;
   }
 
-  __SSR_STATE__[id] = initial;
+  if (!Object.prototype.hasOwnProperty.call(__SSR_STATE__, id)) {
+    __SSR_STATE__[id] = initial;
+  }
+
+  const requestState = getSSRRequestState?.();
+  if (requestState) {
+    if (!requestState.values.has(id)) {
+      requestState.values.set(id, initial);
+    }
+  }
 
   const proto = Object.getPrototypeOf(sg);
   const desc = Object.getOwnPropertyDescriptor(proto, 'v');
@@ -476,9 +506,22 @@ export function ssrSignal<T>(initial: T, explicitId?: string): SSRSignal<T> {
       configurable: true,
       enumerable: desc.enumerable ?? true,
       get() {
+        const state = getSSRRequestState?.();
+        if (state) {
+          state.usedIds.add(id);
+          return state.values.get(id) as T;
+        }
+
         return desc.get!.call(this);
       },
       set(value: T) {
+        const state = getSSRRequestState?.();
+        if (state) {
+          state.values.set(id, value);
+          state.usedIds.add(id);
+          return;
+        }
+
         desc.set!.call(this, value as any);
         __SSR_STATE__[id] = value;
       },
@@ -490,8 +533,45 @@ export function ssrSignal<T>(initial: T, explicitId?: string): SSRSignal<T> {
   return sg;
 }
 
-export function getSSRStore()  { 
-  return `window['__SSR_STATE__'] = ${JSON.stringify(__SSR_STATE__)};`
+export function getSSRSignalGeneration(signal: SSRSignal<unknown>): number | undefined {
+  const state = getSSRRequestState?.();
+  return (state?.signalGenerations ?? processSignalGenerations).get(signal.__ssrId);
+}
+
+export function setSSRSignalGeneration(signal: SSRSignal<unknown>, generation: number) {
+  const state = getSSRRequestState?.();
+  (state?.signalGenerations ?? processSignalGenerations).set(signal.__ssrId, generation);
+}
+
+const INLINE_SCRIPT_JSON_CHARACTERS = /[<>&\u2028\u2029]/g;
+
+function serializeJSONForInlineScript(value: unknown): string {
+  const json = JSON.stringify(value);
+  if (json === undefined) {
+    throw new TypeError('Value cannot be serialized to JSON');
+  }
+
+  return json.replace(INLINE_SCRIPT_JSON_CHARACTERS, (character) =>
+    `\\u${character.charCodeAt(0).toString(16).padStart(4, '0')}`
+  );
+}
+
+export function getSSRStore(): string {
+  let state: Record<string, unknown> = __SSR_STATE__;
+
+  if (typeof window === 'undefined' && getSSRRequestState) {
+    const requestState = getSSRRequestState?.();
+    if (!requestState) {
+      throw new Error('getSSRStore() requires an active SSR request scope');
+    }
+
+    state = {};
+    for (const id of requestState.usedIds) {
+      state[id] = requestState.values.get(id);
+    }
+  }
+
+  return `window['__SSR_STATE__'] = ${serializeJSONForInlineScript(state)};`;
 }
 
 export function untracked<T>(fn: () => T): T {

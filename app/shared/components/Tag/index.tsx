@@ -14,7 +14,7 @@ export default function Tag({ title, link , subTitle, className = '' }: TagProps
       { //prettier-ignore
         !link ? <div className="Tag-title">{ title }</div> : (
           <a className="Tag-title" href={ link } rel="noopener noreferrer nofollow" target="_blank">
-          <Button variant="ghostLink">{ title }</Button>
+          <Button as="span" variant="ghostLink">{ title }</Button>
         </a>
       )}
     </div>

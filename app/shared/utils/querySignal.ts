@@ -1,6 +1,12 @@
 // querySignal.ts
 import { instance } from 'api/api.config';
-import { ssrSignal, type SSRSignal } from './_stm';
+import {
+  getSSRSignalGeneration,
+  setSSRSignalGeneration,
+  ssrSignal,
+  type SSRSignal,
+} from './_stm';
+import { toCdnMediaUrls } from './toCdnMediaUrl';
 
 const isServer = typeof window === 'undefined';
 
@@ -53,7 +59,6 @@ type PendingRequest = {
 const cache = new Map<string, VersionedCacheEntry>();
 const inFlight = new Map<string, PendingRequest>();
 const familyGenerations = new Map<string, number>();
-const signalGenerations = new WeakMap<SSRSignal<unknown>, number>();
 
 let lastCleanup = 0;
 
@@ -118,8 +123,9 @@ export function createQuery<TData, TParams = any, TParent = any>(
 
   async function request(params: TParams, timeout?: number): Promise<TData> {
     const resp = await instance.get(endpoint, { params, timeout });
+    const responseData = toCdnMediaUrls(resp.data);
 
-    const raw = takeFirst ? resp.data?.[0] : resp.data;
+    const raw = takeFirst ? responseData?.[0] : responseData;
     let result = map ? map(raw, resp, params) : (raw ?? initial);
 
     if (middleware) {
@@ -132,12 +138,11 @@ export function createQuery<TData, TParams = any, TParent = any>(
   async function fetch(params: TParams = {} as TParams): Promise<TData> {
     const generation = getFamilyGeneration(family);
 
-    // На сервере parent signal является process-wide singleton. После обновления
-    // family используем его только когда он точно заполнен тем же поколением.
+    // На сервере значение и generation parent signal принадлежат request scope.
     const canUseParent =
       parent &&
       findInParent &&
-      (!isServer || signalGenerations.get(parent as SSRSignal<unknown>) === generation);
+      (!isServer || getSSRSignalGeneration(parent as SSRSignal<unknown>) === generation);
 
     if (canUseParent) {
       const found = findInParent(parent.v, params);
@@ -196,7 +201,7 @@ export function createQuery<TData, TParams = any, TParent = any>(
     }
   }
 
-  /** Заполняет server cache, не изменяя process-wide SSR signal. */
+  /** Заполняет server cache, по умолчанию не изменяя SSR signal. */
   async function prime(
     params: TParams = {} as TParams,
     options: { force?: boolean; updateSignal?: boolean } = {}
@@ -220,11 +225,7 @@ export function createQuery<TData, TParams = any, TParent = any>(
     return result;
   }
 
-  /**
-   * sg — синглтон, общий для всех параллельных SSR-запросов, поэтому на сервере
-   * его значение может принадлежать чужим params. Берём последнее известное
-   * значение именно для этого ключа. На клиенте кэша нет и sg.v корректен.
-   */
+  /** При server cache miss не подменяем результат значением другого cache key. */
   function fallback(useCache: boolean, key: string): TData {
     if (!useCache) return sg.v;
 
@@ -274,7 +275,7 @@ export function createQuery<TData, TParams = any, TParent = any>(
 
   function setSignal(data: TData, generation: number) {
     sg.v = data;
-    signalGenerations.set(sg as SSRSignal<unknown>, generation);
+    setSSRSignalGeneration(sg as SSRSignal<unknown>, generation);
   }
 
   return { sg, fetch, prime, family };

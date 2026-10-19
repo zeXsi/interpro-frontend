@@ -184,7 +184,7 @@ export default function ProjectPage({ loaderData: data, params }: Route.Componen
           <div className="__nextItem">
             <Subtitle>(Следующий проект)</Subtitle>
             <Link to={`/projects/${nextSlug}`} slug={[nextProjectTitle]}>
-              <Button.Arrow variant="link" direction="right">
+              <Button.Arrow as="span" variant="link" direction="right">
                 {nextProjectTitle}
               </Button.Arrow>
             </Link>

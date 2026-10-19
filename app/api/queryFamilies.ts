@@ -1,4 +1,5 @@
 export const QUERY_FAMILIES = {
+  home: 'home',
   projects: 'projects',
   services: 'services',
   news: 'news',

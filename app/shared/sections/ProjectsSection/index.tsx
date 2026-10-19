@@ -7,7 +7,7 @@ import { useDebouncedUpdate } from 'shared/hooks/useDebouncedUpdate';
 import Button from 'shared/components/Button';
 
 import useRefMap from '@qtpy/use-ref-map';
-import { useNavigate } from 'shared/components/NavigationTracker';
+import Link from 'shared/components/Link';
 
 import Degree from 'shared/components/Degree';
 
@@ -16,16 +16,28 @@ import IsNot from 'shared/components/IsNot';
 import { sgProjects } from 'api/projects/projects.api';
 import { signal } from 'shared/utils/_stm';
 import { useSignalValue, useWatch } from 'shared/utils/_stm/react/react';
-import { Project } from 'api/projects/projects.types';
 import { decodeUnicodeEscapes } from 'shared/utils/decodeUnicodeEscapes';
+import type { HomeProject } from 'api/home/home.types';
 
 export const hoveredProject = signal(-Infinity);
 
-export default function ProjectsSection() {
-  const { goTo } = useNavigate();
+interface ProjectsSectionProps {
+  items?: HomeProject[];
+  total?: number;
+}
+
+export default function ProjectsSection({ items, total }: ProjectsSectionProps) {
   const refsProjects = useRefMap<ProjectRef>();
 
-  const dataMax = sgProjects.v.slice(0, 5);
+  const dataMax: ProjectPreview[] = items ?? sgProjects.v.slice(0, 5).map((project) => ({
+    id: project.id,
+    slug: project.slug,
+    title: project.payload.title,
+    exhibition: project.payload.meta?.exhibition[0]?.name ?? null,
+    year: project.payload.meta?.year?.name ?? null,
+    area: project.payload.meta?.area ?? 0,
+    cover: project.payload.cover ? { url: project.payload.cover } : null,
+  }));
 
   return (
     <div className="ProjectsSection px">
@@ -33,30 +45,32 @@ export default function ProjectsSection() {
       <div className="ProjectsSection-container">
         <ProjectTitles projects={dataMax} />
         <div className="ProjectsSection-container-items">
-          {dataMax.map(({ payload, slug, id }, index) => {
+          {dataMax.map(({ title, exhibition, year, area, cover, slug, id }, index) => {
             return (
               <ProjectItem
                 key={index}
-                title={payload.title}
+                title={title}
                 slug={slug}
                 id={id}
                 ref={refsProjects.getRef(`project_${index}`)}
-                nameCompany={payload.meta?.exhibition[0]?.name || 'нет'}
-                year={payload?.meta?.year?.name || 'нет'}
-                square={<Degree text={`${payload?.meta?.area} м`} degree={2} />}
-                imgSrc={payload.cover}
+                nameCompany={exhibition || 'нет'}
+                year={year || 'нет'}
+                square={<Degree text={`${area} м`} degree={2} />}
+                cover={cover}
               />
             );
           })}
         </div>
       </div>
       <div className="Projects_footer">
-        <Button variant="link" onClick={() => goTo('/projects')}>
-          Все проекты
-        </Button>
-        <Button variant="link" className="Projects_footer-qty" onClick={() => goTo('/projects')}>
-          {sgProjects.v.length}
-        </Button>
+        <Link to="/projects">
+          <Button as="span" variant="link">Все проекты</Button>
+        </Link>
+        <Link to="/projects">
+          <Button as="span" variant="link" className="Projects_footer-qty">
+            {total ?? sgProjects.v.length}
+          </Button>
+        </Link>
       </div>
     </div>
   );
@@ -66,7 +80,7 @@ interface ProjectProps {
   nameCompany: string;
   year: number | string;
   square: string | React.JSX.Element;
-  imgSrc: string;
+  cover: HomeProject['cover'];
   title: string;
   slug: string;
   id: number;
@@ -79,14 +93,14 @@ interface ProjectRef {
   slug: string;
 }
 
-function ProjectItem({ ref, id, slug, title, nameCompany, year, square, imgSrc }: ProjectProps) {
+type ProjectPreview = Pick<HomeProject, 'id' | 'slug' | 'title' | 'exhibition' | 'year' | 'area' | 'cover'>;
+
+function ProjectItem({ ref, id, slug, title, nameCompany, year, square, cover }: ProjectProps) {
   useSignalValue(hoveredProject);
   const refProject = useRef<HTMLDivElement>(null);
   const projectTitle = decodeUnicodeEscapes(title);
 
   const clIsHover = hoveredProject.v == id ? 'isHover' : '';
-
-  const { goTo } = useNavigate();
 
   useImperativeHandle(ref, () => ({
     refProject,
@@ -108,21 +122,31 @@ function ProjectItem({ ref, id, slug, title, nameCompany, year, square, imgSrc }
             <IsNot value={square} children={<span className="header-square">{square}</span>} />
           </div>
         </div>
-        <div
-          className={`Project_img ${clIsHover}`}
-          onMouseEnter={() => hoveredProject.v = id}
-          onMouseLeave={() => hoveredProject.v = -id}
-          onClick={() => goTo(`/projects/${slug}`, projectTitle)}
-        >
-          <img src={imgSrc} alt={`Проект: ${projectTitle}, выставка ${nameCompany}, ${year} год`} />
-        </div>
+        <Link to={`/projects/${slug}`} slug={projectTitle}>
+          <div
+            className={`Project_img ${clIsHover}`}
+            onMouseEnter={() => hoveredProject.v = id}
+            onMouseLeave={() => hoveredProject.v = -id}
+          >
+            <img
+              src={cover?.url}
+              srcSet={cover?.srcset || undefined}
+              sizes="(max-width: 1000px) calc(100vw - 16px), 60vw"
+              width={cover?.width || undefined}
+              height={cover?.height || undefined}
+              loading="lazy"
+              decoding="async"
+              alt={`Проект: ${projectTitle}, выставка ${nameCompany}, ${year} год`}
+            />
+          </div>
+        </Link>
       </div>
     </div>
   );
 }
 
 interface ProjectTitlesProps {
-  projects: Project[];
+  projects: ProjectPreview[];
 }
 
 export function ProjectTitles({ projects }: ProjectTitlesProps) {
@@ -192,7 +216,7 @@ export function ProjectTitles({ projects }: ProjectTitlesProps) {
             key={index}
             ref={refsH1.getRef(`project_${index}`) as any}
             className={`Project-title-animate ${isLast}`}
-            children={<ButtonWrap slug={props.slug} id={props.id} title={props.payload.title} />}
+            children={<ButtonWrap slug={props.slug} id={props.id} title={props.title} />}
           />
         );
       })}
@@ -207,10 +231,8 @@ interface Props {
 }
 function ButtonWrap({ slug, id, title }: Props) {
   useSignalValue(hoveredProject);
-  const refButton = useRef<HTMLButtonElement | null>(null);
+  const refButton = useRef<HTMLSpanElement | null>(null);
   const projectTitle = decodeUnicodeEscapes(title);
-
-  const { goTo } = useNavigate();
 
   useWatch(() => { 
    const button = refButton.current;
@@ -226,19 +248,19 @@ function ButtonWrap({ slug, id, title }: Props) {
 
 
   return (
-    <Button
-      variant="link"
-      underline="left-right"
-      className={`Project-title-button`}
-      onClick={() => {
-        goTo(`/projects/${slug}`, projectTitle);
-      }}
-      isHover={id === hoveredProject.v}
-      onMouseEnter={() => hoveredProject.v = id}
-      onMouseLeave={() => hoveredProject.v = -id}
-      ref={refButton}
-    >
-      {projectTitle}
-    </Button>
+    <Link to={`/projects/${slug}`} slug={projectTitle}>
+      <Button
+        as="span"
+        variant="link"
+        underline="left-right"
+        className={`Project-title-button`}
+        isHover={id === hoveredProject.v}
+        onMouseEnter={() => hoveredProject.v = id}
+        onMouseLeave={() => hoveredProject.v = -id}
+        ref={refButton}
+      >
+        {projectTitle}
+      </Button>
+    </Link>
   );
 }

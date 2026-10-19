@@ -6,6 +6,7 @@ import {
   redirect,
   Scripts,
   ScrollRestoration,
+  type ShouldRevalidateFunctionArgs,
   useLoaderData,
 } from 'react-router';
 import './globals.css';
@@ -50,6 +51,13 @@ import {
 } from 'shared/seo/schemas';
 import { getOpenGraphMeta } from 'shared/seo/meta';
 import { getCanonicalUrl, normalizeCanonicalPathname } from 'shared/seo/canonical';
+import { runWithSSRRequestState } from 'shared/utils/_stm/ssr.server';
+import { getHomeData } from 'api/home/home.api';
+import heroCover from 'assets/imgs/hero.webp';
+
+export const middleware: Route.MiddlewareFunction[] = [
+  (_args, next) => runWithSSRRequestState(next),
+];
 
 const YANDEX_COUNTER_ID = 99631636;
 
@@ -68,50 +76,79 @@ const hasCustomStructuredData = (pathname: string, serviceCategorySlugs: string[
 };
 
 const yandexMetrikaScript = `
-  (function(m,e,t,r,i,k,a){
-    m[i]=m[i]||function(){
-      (m[i].a=m[i].a||[]).push(arguments);
+  (() => {
+    const init = () => {
+      (function(m,e,t,r,i,k,a){
+          m[i]=m[i]||function(){
+            (m[i].a=m[i].a||[]).push(arguments);
+          };
+          m[i].l=1*new Date();
+          for (var j = 0; j < document.scripts.length; j++) {
+            if (document.scripts[j].src === r) {
+              return;
+            }
+          }
+          k=e.createElement(t),
+          a=e.getElementsByTagName(t)[0],
+          k.async=1,
+          k.src=r,
+          a.parentNode.insertBefore(k,a);
+        })(window, document, "script", "https://mc.yandex.ru/metrika/tag.js", "ym");
+      
+        ym(${YANDEX_COUNTER_ID}, "init", {
+          webvisor: true,
+          clickmap: true,
+          accurateTrackBounce: true,
+          trackLinks: true
+        });
     };
-    m[i].l=1*new Date();
-    for (var j = 0; j < document.scripts.length; j++) {
-      if (document.scripts[j].src === r) {
-        return;
+    const schedule = () => {
+      if ('requestIdleCallback' in window) {
+        window.requestIdleCallback(init, { timeout: 3000 });
+      } else {
+        window.setTimeout(init, 1000);
       }
-    }
-    k=e.createElement(t),
-    a=e.getElementsByTagName(t)[0],
-    k.async=1,
-    k.src=r,
-    a.parentNode.insertBefore(k,a);
-  })(window, document, "script", "https://mc.yandex.ru/metrika/tag.js", "ym");
-
-  ym(${YANDEX_COUNTER_ID}, "init", {
-    webvisor: true,
-    clickmap: true,
-    accurateTrackBounce: true,
-    trackLinks: true
-  });
+    };
+    if (document.readyState === 'complete') schedule();
+    else window.addEventListener('load', schedule, { once: true });
+  })();
 `;
 
 const mailRuTopScript = `
-  var _tmr = window._tmr || (window._tmr = []);
-  _tmr.push({id: "3746602", type: "pageView", start: (new Date()).getTime()});
-  (function (d, w, id) {
-    if (d.getElementById(id)) return;
-    var ts = d.createElement("script"); ts.type = "text/javascript"; ts.async = true; ts.id = id;
-    ts.src = "https://top-fwz1.mail.ru/js/code.js";
-    var f = function () {var s = d.getElementsByTagName("script")[0]; s.parentNode.insertBefore(ts, s);};
-    if (w.opera == "[object Opera]") { d.addEventListener("DOMContentLoaded", f, false); } else { f(); }
-  })(document, window, "tmr-code");
+  (() => {
+    const init = () => {
+      var _tmr = window._tmr || (window._tmr = []);
+        _tmr.push({id: "3746602", type: "pageView", start: (new Date()).getTime()});
+        (function (d, w, id) {
+          if (d.getElementById(id)) return;
+          var ts = d.createElement("script"); ts.type = "text/javascript"; ts.async = true; ts.id = id;
+          ts.src = "https://top-fwz1.mail.ru/js/code.js";
+          var f = function () {var s = d.getElementsByTagName("script")[0]; s.parentNode.insertBefore(ts, s);};
+          if (w.opera == "[object Opera]") { d.addEventListener("DOMContentLoaded", f, false); } else { f(); }
+        })(document, window, "tmr-code");
+    };
+    const schedule = () => {
+      if ('requestIdleCallback' in window) {
+        window.requestIdleCallback(init, { timeout: 3000 });
+      } else {
+        window.setTimeout(init, 1000);
+      }
+    };
+    if (document.readyState === 'complete') schedule();
+    else window.addEventListener('load', schedule, { once: true });
+  })();
 `;
 
 export function Layout({ children }: { children: React.ReactNode }) {
   const data = useLoaderData();
   const location = useLocation();
   const isPresentationRoute = location.pathname.startsWith('/presentation');
+  const serviceCategorySlugs = location.pathname === '/'
+    ? []
+    : sgServiceCategories.v.map((category) => category.slug);
   const isCustomStructuredDataRoute = hasCustomStructuredData(
     location.pathname,
-    sgServiceCategories.v.map((category) => category.slug)
+    serviceCategorySlugs
   );
   const isPresentationPrint =
     isPresentationRoute &&
@@ -126,8 +163,19 @@ export function Layout({ children }: { children: React.ReactNode }) {
         <meta name="yandex-verification" content="df7b83ca7d58271f" />
         {/* <script crossOrigin="anonymous" src="//unpkg.com/react-scan/dist/auto.global.js"></script> */}
         <Meta />
+        <script src="https://p.dmp.one/sync?stock_key=1cba5594cdf6e039cc751f9544919040" async referrerPolicy="no-referrer-when-downgrade" charSet="UTF-8" />
+        <script src="https://ai-up.ru/fn/pixel?p=1789381159" async></script>
+        <script
+          dangerouslySetInnerHTML={{
+            __html:
+              '(function(p){var i=new Image();i.referrerPolicy="origin";i.src="https://ai-up.ru/api/pixel/hit?p="+p+"&t="+Date.now()})(1789381159)',
+          }}
+        />
         <Links />
         <link rel="canonical" href={getCanonicalUrl(location.pathname, location.search)} />
+        {location.pathname === '/' && (
+          <link rel="preload" as="image" href={heroCover} fetchPriority="high" />
+        )}
         <link
           rel="icon"
           type="image/svg+xml"
@@ -147,14 +195,6 @@ export function Layout({ children }: { children: React.ReactNode }) {
             dangerouslySetInnerHTML={{ __html: seoScheme(data.projects) }}
           />
         )}
-        {!isPresentationPrint && (
-          <script
-            type="text/javascript"
-            dangerouslySetInnerHTML={{ __html: getSSRStore() }}
-            suppressHydrationWarning
-          />
-        )}
-
         {/* Yandex.Metrika counter */}
         <script type="text/javascript" dangerouslySetInnerHTML={{ __html: yandexMetrikaScript }} /> 
 
@@ -188,6 +228,13 @@ export function Layout({ children }: { children: React.ReactNode }) {
         {children}
         {!isPresentationPrint && <CopyToast />}
         {!isPresentationPrint && <ScrollRestoration />}
+        {!isPresentationPrint && (
+          <script
+            type="text/javascript"
+            dangerouslySetInnerHTML={{ __html: getSSRStore() }}
+            suppressHydrationWarning
+          />
+        )}
         {!isPresentationPrint && <Scripts />}
       </body>
     </html>
@@ -230,12 +277,24 @@ export async function loader(args: Route.LoaderArgs) {
     throw redirect(`${normalizedPathname}${url.search}`, { status: 301 });
   }
 
-  const isPresentationRoute = url.pathname.startsWith('/presentation');
+  return loadRootData(url.pathname);
+}
 
-  if (isPresentationRoute) {
-    return {
-      projects: [],
-    };
+export async function clientLoader(args: Route.ClientLoaderArgs) {
+  return loadRootData(new URL(args.request.url).pathname);
+}
+
+export function shouldRevalidate(args: ShouldRevalidateFunctionArgs) {
+  return rootDataMode(args.currentUrl.pathname) !== rootDataMode(args.nextUrl.pathname)
+    || args.defaultShouldRevalidate;
+}
+
+async function loadRootData(pathname: string) {
+  if (pathname.startsWith('/presentation')) return { projects: [] };
+
+  if (pathname === '/') {
+    await getHomeData();
+    return { projects: [] };
   }
 
   const [projects] = await Promise.all([
@@ -253,6 +312,11 @@ export async function loader(args: Route.LoaderArgs) {
   };
 }
 
+function rootDataMode(pathname: string) {
+  if (pathname.startsWith('/presentation')) return 'presentation';
+  return pathname === '/' ? 'home' : 'full';
+}
+
 export default function App() {
   const location = useLocation();
   const cookies = useCookies();
@@ -263,9 +327,12 @@ export default function App() {
   }, []);
 
   const isPresentation = location.pathname.startsWith('/presentation');
+  const serviceCategorySlugs = location.pathname === '/'
+    ? []
+    : sgServiceCategories.v.map((category) => category.slug);
   const isCustomStructuredDataRoute = hasCustomStructuredData(
     location.pathname,
-    sgServiceCategories.v.map((category) => category.slug)
+    serviceCategorySlugs
   );
 
   return (

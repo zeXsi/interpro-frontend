@@ -1,0 +1,6 @@
+FROM mcr.microsoft.com/playwright:v1.58.2-noble
+
+RUN npm install --global --ignore-scripts playwright@1.58.2
+
+EXPOSE 3000
+CMD ["playwright", "run-server", "--port", "3000", "--host", "0.0.0.0"]
