@@ -11,6 +11,7 @@ import { getProjectsBySlugs } from 'api/projects/projects.api';
 import type { HomeProject } from 'api/home/home.types';
 import { useLayoutEffect, useRef, useState } from 'react';
 import Accordion from 'shared/components/Accordion';
+import Button from 'shared/components/Button';
 import Link from 'shared/components/Link';
 import StartPage from 'shared/components/StartPage';
 import { decodeUnicodeEscapes } from 'shared/utils/decodeUnicodeEscapes';
@@ -41,7 +42,7 @@ const priceFaqItems = [
   {
     question: 'Что входит в стоимость стенда?',
     answer:
-      'В\u00a0стоимость включены: дизайн-проект, производство конструкций на\u00a0собственном производстве, доставка, монтаж и\u00a0демонтаж. Дополнительно\u00a0— мультимедиа, индивидуальная мебель, подвесные конструкции.',
+      'В\u00a0стоимость включены: дизайн-проект, производство конструкций на\u00a0собственном производстве, доставка, монтаж и\u00a0демонтаж.',
   },
   {
     question: 'Почему нельзя назвать точную цену сразу?',
@@ -51,7 +52,7 @@ const priceFaqItems = [
   {
     question: 'Как быстро вы сделаете расчёт?',
     answer:
-      'После получения брифа\u00a0— в\u00a0течение 2\u00a0рабочих дней. Вместе с\u00a0расчётом пришлём предварительную концепцию стенда.',
+      'После получения брифа\u00a0— в\u00a0течение 7\u00a0рабочих дней. Вместе с\u00a0расчётом пришлём предварительную концепцию стенда.',
   },
   {
     question: 'Можно ли заказать только дизайн-проект?',
@@ -134,7 +135,7 @@ function HeroSection({ onBrief }: { onBrief: () => void }) {
               конструкциями. Внутри диапазона цена зависит от&nbsp;площади, уровня материалов,
               состава функциональных зон и&nbsp;сроков изготовления
             </p>
-            <BriefButton className="StandPrices-heroButton" onClick={onBrief} />
+            <BriefButton variant="ghostLink" onClick={onBrief} />
           </div>
         </div>
         <p className="StandPrices-heroNote">
@@ -155,11 +156,20 @@ function HeroSection({ onBrief }: { onBrief: () => void }) {
   );
 }
 
-function BriefButton({ className = '', onClick }: { className?: string; onClick: () => void }) {
+function BriefButton({
+  className = '',
+  variant = 'link',
+  onClick,
+}: {
+  className?: string;
+  variant?: 'link' | 'ghostLink';
+  onClick: () => void;
+}) {
   return (
     <button className={`StandPrices-briefButton ${className}`} type="button" onClick={onClick}>
-      <span>Заполнить бриф</span>
-      <ArrowRightIcon />
+      <Button.Arrow as="span" direction="right" variant={variant}>
+        Заполнить бриф
+      </Button.Arrow>
     </button>
   );
 }

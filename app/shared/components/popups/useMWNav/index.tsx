@@ -348,6 +348,10 @@ function Desktop({
       link: '/about-us',
     },
     {
+      label: 'Цены на застройку',
+      link: '/stand-prices',
+    },
+    {
       label: 'Контакты',
       link: '/contacts',
     },
@@ -522,6 +526,11 @@ function Mobile({
           direction="right"
           className="MWNav_list-li nested"
         />
+        <Link to="/stand-prices" onClick={() => toNavigate('/stand-prices')}>
+          <span className="ButtonArrow isHideUnderline MWNav_list-li normal right link">
+            <span className="Button link">Цены на застройку</span>
+          </span>
+        </Link>
         <Link to="/contacts" onClick={() => toNavigate('/contacts')}>
           <span className="ButtonArrow isHideUnderline MWNav_list-li normal right link">
             <span className="Button link">контакты</span>

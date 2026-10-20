@@ -38,13 +38,12 @@ export const STAND_ZONES: { title: string; Icon: Icon }[] = [
   { title: 'Подвесная конструкция', Icon: ZoneCeiling },
 ];
 
-// TODO: в макете фото-заглушки (две картинки на пять стилей) — заменить на реальные.
 export const STAND_STYLES = [
-  { title: 'Минимализм', description: 'чистые линии, нейтральные цвета', image: '/images/brief/style-1.jpg' },
-  { title: 'Технологичный', description: 'металл, подсветка, хай-тек', image: '/images/brief/style-2.jpg' },
-  { title: 'Натуральный', description: 'дерево, живые растения, тепло', image: '/images/brief/style-3.jpg' },
-  { title: 'Яркий', description: 'насыщенные цвета, графика, акценты', image: '/images/brief/style-4.jpg' },
-  { title: 'Корпоративный', description: 'строго в фирменном стиле компании', image: '/images/brief/style-5.jpg' },
+  { title: 'Минимализм', description: 'чистые линии, нейтральные цвета', image: '/images/brief/minimalism.webp' },
+  { title: 'Технологичный', description: 'металл, подсветка, хай-тек', image: '/images/brief/technology.jpg' },
+  { title: 'Натуральный', description: 'дерево, живые растения, тепло', image: '/images/brief/natural.webp' },
+  { title: 'Яркий', description: 'насыщенные цвета, графика, акценты', image: '/images/brief/bright.jpeg' },
+  { title: 'Корпоративный', description: 'строго в фирменном стиле компании', image: '/images/brief/corporate.webp' },
 ];
 
 export const BUDGETS = [

@@ -15,36 +15,38 @@
 
 /* Кнопка «Заполнить бриф» */
 .StandPrices-briefButton {
-  display: inline-flex;
-  align-items: center;
-  gap: clamp(0.25rem, calc(0.083rem + 0.347vw), 0.5rem); /* 4px @768 → 8px @1920 */
   width: fit-content;
   cursor: pointer;
 
-  span {
+  .ButtonArrow {
+    gap: clamp(0.25rem, calc(0.083rem + 0.347vw), 0.5rem); /* 4px @768 → 8px @1920 */
+  }
+
+  .Button {
     font-family: var(--font-family);
     font-weight: 400;
     font-size: clamp(1.125rem, calc(0.875rem + 0.521vw), 1.5rem); /* 18px @768 → 24px @1920 */
     line-height: 120%;
     letter-spacing: -0.04em;
     text-align: center;
-    text-decoration: underline;
     text-decoration-skip-ink: none;
     text-decoration-thickness: 1px;
     text-underline-offset: 0.25em;
     color: #000;
   }
 
-  svg {
+  .ButtonArrow-icon {
     width: clamp(1.25rem, calc(1.083rem + 0.347vw), 1.5rem); /* 20px @768 → 24px @1920 */
     height: clamp(1.25rem, calc(1.083rem + 0.347vw), 1.5rem); /* 20px @768 → 24px @1920 */
     flex-shrink: 0;
-    transition: transform 0.3s ease-out;
+    transition: opacity 0.2s ease-out;
   }
 
   @media (hover: hover) {
-    &:hover svg {
-      transform: translateX(4px);
+    .Button:is(.link, .ghostLink).center-right::before {
+      height: 1px;
+      animation-duration: 0.2s;
+      animation-timing-function: ease-out;
     }
   }
 }
@@ -126,10 +128,6 @@
 
 .StandPrices-heroText {
   max-width: 41rem;
-}
-
-.StandPrices-heroButton {
-  opacity: 0.6;
 }
 
 .StandPrices-heroNote {
