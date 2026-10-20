@@ -1,6 +1,5 @@
 :root {
   --height: clamp(18.75rem, calc(3.875rem + 30.99vw), 41.063rem); /* min: 300px, max: 657px */
-  --offset: 300px;
   --countProjects: 0;
   --sizeProject: calc(var(--height) + var(--offset));
   --accHeightTitle: 0;
