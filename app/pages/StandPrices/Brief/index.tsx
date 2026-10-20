@@ -6,6 +6,7 @@ import { sendLead } from 'api/form';
 import { useEffect, useState, type ReactNode } from 'react';
 import { GlobalScrollLock } from 'shared/components/_helpers/GlobalScrollLock';
 import Link from 'shared/components/Link';
+import Button from 'shared/components/Button';
 
 // timeUntil пока не используется: подсказка «До выставки…» на согласовании
 import { AreaRange, BudgetRange, Checkbox, Consent, DateField, Field, FileField, formatDate } from './controls';
@@ -461,20 +462,11 @@ interface NavButtonProps {
 }
 
 function NavButton({ direction, muted = false, disabled = false, className = '', onClick, children }: NavButtonProps) {
-  const arrow = (
-    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true" className={direction === 'back' ? 'isBack' : ''}>
-      <path
-        d="M14.9348 6.2162C15.2544 5.89668 15.7723 5.89668 16.0918 6.2162L21.2987 11.4231C21.6182 11.7426 21.6182 12.2605 21.2987 12.58L16.0918 17.7869C15.7723 18.1064 15.2544 18.1064 14.9348 17.7869C14.6153 17.4674 14.6153 16.9494 14.9348 16.6299L18.745 12.8197H3.26562V11.1834H18.745L14.9348 7.37316C14.6153 7.05364 14.6153 6.53572 14.9348 6.2162Z"
-        fill="currentColor"
-      />
-    </svg>
-  );
-
   return (
-    <button type="button" className={`Brief-navButton ${muted ? 'isMuted' : ''} ${className}`} disabled={disabled} onClick={onClick}>
-      {direction === 'back' && arrow}
-      <span>{children}</span>
-      {direction === 'next' && arrow}
+    <button type="button" className={`Brief-navButton ${className}`} disabled={disabled} onClick={onClick}>
+      <Button.Arrow as="span" direction={direction === 'back' ? 'left' : 'right'} variant={muted ? 'ghostLink' : 'link'}>
+        {children}
+      </Button.Arrow>
     </button>
   );
 }
