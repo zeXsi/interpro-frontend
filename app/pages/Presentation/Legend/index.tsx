@@ -46,36 +46,39 @@ export default function Legend({ data, id }: any) {
     return (
       <section
         ref={sectionRef}
-        className="Legend"
+        className="PresentationLegend"
         id={id}
         style={{ '--count-slides': items.length } as React.CSSProperties}
       >
-        <div className="Legend__swiper">
+        <div className="PresentationLegend__swiper">
           {items.map((item: any, index: number) => (
             <div
               key={`print-slide-${index}-${item.id ?? 'no-id'}`}
-              className="Legend__swiper-slide"
+              className="PresentationLegend__swiper-slide"
             >
               <PresentationImage
                 src={item.full}
                 alt={item.title}
-                className="Legend__swiper-image"
+                className="PresentationLegend__swiper-image"
               />
 
               {item.attrs.legend > 0 && (
-                <div className="Legend__swiper-desc">
-                  {item.title && <h3 className="Legend__swiper-title">{item.title}</h3>}
+                <div className="PresentationLegend__swiper-desc">
+                  {item.title && <h3 className="PresentationLegend__swiper-title">{item.title}</h3>}
 
-                  <ul className="Legend__swiper-list">
+                  <ul className="PresentationLegend__swiper-list">
                     {item.attrs.map((attr: any) => (
-                      <li key={attr.label} className="Legend__swiper-item">
+                      <li key={attr.label} className="PresentationLegend__swiper-item">
                         <span>{attr.label}</span>
                         <p>{attr.value}</p>
                       </li>
                     ))}
                   </ul>
 
-                  <p className="Legend__swiper-txt" dangerouslySetInnerHTML={{ __html: item.text }} />
+                  <p
+                    className="PresentationLegend__swiper-txt"
+                    dangerouslySetInnerHTML={{ __html: item.text }}
+                  />
                 </div>
               )}
 
@@ -109,7 +112,7 @@ export default function Legend({ data, id }: any) {
   return (
     <section
       ref={sectionRef}
-      className="Legend"
+      className="PresentationLegend"
       id={id}
       style={{ '--count-slides': items.length } as React.CSSProperties}
     >
@@ -125,33 +128,36 @@ export default function Legend({ data, id }: any) {
         pagination={pagination}
         modules={[EffectFade, Pagination]}
         allowTouchMove={false}
-        className="Legend__swiper"
+        className="PresentationLegend__swiper"
       >
         {items.map((item: any, index: number) => (
           <SwiperSlide
             key={`swiper-slide-${index}-${item.id ?? 'no-id'}`}
-            className="Legend__swiper-slide"
+            className="PresentationLegend__swiper-slide"
           >
             <PresentationImage
               src={item.full}
               alt={item.title}
-              className="Legend__swiper-image"
+              className="PresentationLegend__swiper-image"
             />
 
             {item.attrs.length > 0 && (
-              <div className="Legend__swiper-desc">
-                {item.title && <h3 className="Legend__swiper-title">{item.title}</h3>}
+              <div className="PresentationLegend__swiper-desc">
+                {item.title && <h3 className="PresentationLegend__swiper-title">{item.title}</h3>}
 
-                <ul className="Legend__swiper-list">
+                <ul className="PresentationLegend__swiper-list">
                   {item.attrs.map((attr: any) => (
-                    <li key={attr.label} className="Legend__swiper-item">
+                    <li key={attr.label} className="PresentationLegend__swiper-item">
                       <span>{attr.label}</span>
                       <p>{attr.value}</p>
                     </li>
                   ))}
                 </ul>
 
-                <p className="Legend__swiper-txt" dangerouslySetInnerHTML={{ __html: item.text }} />
+                <p
+                  className="PresentationLegend__swiper-txt"
+                  dangerouslySetInnerHTML={{ __html: item.text }}
+                />
               </div>
             )}
           </SwiperSlide>
@@ -161,26 +167,32 @@ export default function Legend({ data, id }: any) {
       </Swiper>
 
       {items.map((item: any, index: number) => (
-        <div className="Legend__content" key={`legend-content-${index}-${item.id ?? 'no-id'}`}>
-          {item.title && <h2 className="Legend__content-title">{item.title}</h2>}
+        <div
+          className="PresentationLegend__content"
+          key={`legend-content-${index}-${item.id ?? 'no-id'}`}
+        >
+          {item.title && <h2 className="PresentationLegend__content-title">{item.title}</h2>}
           <PresentationImage
             src={item.full}
             alt={item.title}
-            className="Legend__content-image"
+            className="PresentationLegend__content-image"
           />
 
           {item.attrs.length > 0 && (
-            <div className="Legend__content-desc">
-              <ul className="Legend__content-list">
+            <div className="PresentationLegend__content-desc">
+              <ul className="PresentationLegend__content-list">
                 {item.attrs.map((attr: any) => (
-                  <li key={attr.label} className="Legend__content-item">
+                  <li key={attr.label} className="PresentationLegend__content-item">
                     <span>{attr.label}</span>
                     <p>{attr.value}</p>
                   </li>
                 ))}
               </ul>
 
-              <p className="Legend__content-txt" dangerouslySetInnerHTML={{ __html: item.text }} />
+              <p
+                className="PresentationLegend__content-txt"
+                dangerouslySetInnerHTML={{ __html: item.text }}
+              />
             </div>
           )}
         </div>

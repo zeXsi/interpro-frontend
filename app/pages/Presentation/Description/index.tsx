@@ -6,11 +6,14 @@ export default function Description({ data, id }: any) {
   if (!text_heading && !text_body) return null;
 
   return (
-    <section className="About" id={id}>
-      <div className="About__wrapper">
-        {text_heading && <p className="About__abovetxt">{text_heading}</p>}
+    <section className="PresentationAbout" id={id}>
+      <div className="PresentationAbout__wrapper">
+        {text_heading && <p className="PresentationAbout__abovetxt">{text_heading}</p>}
         {text_body && (
-          <div className="About__text_body" dangerouslySetInnerHTML={{ __html: text_body }} />
+          <div
+            className="PresentationAbout__text_body"
+            dangerouslySetInnerHTML={{ __html: text_body }}
+          />
         )}
       </div>
     </section>

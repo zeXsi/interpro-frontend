@@ -56,19 +56,17 @@ export default function Video({ data, id }: any) {
     container.addEventListener('wheel', handleWheel, { passive: false, capture: true });
 
     return () => {
-      container.removeEventListener(
-        'wheel',
-        handleWheel,
-        { capture: true } as EventListenerOptions
-      );
+      container.removeEventListener('wheel', handleWheel, {
+        capture: true,
+      } as EventListenerOptions);
     };
   }, []);
 
   return (
     src && (
-      <section ref={containerRef} className="Video" id={id}>
+      <section ref={containerRef} className="PresentationVideo" id={id}>
         <iframe src={src} allowFullScreen frameBorder="0" title="video" />
-        <p className="Video__print-link">
+        <p className="PresentationVideo__print-link">
           Ссылка на видео:{' '}
           <a href={publicUrl} target="_blank" rel="noreferrer">
             {publicUrl}

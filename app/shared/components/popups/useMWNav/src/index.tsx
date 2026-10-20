@@ -12,6 +12,7 @@ export interface PopupProps {
   isOnCloseBG?: boolean;
   domPortalById?: string;
   eventCloseBG?: PopupEvent;
+  onCloseBG?: (e: React.SyntheticEvent<HTMLDivElement>) => void;
 }
 export type PopupControl<T = any, TImp extends object = any> = {
   setData: (val: T) => void;
@@ -29,7 +30,15 @@ export default function usePopup<T = any, TImp extends object = any>(delay: numb
 
   const refPortalData = useRef<Partial<PopupControl<T, TImp>>>({});
   const isSSR = getCheckIsSSR();
-  const toOpenPopup = () => setIsShowed(true);
+  const toOpenPopup = () => {
+    // Повторное открытие во время анимации закрытия отменяет закрытие.
+    if (refTimeId.current !== null) {
+      clearTimeout(refTimeId.current);
+      refTimeId.current = null;
+      refContainer.current?.classList.remove('isRemove');
+    }
+    setIsShowed(true);
+  };
 
   const toClosePopup = () => {
     if (refTimeId.current !== null) return;
@@ -74,6 +83,7 @@ export default function usePopup<T = any, TImp extends object = any>(delay: numb
     isOnCloseBG = true,
     domPortalById = 'root',
     eventCloseBG = 'onClick',
+    onCloseBG,
   }: PopupProps) => {
     if (isSSR) {
       return null;
@@ -85,7 +95,7 @@ export default function usePopup<T = any, TImp extends object = any>(delay: numb
           <div
             className={`Popup ${className} ${clIsVisible}`}
             ref={refContainer}
-            {...{ [eventCloseBG]: isOnCloseBG ? handleClose : undefined }}
+            {...{ [eventCloseBG]: isOnCloseBG ? (onCloseBG ?? handleClose) : undefined }}
           >
             <div className="Popup_container"   {...{ [eventCloseBG]: (e:any) =>  e.stopPropagation()}}>
               {children}
