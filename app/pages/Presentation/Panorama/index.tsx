@@ -25,7 +25,7 @@ export default function PanoramaViewer({ data, id }: any) {
 
   if (isPdfExport) {
     return (
-      <section id={id} className="panorama">
+      <section id={id} className="PresentationPanorama">
         <PresentationImage src={image} alt="360 panorama" />
       </section>
     );
@@ -34,10 +34,10 @@ export default function PanoramaViewer({ data, id }: any) {
   return (
     <section
       id={id}
-      className={`panorama ${interacted ? 'interacted' : ''}`}
+      className={`PresentationPanorama ${interacted ? 'interacted' : ''}`}
       onPointerDown={() => setInteracted(true)}
     >
-      <div className="panorama-label">
+      <div className="PresentationPanorama__label">
         <svg
           width="20"
           height="20"

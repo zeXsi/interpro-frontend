@@ -8,13 +8,13 @@ export default function Cover() {
   const renderSpans = (arr?: any[]) => arr?.map((item, index) => <span key={index}>{item}</span>);
 
   return (
-    <section className="Cover" id="hero">
-      <h1 className="Cover__title">{presentationResponse.title}</h1>
-      <p className="Cover__txt">
+    <section className="PresentationCover" id="hero">
+      <h1 className="PresentationCover__title">{presentationResponse.title}</h1>
+      <p className="PresentationCover__txt">
         {renderSpans(presentationResponse.tax?.year)}
         {renderSpans(presentationResponse.tax?.expo)}
         {renderSpans(presentationResponse.tax?.stand_type)}
-        
+
         {hasProjectSize && (
           <span>
             {presentationResponse.project_size} м<sup>2</sup>

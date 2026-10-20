@@ -1,10 +1,10 @@
-.Contacts {
+.PresentationContacts {
   padding-inline: 1.25rem;
   min-height: 100vh;
   display: grid;
   align-items: center;
 
-  .Contacts__content {
+  .PresentationContacts__content {
     display: grid;
     grid-template-columns: repeat(6, 1fr);
     gap: 1.25rem;
@@ -18,7 +18,7 @@
       grid-template-columns: 1fr;
       gap: 2.75rem;
 
-      .Contacts__col:last-child {
+      .PresentationContacts__col:last-child {
         margin-top: 1.25rem;
       }
     }
@@ -35,7 +35,7 @@
     padding-bottom: 8rem;
   }
 
-  .Contacts__col {
+  .PresentationContacts__col {
     @media (width > 1024px) {
       &:first-of-type {
         grid-column-start: 3;
@@ -57,13 +57,13 @@
     }
   }
 
-  .Contacts__list {
+  .PresentationContacts__list {
     list-style: none;
     margin-top: 1rem;
     display: grid;
     gap: 0.75rem;
 
-    .Contacts__list-item {
+    .PresentationContacts__list-item {
       span {
         font-family: var(--font-family);
         font-weight: 500;
@@ -72,7 +72,7 @@
         text-transform: uppercase;
       }
 
-      .Contacts__list-button {
+      .PresentationContacts__list-button {
         display: inline-block;
         padding: 20px 12px;
         border-radius: 100px;
@@ -103,7 +103,7 @@
       }
     }
 
-    .Contacts__list-btn {
+    .PresentationContacts__list-btn {
       font-family: var(--font-family);
       font-weight: 500;
       font-size: 2rem;

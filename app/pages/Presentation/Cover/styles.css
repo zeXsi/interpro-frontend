@@ -1,4 +1,4 @@
-.Cover {
+.PresentationCover {
   min-height: 100vh;
   display: flex;
   align-items: center;
@@ -18,7 +18,7 @@
     padding-inline: 0.5rem;
   }
 
-  .Cover__title {
+  .PresentationCover__title {
     font-family: var(--font-family);
     font-weight: 400;
     font-size: 7.75rem;
@@ -34,7 +34,7 @@
     }
   }
 
-  .Cover__txt {
+  .PresentationCover__txt {
     display: flex;
     flex-wrap: wrap;
     gap: 1.5rem;

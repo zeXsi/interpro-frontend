@@ -14,10 +14,10 @@ export default function Comparison({ data, id }: any) {
   if (isPdfExport) {
     return (
       <>
-        <section className="Comparison Comparison--printSlide" id={id}>
+        <section className="PresentationComparison PresentationComparison--printSlide" id={id}>
           <PresentationImage src={before} alt="До" />
         </section>
-        <section className="Comparison Comparison--printSlide">
+        <section className="PresentationComparison PresentationComparison--printSlide">
           <PresentationImage src={after} alt="После" />
         </section>
       </>
@@ -25,7 +25,7 @@ export default function Comparison({ data, id }: any) {
   }
 
   return (
-    <section className="Comparison" id={id}>
+    <section className="PresentationComparison" id={id}>
       <ImgComparisonSlider>
         <PresentationImage slot="first" src={before} alt="До" />
         <PresentationImage slot="second" src={after} alt="После" />

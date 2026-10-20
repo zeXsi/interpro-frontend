@@ -1,4 +1,4 @@
-.Content {
+.PresentationContent {
   height: 100vh;
   display: grid;
   grid-template-columns: repeat(6, 1fr);
@@ -14,7 +14,7 @@
     padding: 0 0.5rem;
   }
 
-  .Content__wrapper {
+  .PresentationContent__wrapper {
     grid-column: span 4 / span 4;
     grid-column-start: 2;
     text-align: center;
@@ -33,7 +33,7 @@
     }
   }
 
-  .Content__title {
+  .PresentationContent__title {
     font-family: var(--font-family);
     font-weight: 400;
     font-size: 6rem;
@@ -51,7 +51,7 @@
     }
   }
 
-  .Content__txt {
+  .PresentationContent__txt {
     font-family: var(--font-family);
     font-size: 1.5rem;
     line-height: 136%;
