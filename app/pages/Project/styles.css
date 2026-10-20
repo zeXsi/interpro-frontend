@@ -136,8 +136,8 @@
     .Tag-title {
       font-family: var(--font-family);
       font-weight: 400;
-      font-size: clamp(1.5rem, calc(1.167rem + 0.694vw), 2rem);
-      /* min: 24px, max: 32px */
+      font-size: clamp(1.125rem, calc(1.167rem + 0.694vw), 2rem);
+      /* min: 18px, max: 32px */
       /* viewPort: 768-1920 */
       line-height: 136%;
       letter-spacing: -0.02em;
@@ -229,7 +229,7 @@
   gap: var(--offset);
 
   &.isLastText .ImgWithText-text {
-    order: 2;
+    /* order: 2; */
   }
 
   .ImgWithText_imgs {
