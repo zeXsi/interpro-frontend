@@ -332,7 +332,13 @@ export function DateField({ value, onChange, isPickOnly = false }: DateFieldProp
   };
 
   return (
-    <div className="Brief-date" ref={rootRef}>
+    <div
+      className="Brief-date"
+      ref={rootRef}
+      onBlur={(event) => {
+        if (!event.currentTarget.contains(event.relatedTarget)) setIsOpen(false);
+      }}
+    >
       <label className="Brief-field">
         <input
           type="text"
