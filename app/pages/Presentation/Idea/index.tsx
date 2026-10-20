@@ -32,29 +32,29 @@ export default function Idea({ data, id }: any) {
   };
 
   return (
-    <section className="Idea" id={id}>
+    <section className="PresentationIdea" id={id}>
       {images.length > 0 && !isPdfExport && <Popup />}
 
       <div
-        className={`Idea__content ${layout} ${heading !== '' ? 'heading' : 'no-heading'} ${
+        className={`PresentationIdea__content ${layout} ${heading !== '' ? 'heading' : 'no-heading'} ${
           images.length === 0 ? 'no-img' : ''
         }`}
       >
         {heading && (
-          <div className="Idea__content-desc">
+          <div className="PresentationIdea__content-desc">
             <Text>{heading}</Text>
           </div>
         )}
 
         {images.length > 0 && (
-          <div className={`Idea__content-slides ${layout}`}>
+          <div className={`PresentationIdea__content-slides ${layout}`}>
             {images.map((item: any) =>
               isPdfExport ? (
                 <PresentationImage key={item.id} src={item.full} alt="Идея и концепция" />
               ) : (
                 <GalleryImage
                   key={item.id}
-                  wrapperClassName="Idea__gallery-image"
+                  wrapperClassName="PresentationIdea__gallery-image"
                   src={item.full}
                   alt="Идея и концепция"
                   onClick={() => openAllImages(item.full)}

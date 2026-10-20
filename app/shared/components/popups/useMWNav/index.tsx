@@ -117,9 +117,13 @@ const getNextMWNavHostId = () => {
 export default function useMWNav() {
   const location = useLocation();
   const isHome = location.pathname === '/';
-  const navigation = isHome
-    ? compactNavigation(sgHomeData.v.services_navigation)
-    : fullNavigation();
+  const navigationSource = isHome ? sgHomeData.v.services_navigation : sgServiceCategories.v;
+  // Стабильная ссылка обязательна: navigation входит в deps Popup.Memo,
+  // новый массив на каждом рендере пересоздаёт Popup и перезапускает анимацию открытия.
+  const navigation = useMemo(
+    () => (isHome ? compactNavigation(sgHomeData.v.services_navigation) : fullNavigation()),
+    [isHome, navigationSource]
+  );
   const projectCount = isHome ? sgHomeData.v.projects.total : sgProjects.v.length;
   const instanceIdRef = useRef(0);
   if (!instanceIdRef.current) {
@@ -135,21 +139,25 @@ export default function useMWNav() {
   const {
     Popup: PopupRoot,
     toOpenPopup,
-    showWithData,
     toTogglePopup,
     toClosePopup,
     ...props
   } = usePopup<
     unionTypes,
     ImpMethods
-  >(0.1);
+  >(0.3); // = длительности transition .Popup_container в styles.css, иначе анимация закрытия обрывается
+
+  // Режим выставляется синхронно до открытия, чтобы не мигало предыдущее содержимое.
+  // При закрытии режим не сбрасывается: иначе во время анимации закрытия подменится контент.
+  const _showWithData = (data: unionTypes) => {
+    MWNavMode.v = data;
+    toOpenPopup();
+  };
 
   const _toOpenPopup = () => {
     if (refTimeId.current) return;
+    MWNavMode.v = 'nav';
     toOpenPopup();
-    if (props.getImperativeData()?.getData?.() === 'contacts') {
-      props.getImperativeData()?.setData?.('nav');
-    }
     refTimeId.current = setTimeout(() => {
       refTimeId.current = null;
     }, 1000);
@@ -157,12 +165,21 @@ export default function useMWNav() {
 
   const _toClosePopup = () => {
     if (refTimeId.current) return;
-    showWithData('nav');
     toClosePopup();
   };
   const _toTogglePopup = () => {
-    showWithData('nav');
+    if (!props.isShowed) MWNavMode.v = 'nav';
     toTogglePopup();
+  };
+
+  // Пока контейнер выезжает (translateY), под ним открыт фон попапа.
+  // Закрываем только при движении ниже итоговой (layout) высоты контейнера.
+  const onCloseBG = (e: React.SyntheticEvent<HTMLDivElement>) => {
+    const popup = e.currentTarget;
+    const container = popup.firstElementChild as HTMLElement | null;
+    const clientY = (e as React.MouseEvent<HTMLDivElement>).clientY;
+    if (container && clientY - popup.getBoundingClientRect().top < container.offsetHeight) return;
+    toClosePopup();
   };
 
   useEffect(() => {
@@ -187,12 +204,12 @@ export default function useMWNav() {
 
   useEffect(() => {
     mwNavControllers.set(instanceId, {
-      showWithData,
+      showWithData: _showWithData,
       toOpenPopup: _toOpenPopup,
       toClosePopup: _toClosePopup,
       toTogglePopup: _toTogglePopup,
     });
-  }, [instanceId, showWithData, _toOpenPopup, _toClosePopup, _toTogglePopup]);
+  }, [instanceId, _showWithData, _toOpenPopup, _toClosePopup, _toTogglePopup]);
 
   useEffect(() => {
     if (isHost) {
@@ -202,7 +219,7 @@ export default function useMWNav() {
 
   const getController = () =>
     mwNavControllers.get(MWNavHostId.v ?? instanceId) ?? {
-      showWithData,
+      showWithData: _showWithData,
       toOpenPopup: _toOpenPopup,
       toClosePopup: _toClosePopup,
       toTogglePopup: _toTogglePopup,
@@ -227,10 +244,17 @@ export default function useMWNav() {
         if (!isHost) return null;
 
         return (
-          <PopupRoot className="MWNav" isOnCloseBG={true} eventCloseBG="onMouseMove">
+          <PopupRoot
+            className="MWNav"
+            isOnCloseBG={true}
+            eventCloseBG="onMouseMove"
+            onCloseBG={onCloseBG}
+          >
             <Switcher
               type={MWNavMode.v}
-              toClosePopup={_toClosePopup}
+              // Без защиты _toClosePopup: она нужна только против hover+click по «(меню)»,
+              // переход по ссылке должен закрывать меню всегда.
+              toClosePopup={toClosePopup}
               changeChildren={setType}
               navigation={navigation}
               projectCount={projectCount}
@@ -348,6 +372,10 @@ function Desktop({
       link: '/about-us',
     },
     {
+      label: 'Цены на застройку',
+      link: '/stand-prices',
+    },
+    {
       label: 'Контакты',
       link: '/contacts',
     },
@@ -359,7 +387,7 @@ function Desktop({
 
   return (
     <div className="MWNav_desktop">
-      <ThreeLevelNav columns={columns} onNavigate={toNavigate} />;
+      <ThreeLevelNav columns={columns} onNavigate={toNavigate} />
     </div>
   );
 }
@@ -522,6 +550,11 @@ function Mobile({
           direction="right"
           className="MWNav_list-li nested"
         />
+        <Link to="/stand-prices" onClick={() => toNavigate('/stand-prices')}>
+          <span className="ButtonArrow isHideUnderline MWNav_list-li normal right link">
+            <span className="Button link">Цены на застройку</span>
+          </span>
+        </Link>
         <Link to="/contacts" onClick={() => toNavigate('/contacts')}>
           <span className="ButtonArrow isHideUnderline MWNav_list-li normal right link">
             <span className="Button link">контакты</span>

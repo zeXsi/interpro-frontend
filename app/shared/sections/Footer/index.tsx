@@ -22,6 +22,7 @@ export default function Footer() {
             ['Проекты', '/projects'],
             ['блог', '/blog'],
             ['о нас', '/about-us'],
+            ['Цены на застройку', '/stand-prices'],
             ['контакты', '/contacts'],
 
             ['отзывы', '/about-us/clients'],

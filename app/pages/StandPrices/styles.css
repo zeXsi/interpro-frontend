@@ -1,0 +1,744 @@
+/* Значения из Figma: десктоп 1920, планшет 768, мобилка 375.
+   Fluid-интерполяция: 768–1920 и 375–768. */
+
+.StandPrices {
+  width: 100%;
+  background: #fff;
+  display: flex;
+  flex-direction: column;
+}
+
+.StandPrices-heading {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  column-gap: 20px;
+  padding-top: 4rem;
+  padding-bottom: 3rem;
+}
+
+.StandPrices-title {
+  grid-column: 1 / 3;
+  font-family: var(--font-family);
+  font-weight: 400;
+  font-size: 4rem;
+  line-height: 92%;
+  letter-spacing: -0.04em;
+  color: #000;
+  white-space: nowrap;
+}
+
+.StandPrices-nowrap {
+  white-space: nowrap;
+}
+
+/* Кнопка «Заполнить бриф» */
+.StandPrices-briefButton {
+  width: fit-content;
+  cursor: pointer;
+
+  .ButtonArrow {
+    gap: clamp(0.25rem, calc(0.083rem + 0.347vw), 0.5rem); /* 4px @768 → 8px @1920 */
+  }
+
+  .Button {
+    font-family: var(--font-family);
+    font-weight: 400;
+    font-size: clamp(1.125rem, calc(0.875rem + 0.521vw), 1.5rem); /* 18px @768 → 24px @1920 */
+    line-height: 120%;
+    letter-spacing: -0.04em;
+    text-align: center;
+    text-decoration-skip-ink: none;
+    text-decoration-thickness: 1px;
+    text-underline-offset: 0.25em;
+    color: #000;
+  }
+
+  .ButtonArrow-icon {
+    width: clamp(1.25rem, calc(1.083rem + 0.347vw), 1.5rem); /* 20px @768 → 24px @1920 */
+    height: clamp(1.25rem, calc(1.083rem + 0.347vw), 1.5rem); /* 20px @768 → 24px @1920 */
+    flex-shrink: 0;
+    transition: opacity 0.2s ease-out;
+  }
+
+  @media (hover: hover) {
+    .Button:is(.link, .ghostLink).center-right::before {
+      height: 1px;
+      animation-duration: 0.2s;
+      animation-timing-function: ease-out;
+    }
+  }
+}
+
+/* ---------- Hero ---------- */
+
+.StandPrices-hero {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  min-height: clamp(45rem, 56.25vw, 67.5rem); /* 1080px @1920 */
+}
+
+.StandPrices-heroLeft {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 6rem;
+  padding: 2.5rem;
+  background: #f5f5f5;
+}
+
+.StandPrices-heroContent {
+  display: flex;
+  flex-direction: column;
+  gap: clamp(6rem, calc(4.833rem + 2.431vw), 7.75rem); /* 96px @768 → 124px @1920 */
+}
+
+.StandPrices-heroHead {
+  display: flex;
+  flex-direction: column;
+  gap: 4rem;
+}
+
+.StandPrices-heroTitleWrap {
+  display: flex;
+  flex-direction: column;
+  gap: clamp(1rem, calc(0.333rem + 1.389vw), 2rem); /* 16px @768 → 32px @1920 */
+}
+
+.StandPrices-heroBody {
+  display: flex;
+  flex-direction: column;
+  gap: clamp(1.5rem, calc(1.167rem + 0.694vw), 2rem); /* 24px @768 → 32px @1920 */
+}
+
+.StandPrices-heroLabel {
+  font-family: var(--font-family);
+  font-weight: 500;
+  font-size: 1.125rem;
+  line-height: 120%;
+  letter-spacing: -0.02em;
+  text-transform: uppercase;
+  color: #000;
+  opacity: 0.6;
+}
+
+.StandPrices-heroTitle {
+  font-family: var(--font-family);
+  font-weight: 400;
+  font-size: clamp(4rem, calc(3.083rem + 1.91vw), 5.375rem); /* 64px @768 → 86px @1920 */
+  line-height: 92%;
+  letter-spacing: -0.04em;
+  color: #000;
+}
+
+.StandPrices-heroSubtitle,
+.StandPrices-heroText {
+  font-family: var(--font-family);
+  font-weight: 400;
+  font-size: clamp(1.125rem, calc(0.875rem + 0.521vw), 1.5rem); /* 18px @768 → 24px @1920 */
+  line-height: 126%;
+  letter-spacing: -0.04em;
+  color: #000;
+}
+
+.StandPrices-heroSubtitle {
+  opacity: 0.6;
+}
+
+.StandPrices-heroText {
+  max-width: 41rem;
+}
+
+.StandPrices-heroNote {
+  max-width: 27rem;
+  font-family: var(--font-family);
+  font-weight: 400;
+  font-size: 1.125rem;
+  line-height: 126%;
+  letter-spacing: -0.04em;
+  color: #000;
+  opacity: 0.6;
+}
+
+.StandPrices-heroRight {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #ebebeb;
+}
+
+.StandPrices-heroImage {
+  display: block;
+  width: 27rem;
+  max-width: 100%;
+  height: auto;
+}
+
+/* ---------- Почему нельзя назвать точную цену сразу ---------- */
+
+.StandPrices-factors {
+  padding-top: clamp(4rem, calc(10.25rem - 5.208vw), 7.75rem); /* 124px @768 → 64px @1920 */
+  display: flex;
+  flex-direction: column;
+  gap: clamp(3rem, calc(1rem + 4.167vw), 6rem); /* 48px @768 → 96px @1920 */
+}
+
+.StandPrices-factorsHead {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  column-gap: 20px;
+
+  .StandPrices-sectionTitle {
+    grid-column: 1 / 3;
+    max-width: 35rem;
+    font-size: 3rem;
+  }
+}
+
+.StandPrices-factorsText {
+  grid-column: 4 / 6;
+  padding-top: 1rem; /* в макете текст на 16 ниже заголовка */
+  font-family: var(--font-family);
+  font-weight: 400;
+  font-size: clamp(1.125rem, calc(0.875rem + 0.521vw), 1.5rem); /* 18px @768 → 24px @1920 */
+  line-height: 126%;
+  letter-spacing: -0.04em;
+  color: #000;
+}
+
+/* .StandPrices — чтобы перебить padding: 0 из swiper/css */
+.StandPrices .StandPrices-factorsSwiper {
+  width: 100%;
+  padding: 0 var(--px);
+}
+
+.StandPrices-factorsSwiper .StandPrices-factorSlide {
+  /* 5 карточек в ряд — 352px @1920 */
+  width: calc((100% - 80px) / 5);
+  height: auto;
+  display: flex;
+}
+
+/* Карточка — как в «Что мы создаём» на /museum-spaces */
+.StandPrices-factorCard {
+  width: 100%;
+  min-height: clamp(13rem, calc(11.375rem + 3.385vw), 15.438rem); /* 208px @768 → 247px @1920 */
+  padding: clamp(1rem, calc(0.333rem + 1.389vw), 2rem); /* 16px @768 → 32px @1920 */
+  background: #f5f5f5;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: clamp(0.5rem, calc(-1.167rem + 3.472vw), 3rem); /* 8px @768 → 48px @1920 */
+
+  svg {
+    width: clamp(2rem, calc(1.333rem + 1.389vw), 3rem); /* 32px @768 → 48px @1920 */
+    height: clamp(2rem, calc(1.333rem + 1.389vw), 3rem); /* 32px @768 → 48px @1920 */
+    flex-shrink: 0;
+  }
+
+  p {
+    font-family: var(--font-family);
+    font-weight: 400;
+    font-size: clamp(1.25rem, calc(1.083rem + 0.347vw), 1.5rem); /* 20px @768 → 24px @1920 */
+    line-height: 120%;
+    letter-spacing: -0.04em;
+    color: #000;
+  }
+}
+
+/* ---------- Заголовки секций ---------- */
+
+.StandPrices-sectionTitle {
+  font-family: var(--font-family);
+  font-weight: 400;
+  font-size: clamp(3rem, calc(2.333rem + 1.389vw), 4rem); /* 48px @768 → 64px @1920 */
+  line-height: 110%;
+  letter-spacing: -0.04em;
+  color: #000;
+}
+
+/* ---------- Реализованные проекты ---------- */
+
+.StandPrices-projects {
+  padding-top: clamp(7.75rem, calc(3.917rem + 7.986vw), 13.5rem); /* 124px @768 → 216px @1920 */
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+.StandPrices-projectsHead {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 20px;
+}
+
+.StandPrices-projectsControls {
+  display: flex;
+  gap: 8px;
+
+  button {
+    width: 3rem;
+    height: 3rem;
+    border-radius: 100px;
+    background: #f5f5f5;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: opacity 0.3s ease-out;
+
+    svg {
+      width: 1.5rem;
+      height: 1.5rem;
+    }
+
+    .isLeft {
+      transform: rotate(180deg);
+    }
+
+    &:disabled {
+      opacity: 0.4;
+      cursor: default;
+    }
+  }
+}
+
+.StandPrices-projectsSwiper {
+  width: 100%;
+}
+
+.StandPrices-projectsSwiper .StandPrices-projectSlide {
+  /* 3 колонки сетки из 5 — 1096px @1920 */
+  width: calc((100% - 2 * var(--px) - 80px) / 5 * 3 + 40px);
+  height: auto;
+}
+
+.StandPrices-projectCard {
+  display: flex;
+  flex-direction: column;
+  gap: clamp(0.5rem, calc(0.167rem + 0.694vw), 1rem); /* 8px @768 → 16px @1920 */
+}
+
+.StandPrices-projectImage {
+  width: 100%;
+  aspect-ratio: 1096 / 617;
+  overflow: hidden;
+  background: #f5f5f5;
+
+  img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.6s ease-out;
+  }
+
+  @media (hover: hover) {
+    &:hover img {
+      transform: scale(1.03);
+    }
+  }
+}
+
+.StandPrices-projectInfo {
+  display: flex;
+  gap: 20px;
+}
+
+.StandPrices-projectMeta {
+  flex-shrink: 0;
+  width: 22rem;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.StandPrices-projectTitle {
+  font-family: var(--font-family);
+  font-weight: 400;
+  font-size: clamp(1.5rem, calc(0.5rem + 2.083vw), 3rem); /* 24px @768 → 48px @1920 */
+  line-height: 136%;
+  letter-spacing: -0.04em;
+  color: #000;
+}
+
+.StandPrices-projectTags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+
+  span {
+    padding: 6px;
+    background: rgb(0 0 0 / 0.03);
+    font-family: var(--font-family);
+    font-weight: 400;
+    font-size: clamp(0.875rem, calc(0.708rem + 0.347vw), 1.125rem); /* 14px @768 → 18px @1920 */
+    line-height: 136%;
+    letter-spacing: -0.04em;
+    color: rgb(0 0 0 / 0.6);
+  }
+}
+
+.StandPrices-projectDescription {
+  max-width: 45.25rem;
+  padding-top: 8px;
+  font-family: var(--font-family);
+  font-weight: 400;
+  font-size: 1.5rem;
+  line-height: 136%;
+  letter-spacing: -0.04em;
+  color: #000;
+  white-space: pre-line;
+  display: -webkit-box;
+  -webkit-line-clamp: 6;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+/* ---------- Вопросы о стоимости ---------- */
+
+.StandPrices-faq {
+  padding-top: clamp(7.75rem, calc(3.917rem + 7.986vw), 13.5rem); /* 124px @768 → 216px @1920 */
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  column-gap: 20px;
+  row-gap: clamp(2rem, calc(0.667rem + 2.778vw), 4rem); /* 32px @768 → 64px @1920 */
+}
+
+.StandPrices-faqTitle {
+  grid-column: 1 / -1;
+  justify-self: center;
+  font-family: var(--font-family);
+  font-weight: 400;
+  font-size: clamp(1.75rem, calc(0.25rem + 3.125vw), 4rem); /* 28px @768 → 64px @1920 */
+  line-height: 110%;
+  letter-spacing: -0.04em;
+  text-align: center;
+  color: #000;
+}
+
+.StandPrices-faqItems {
+  grid-column: 2 / 5;
+  display: flex;
+  flex-direction: column;
+
+  .Accordion {
+    --pd: clamp(1.5rem, calc(0.833rem + 1.389vw), 2.5rem); /* 24px @768 → 40px @1920 */
+
+    /* шаг пунктов как в макете: бордер входит в высоту */
+    padding: calc(var(--pd) - 0.5px) 0;
+    border-top: 1px solid rgb(0 0 0 / 0.1);
+
+    &:last-child {
+      border-bottom: 1px solid rgb(0 0 0 / 0.1);
+    }
+
+    &.active .Accordion_header-icon {
+      transform: rotate(45deg);
+    }
+
+    .Accordion_header {
+      gap: clamp(1rem, calc(3.5rem - 2.083vw), 2.5rem); /* 40px @768 → 16px @1920 */
+    }
+
+    .Accordion_content .wrap-children > *:first-child {
+      padding-top: clamp(1rem, calc(0.667rem + 0.694vw), 1.5rem); /* 16px @768 → 24px @1920 */
+    }
+  }
+
+  .Accordion_header-title {
+    font-family: var(--font-family);
+    font-weight: 400;
+    font-size: clamp(1.25rem, calc(0.75rem + 1.042vw), 2rem); /* 20px @768 → 32px @1920 */
+    line-height: 120%;
+    letter-spacing: -0.04em;
+    color: #000;
+  }
+
+  .Accordion_header-icon {
+    --size: clamp(1.5rem, calc(1.167rem + 0.694vw), 2rem); /* 24px @768 → 32px @1920 */
+
+    flex-shrink: 0;
+    width: var(--size);
+    height: var(--size);
+    transition: transform 0.3s ease-out;
+
+    path {
+      fill: #000;
+    }
+  }
+
+  .Accordion_content-description {
+    font-family: var(--font-family);
+    font-weight: 400;
+    font-size: clamp(1.125rem, calc(0.875rem + 0.521vw), 1.5rem); /* 18px @768 → 24px @1920 */
+    line-height: 136%;
+    letter-spacing: -0.04em;
+    color: #000;
+    opacity: 0.6;
+  }
+}
+
+/* ---------- Получите бесплатный дизайн-проект ---------- */
+
+.StandPrices-brief {
+  padding-top: clamp(7.75rem, calc(3.917rem + 7.986vw), 13.5rem); /* 124px @768 → 216px @1920 */
+  padding-bottom: clamp(7.75rem, calc(3.917rem + 7.986vw), 13.5rem); /* 124px @768 → 216px @1920 */
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  column-gap: 20px;
+
+  .StandPrices-sectionTitle {
+    grid-column: 1 / 3;
+  }
+}
+
+.StandPrices-briefBody {
+  grid-column: 4 / 6;
+  padding-top: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: clamp(2.75rem, calc(2.583rem + 0.347vw), 3rem); /* 44px @768 → 48px @1920 */
+}
+
+.StandPrices-briefText {
+  /* первая строка в макете занимает ровно 724px — запас, чтобы со скроллбаром
+     «достаточно» не уезжало на следующую строку */
+  width: calc(100% + 1rem);
+  font-family: var(--font-family);
+  font-weight: 400;
+  font-size: clamp(1.125rem, calc(0.875rem + 0.521vw), 1.5rem); /* 18px @768 → 24px @1920 */
+  line-height: 126%;
+  letter-spacing: -0.04em;
+  color: #000;
+  opacity: 0.6;
+}
+
+/* ---------- Планшет (≤1000) ---------- */
+
+@media (max-width: 1000px) {
+  .StandPrices-heading {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    padding-bottom: 2rem;
+  }
+
+  .StandPrices-title {
+    font-size: 3rem;
+  }
+
+  .StandPrices-hero {
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+  }
+
+  .StandPrices-heroLeft {
+    justify-content: flex-start;
+    padding: 2rem var(--px);
+  }
+
+  .StandPrices-heroTitle {
+    line-height: 86%;
+  }
+
+  .StandPrices-heroSubtitle,
+  .StandPrices-heroText {
+    line-height: 136%;
+  }
+
+  .StandPrices-heroText {
+    max-width: none;
+  }
+
+  .StandPrices-heroNote {
+    font-size: 0.875rem;
+    line-height: 136%;
+  }
+
+  .StandPrices-heroRight {
+    height: 44.688rem;
+  }
+
+  .StandPrices-factorsHead {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+
+    .StandPrices-sectionTitle {
+      max-width: 24.5rem;
+      font-size: 2.25rem;
+      line-height: 120%;
+    }
+  }
+
+  .StandPrices-factorsText {
+    max-width: 35.75rem;
+    padding-top: 0;
+    line-height: 136%;
+    letter-spacing: -0.02em;
+  }
+
+  .StandPrices-factorsSwiper .StandPrices-factorSlide {
+    width: 15rem;
+  }
+
+  .StandPrices-projectsControls {
+    display: none;
+  }
+
+  .StandPrices-projectsSwiper .StandPrices-projectSlide {
+    width: 18.938rem;
+  }
+
+  .StandPrices-projectInfo {
+    flex-direction: column;
+  }
+
+  .StandPrices-projectMeta {
+    width: auto;
+  }
+
+  .StandPrices-projectDescription {
+    display: none;
+  }
+
+  .StandPrices-faq {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .StandPrices-faqItems {
+    width: 100%;
+    max-width: 33.063rem;
+  }
+
+  .StandPrices-brief {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+
+    .StandPrices-sectionTitle {
+      max-width: 31.5rem;
+    }
+  }
+
+  .StandPrices-briefBody {
+    padding-top: 0;
+  }
+
+  .StandPrices-briefText {
+    width: auto;
+    max-width: 29.563rem;
+    line-height: 136%;
+    letter-spacing: -0.02em;
+  }
+
+  .StandPrices-desktopBreak {
+    display: none;
+  }
+}
+
+/* Дискретные отличия мобилки от планшета */
+@media (max-width: 540px) {
+  .StandPrices-heading {
+    padding-top: 3rem;
+    padding-bottom: 1.5rem;
+  }
+
+  .StandPrices-title {
+    font-size: 2rem;
+  }
+
+  /* в макете вопросы FAQ в блоке шириной 271 */
+  .StandPrices-faqItems .Accordion_header-title {
+    max-width: 16.938rem;
+  }
+
+  .StandPrices-sectionTitle {
+    line-height: 96%;
+  }
+
+  .StandPrices-mobileBreak {
+    display: none;
+  }
+
+  .StandPrices-heroLabel {
+    opacity: 0.5;
+  }
+
+  .StandPrices-factorsText {
+    opacity: 0.6;
+  }
+
+  .StandPrices-faqItems {
+    max-width: none;
+  }
+}
+
+/* ---------- Мобилка (≤768) ---------- */
+
+@media (max-width: 768px) {
+  .StandPrices-heroLabel {
+    font-size: clamp(0.875rem, calc(0.636rem + 1.018vw), 1.125rem); /* 14px @375 → 18px @768 */
+    letter-spacing: -0.03em;
+  }
+
+  .StandPrices-heroTitle {
+    font-size: clamp(3rem, calc(2.046rem + 4.071vw), 4rem); /* 48px @375 → 64px @768 */
+  }
+
+  .StandPrices-heroSubtitle,
+  .StandPrices-heroText {
+    font-size: clamp(1rem, calc(0.881rem + 0.509vw), 1.125rem); /* 16px @375 → 18px @768 */
+    letter-spacing: -0.02em;
+  }
+
+  .StandPrices-heroLeft {
+    gap: clamp(2.75rem, calc(-0.351rem + 13.232vw), 6rem); /* 44px @375 → 96px @768 */
+  }
+
+  .StandPrices-heroRight {
+    height: clamp(44.062rem, calc(43.466rem + 2.545vw), 44.688rem); /* 705px @375 → 715px @768 */
+  }
+
+  .StandPrices-heroImage {
+    width: clamp(18.875rem, calc(11.122rem + 33.079vw), 27rem); /* 302px @375 → 432px @768 */
+  }
+
+  .StandPrices-factors {
+    padding-top: clamp(6rem, calc(4.33rem + 7.125vw), 7.75rem); /* 96px @375 → 124px @768 */
+    gap: clamp(2.75rem, calc(2.511rem + 1.018vw), 3rem); /* 44px @375 → 48px @768 */
+  }
+
+  .StandPrices-factorsHead .StandPrices-sectionTitle {
+    max-width: clamp(17.938rem, calc(11.735rem + 26.463vw), 24.438rem); /* 287px @375 → 391px @768 */
+    font-size: clamp(1.75rem, calc(1.273rem + 2.036vw), 2.25rem); /* 28px @375 → 36px @768 */
+  }
+
+  .StandPrices-factorsText {
+    font-size: clamp(1rem, calc(0.881rem + 0.509vw), 1.125rem); /* 16px @375 → 18px @768 */
+  }
+
+  .StandPrices-sectionTitle {
+    font-size: clamp(2.25rem, calc(1.534rem + 3.053vw), 3rem); /* 36px @375 → 48px @768 */
+  }
+
+  .StandPrices-projects {
+    padding-top: clamp(6rem, calc(4.33rem + 7.125vw), 7.75rem); /* 96px @375 → 124px @768 */
+    gap: clamp(1.5rem, calc(1.023rem + 2.036vw), 2rem); /* 24px @375 → 32px @768 */
+  }
+
+  .StandPrices-faq {
+    padding-top: clamp(6rem, calc(4.33rem + 7.125vw), 7.75rem); /* 96px @375 → 124px @768 */
+  }
+
+  .StandPrices-brief {
+    padding-top: clamp(6rem, calc(4.33rem + 7.125vw), 7.75rem); /* 96px @375 → 124px @768 */
+    padding-bottom: clamp(6rem, calc(4.33rem + 7.125vw), 7.75rem); /* 96px @375 → 124px @768 */
+  }
+
+  .StandPrices-briefText {
+    font-size: clamp(1rem, calc(0.881rem + 0.509vw), 1.125rem); /* 16px @375 → 18px @768 */
+  }
+}

@@ -293,16 +293,22 @@ function ImgWithText({
   imgs,
   children,
 }: ImgWithTextProps) {
+  const validImgs = (imgs ?? []).filter((src): src is string => !!src);
+  const hasImgs = validImgs.length > 0;
+  const hasText = !!children;
+
+  if (!hasImgs && !hasText) return null;
+
   const clIsLastText = isLastText ? 'isLastText' : '';
-  const clIsSecondImgs = imgs.length > 1 ? 'isSecondImgs' : '';
+  const clIsSecondImgs = validImgs.length > 1 ? 'isSecondImgs' : '';
   return (
-    !!imgs?.[0] && (
-      <div className={`ImgWithText px ${className}  ${clIsLastText}`}>
-        {children && (
-          <Paragraph className={`ImgWithText-text ${clIsSecondImgs}`}>{children}</Paragraph>
-        )}
+    <div className={`ImgWithText px ${className}  ${clIsLastText}`}>
+      {hasText && (
+        <Paragraph className={`ImgWithText-text ${clIsSecondImgs}`}>{children}</Paragraph>
+      )}
+      {hasImgs && (
         <div className={`ImgWithText_imgs  ${clIsSecondImgs}`}>
-          {imgs.map((src, index, arr) => {
+          {validImgs.map((src, index, arr) => {
             const isVideo = checkIsVideo(src);
             return isVideo ? (
               <VideoPlayer key={index} url={src} />
@@ -318,8 +324,8 @@ function ImgWithText({
             );
           })}
         </div>
-      </div>
-    )
+      )}
+    </div>
   );
 }
 

@@ -43,7 +43,7 @@ export default function useMWImage() {
         if (swiperRef.current && swiperMapRef.current) {
           const swiper = swiperRef.current;
           const swiperMap = swiperMapRef.current;
-          swiper.slideTo(index);
+          swiper.slideToLoop(index);
           swiperMap.slideTo(index);
           setCurrIndex(swiper.realIndex);
         }
@@ -58,7 +58,7 @@ export default function useMWImage() {
             const swiperMap = swiperMapRef.current;
 
             if (swiper && swiperMap) {
-              swiper.slideTo(data[0], 0);
+              swiper.slideToLoop(data[0], 0);
               swiperMap.slideTo(data[0], 0);
               setCurrIndex(swiper.realIndex);
             }

@@ -24,6 +24,7 @@ const initRoutes: State['routesName'] = {
   '/services': 'услуги',
   '/advertising-privacy': 'Политика рекламных материалов',
   '/excursion': 'экскурсия',
+  '/stand-prices': 'цены на выставочные стенды',
   '/blog': 'блог',
   '/news': 'новости',
 

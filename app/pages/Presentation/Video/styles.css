@@ -1,7 +1,7 @@
-.Video {
+.PresentationVideo {
   height: 100vh;
 
-  .Video__print-link {
+  .PresentationVideo__print-link {
     display: none;
   }
 
@@ -26,7 +26,7 @@
       display: none;
     }
 
-    .Video__print-link {
+    .PresentationVideo__print-link {
       display: block;
       font-family: var(--font-family);
       font-size: 14pt;

@@ -77,9 +77,9 @@ main.dark {
   background: #202020;
   color: #fff;
 
-  .Idea {
-    & .Idea__content {
-      & .Idea__content-desc {
+  .PresentationIdea {
+    & .PresentationIdea__content {
+      & .PresentationIdea__content-desc {
         p {
           color: #fff;
         }
@@ -96,9 +96,9 @@ main.dark {
     }
   }
 
-  .Contacts__list {
-    .Contacts__list-item {
-      .Contacts__list-button {
+  .PresentationContacts__list {
+    .PresentationContacts__list-item {
+      .PresentationContacts__list-button {
         background: #fff;
         color: #000;
 
@@ -114,13 +114,13 @@ main.dark {
       }
     }
 
-    .Contacts__list-btn {
+    .PresentationContacts__list-btn {
       color: #fff;
     }
   }
 
-  .About .About__wrapper .About__text_body,
-  .Legend .Legend__content .Legend__content-item span {
+  .PresentationAbout .PresentationAbout__wrapper .PresentationAbout__text_body,
+  .PresentationLegend .PresentationLegend__content .PresentationLegend__content-item span {
     color: #fff;
   }
 }

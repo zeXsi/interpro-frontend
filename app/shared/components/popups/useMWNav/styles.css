@@ -385,11 +385,16 @@
 
 .Popup.MWNav {
   .Popup_container {
-    transition: all 0.3s ease-out;
+    transition: all 0.2s ease-out;
     position: relative;
     @media (min-width: 935px) {
       height: fit-content;
     }
+  }
+
+  /* Пока меню уезжает, не перехватываем курсор у страницы */
+  &.isRemove {
+    pointer-events: none;
   }
 
   &.isRemove .Popup_container {

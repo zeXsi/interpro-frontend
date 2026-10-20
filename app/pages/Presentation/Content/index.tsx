@@ -6,10 +6,12 @@ export default function Content({ data, id }: any) {
   if (!hd_title && !hd_text) return null;
 
   return (
-    <section className="Content" id={id}>
-      <div className="Content__wrapper">
-        {hd_title && <h2 className="Content__title">{hd_title}</h2>}
-        {hd_text && <p className="Content__txt" dangerouslySetInnerHTML={{ __html: hd_text }}></p>}
+    <section className="PresentationContent" id={id}>
+      <div className="PresentationContent__wrapper">
+        {hd_title && <h2 className="PresentationContent__title">{hd_title}</h2>}
+        {hd_text && (
+          <p className="PresentationContent__txt" dangerouslySetInnerHTML={{ __html: hd_text }}></p>
+        )}
       </div>
     </section>
   );

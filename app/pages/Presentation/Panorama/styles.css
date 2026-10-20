@@ -1,17 +1,17 @@
-.panorama {
+.PresentationPanorama {
   height: 100vh;
   position: relative;
 }
 
-.panorama canvas {
+.PresentationPanorama canvas {
   cursor: grab;
 }
 
-.panorama canvas:active {
+.PresentationPanorama canvas:active {
   cursor: grabbing;
 }
 
-.panorama-label {
+.PresentationPanorama__label {
   position: absolute;
   top: 50%;
   left: 50%;
@@ -35,6 +35,6 @@
   pointer-events: none;
 }
 
-.panorama.interacted .panorama-label {
+.PresentationPanorama.interacted .PresentationPanorama__label {
   opacity: 0;
 }
