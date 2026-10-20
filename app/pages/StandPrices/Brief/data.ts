@@ -40,10 +40,10 @@ export const STAND_ZONES: { title: string; Icon: Icon }[] = [
 
 export const STAND_STYLES = [
   { title: 'Минимализм', description: 'чистые линии, нейтральные цвета', image: '/images/brief/minimalism.webp' },
-  { title: 'Технологичный', description: 'металл, подсветка, хай-тек', image: '/images/brief/technology.jpg' },
+  { title: 'Технологичный', description: 'металл, подсветка, хай-тек', image: '/images/brief/technology.webp' },
   { title: 'Натуральный', description: 'дерево, живые растения, тепло', image: '/images/brief/natural.webp' },
-  { title: 'Яркий', description: 'насыщенные цвета, графика, акценты', image: '/images/brief/bright.jpeg' },
-  { title: 'Корпоративный', description: 'строго в фирменном стиле компании', image: '/images/brief/corporate.webp' },
+  { title: 'Яркий', description: 'насыщенные цвета, графика, акценты', image: '/images/brief/bright.webp' },
+  { title: 'Корпоративный', description: 'строго в фирменном стиле компании', image: '/images/brief/corporate.webp' },
 ];
 
 export const BUDGETS = [
