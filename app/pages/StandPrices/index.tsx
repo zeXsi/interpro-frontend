@@ -97,6 +97,13 @@ export default function StandPrices({ loaderData }: Route.ComponentProps) {
   return (
     <StartPage>
       <main className="StandPrices">
+        <div className="StandPrices-heading px">
+          <h1 className="StandPrices-title">
+            Цены на выставочные
+            <br />
+            стенды
+          </h1>
+        </div>
         <HeroSection onBrief={brief.open} />
         <PriceFactorsSection />
         <ProjectsSection projects={toStandProjects(loaderData.projects)} />
@@ -116,11 +123,11 @@ function HeroSection({ onBrief }: { onBrief: () => void }) {
           <div className="StandPrices-heroHead">
             <span className="StandPrices-heroLabel">( Ориентиры по стоимости )</span>
             <div className="StandPrices-heroTitleWrap">
-              <h1 className="StandPrices-heroTitle">
+              <h2 className="StandPrices-heroTitle">
                 от 45 000
                 <br />
                 до 150 000 ₽/м²
-              </h1>
+              </h2>
               <p className="StandPrices-heroSubtitle">
                 Мы застраиваем эксклюзивные выставочные стенды,{' '}
                 <br className="StandPrices-mobileBreak" />
