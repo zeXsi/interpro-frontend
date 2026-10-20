@@ -387,7 +387,7 @@ function Desktop({
 
   return (
     <div className="MWNav_desktop">
-      <ThreeLevelNav columns={columns} onNavigate={toNavigate} />;
+      <ThreeLevelNav columns={columns} onNavigate={toNavigate} />
     </div>
   );
 }
