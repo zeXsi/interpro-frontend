@@ -751,7 +751,7 @@
   transition: opacity 0.2s ease-out;
 }
 
-/* «Бюджет пока не определён»: слайдер серый, но живой — касание снимает галочку */
+/* Бюджет не выбран или «пока не определён»: слайдер серый, но живой — касание засчитывается как выбор */
 .Brief-budget.isDisabled {
   .Brief-budgetTrack {
     background: linear-gradient(#eee, #eee) center / 100% 2px no-repeat;

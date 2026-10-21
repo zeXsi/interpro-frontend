@@ -32,10 +32,15 @@ export function saveUtmToStorage(): void {
   const fresh = readUtmFromLocation();
   if (!Object.keys(fresh).length) return;
 
-  const current = getStoredUtm();
-  const merged = { ...current, ...fresh };
+  try {
+    const current = getStoredUtm();
+    const merged = { ...current, ...fresh };
 
-  window.localStorage.setItem(STORAGE_KEY, JSON.stringify(merged));
+    window.localStorage.setItem(STORAGE_KEY, JSON.stringify(merged));
+  } catch {
+    // Атрибуция необязательна: заблокированное или переполненное хранилище
+    // не должно мешать открытию страницы и отправке формы.
+  }
 }
 
 export function getStoredUtm(): UtmPayload {
