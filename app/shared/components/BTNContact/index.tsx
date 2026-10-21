@@ -1,4 +1,3 @@
-import { hasBriefOpener, openBrief } from 'store/stBrief';
 import { useHidePreloader } from 'store/stPreloader';
 import Button from '../Button';
 import './styles.css';
@@ -11,12 +10,6 @@ export default function BTNContact() {
   const { Popup, toClosePopup, showWithData, isShowed } = useMWNav();
 
   const onClickContact = () => {
-    if (hasBriefOpener()) {
-      if (isShowed) toClosePopup?.();
-      openBrief();
-      return;
-    }
-
     if (!isShowed || mode === 'nav') {
       showWithData?.('contacts');
       return;
