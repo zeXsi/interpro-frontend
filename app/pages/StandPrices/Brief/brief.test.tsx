@@ -3,6 +3,31 @@ import test from 'node:test';
 import { readFileSync } from 'node:fs';
 import ts from 'typescript';
 
+test('contact form links activate popup buttons and keep inline form scrolling', () => {
+  const output = ts.transpileModule(readFileSync('app/shared/utils/scrollToSection.ts', 'utf8'), {
+    compilerOptions: { module: ts.ModuleKind.CommonJS },
+  }).outputText;
+  const module = { exports: {} as any };
+  const lenisManager = { state: { v: null as any } };
+  new Function('require', 'module', 'exports', output)(() => ({ lenisManager }), module, module.exports);
+  let clicks = 0;
+  let nativeScrolls = 0;
+  const popupOpener = { matches: () => true, click: () => { clicks++; } };
+  const inlineForm = { matches: () => false, scrollIntoView: () => { nativeScrolls++; } };
+  const scrolls: any[] = [];
+  lenisManager.state.v = { scrollTo: (...args: any[]) => { scrolls.push(args); } };
+  module.exports.scrollToSection(popupOpener);
+  assert.equal(clicks, 1);
+  assert.deepEqual(scrolls, []);
+  module.exports.scrollToSection(inlineForm);
+  assert.deepEqual(scrolls, [[inlineForm, { offset: -120, duration: 2 }]]);
+  lenisManager.state.v = null;
+  module.exports.scrollToSection(inlineForm);
+  assert.equal(nativeScrolls, 1);
+  module.exports.scrollToSection(popupOpener);
+  assert.equal(clicks, 2);
+});
+
 // Exercise the rendered controls and their event handlers without a DOM or new test dependencies.
 test('budget interaction, file validation/removal and brief submission', async () => {
   let slots: any[] = [];
