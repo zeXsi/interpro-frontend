@@ -1,5 +1,6 @@
 import './styles.css';
 
+import { hasBriefOpener, openBrief } from 'store/stBrief';
 import { useHidePreloader } from 'store/stPreloader';
 import useMWNav, { MWNavMode } from '../popups/useMWNav';
 
@@ -97,9 +98,16 @@ function Header() {
         </li>
         <li
           className="Header_list-li __contacts"
-          onMouseEnter={() => showWithData?.('contacts')}
+          onMouseEnter={() => {
+            if (!hasBriefOpener()) showWithData?.('contacts');
+          }}
           onClick={() => {
             (window as any).ym?.(99631636, 'reachGoal', 'button_contact');
+
+            if (hasBriefOpener()) {
+              if (isShowed) toClosePopup?.();
+              openBrief();
+            }
           }}
         >
           {'\u0441\u0432\u044f\u0437\u0430\u0442\u044c\u0441\u044f'}
