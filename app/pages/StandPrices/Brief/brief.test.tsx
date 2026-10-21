@@ -36,7 +36,11 @@ test('budget interaction, file validation/removal and brief submission', async (
   let chosen: any = null;
   const budget = controls.BudgetRange({ value: null, isUnknown: false, onChange: (value: any) => { chosen = value; } });
   assert.match(budget.props.className, /isDisabled/);
+  assert.equal(chosen, null); // Rendering the active-looking slider must not choose a budget.
+  assert.equal(find(budget, (node) => node.type === 'p').props.children, 'Выберите бюджет');
   const range = find(budget, (node) => node.type === 'input');
+  assert.equal(range.props['aria-valuetext'], 'Не выбран');
+  assert.equal(range.props.disabled, undefined);
   for (const event of ['onPointerDown', 'onClick']) {
     chosen = null;
     range.props[event]();
@@ -47,6 +51,11 @@ test('budget interaction, file validation/removal and brief submission', async (
     range.props.onKeyDown({ key });
     assert.equal(chosen, 0);
   }
+  const selectedBudget = controls.BudgetRange({ value: 0, isUnknown: false, onChange: () => {} });
+  assert.doesNotMatch(selectedBudget.props.className, /isDisabled/);
+  assert.equal(find(selectedBudget, (node) => node.type === 'input').props['aria-valuetext'], data.formatRub(data.BUDGETS[0]));
+  const unknownBudget = controls.BudgetRange({ value: null, isUnknown: true, onChange: () => {} });
+  assert.equal(find(unknownBudget, (node) => node.type === 'p').props.children, 'Не определён');
   const file = (name: string, size = 1) => ({ name, size, type: '' });
   let files: any[] = [];
   const renderFiles = () => { cursor = 0; return controls.FileField({ files, onChange: (value: any[]) => { files = value; } }); };
@@ -103,6 +112,13 @@ test('budget interaction, file validation/removal and brief submission', async (
   find(tree, (node) => node.type === controls.Checkbox).props.onChange(true);
   assert.equal(slots[0].budget, null);
   assert.equal(slots[0].budgetUnknown, true);
+  popup = hook(); tree = renderSteps();
+  assert.equal(find(tree, (node) => node.props.className === 'Brief-next').props.disabled, false);
+  find(tree, (node) => node.type === controls.Checkbox).props.onChange(false);
+  popup = hook(); tree = renderSteps();
+  assert.equal(slots[0].budget, null);
+  assert.equal(find(tree, (node) => node.props.className === 'Brief-next').props.disabled, true);
+  find(tree, (node) => node.type === controls.Checkbox).props.onChange(true);
   popup = hook(); tree = renderSteps();
   find(tree, (node) => node.type === controls.BudgetRange).props.onChange(0);
   assert.equal(slots[0].budgetUnknown, false);

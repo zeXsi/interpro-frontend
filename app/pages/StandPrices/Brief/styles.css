@@ -751,30 +751,9 @@
   transition: opacity 0.2s ease-out;
 }
 
-/* Бюджет не выбран или «пока не определён»: слайдер серый, но живой — касание засчитывается как выбор */
-.Brief-budget.isDisabled {
-  .Brief-budgetTrack {
-    background: linear-gradient(#eee, #eee) center / 100% 2px no-repeat;
-
-    input {
-
-      &::-webkit-slider-thumb {
-        background: #bdbdbd;
-      }
-
-      &::-moz-range-thumb {
-        background: #bdbdbd;
-      }
-    }
-  }
-
-  .Brief-budgetTicks span {
-    background: #eee;
-  }
-
-  .Brief-budgetValue {
-    opacity: 0.4;
-  }
+/* При пустом бюджете приглушена только подпись, слайдер сохраняет обычные цвета. */
+.Brief-budget.isDisabled .Brief-budgetValue {
+  opacity: 0.4;
 }
 
 /* ---------- 5. Выставка ---------- */
