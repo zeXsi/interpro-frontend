@@ -9,11 +9,12 @@ import TimerIcon from 'assets/icons/stand-prices/timer.svg?react';
 import { getHomeData } from 'api/home/home.api';
 import { getProjectsBySlugs } from 'api/projects/projects.api';
 import type { HomeProject } from 'api/home/home.types';
-import { useLayoutEffect, useRef, useState } from 'react';
+import { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import Accordion from 'shared/components/Accordion';
 import Button from 'shared/components/Button';
 import Link from 'shared/components/Link';
 import StartPage from 'shared/components/StartPage';
+import { registerBriefOpener } from 'store/stBrief';
 import { decodeUnicodeEscapes } from 'shared/utils/decodeUnicodeEscapes';
 import { getOpenGraphMeta } from 'shared/seo/meta';
 import { Swiper, SwiperSlide } from 'swiper/react';
@@ -93,6 +94,11 @@ export function meta() {
 
 export default function StandPrices({ loaderData }: Route.ComponentProps) {
   const brief = useBriefPopup();
+  const openBriefRef = useRef(brief.open);
+  openBriefRef.current = brief.open;
+
+  // Кнопки «связаться» в хедере открывают бриф, а не контакты
+  useEffect(() => registerBriefOpener(() => openBriefRef.current()), []);
 
   return (
     <StartPage>
