@@ -10,13 +10,23 @@ import { useHidePreloader } from 'store/stPreloader';
 export default function useCookies() {
   const { Popup, ...props } = usePopup(0.4);
   const toClosePopup = () => {
-    localStorage.setItem('cookies', 'saved');
+    try {
+      window.localStorage.setItem('cookies', 'saved');
+    } catch {
+      // При недоступном хранилище закрываем уведомление только в текущем сеансе.
+    }
     props.toClosePopup();
     sgIsOpenMWCookies.v = false;
   };
 
   useEffect(() => {
-    if (localStorage.getItem('cookies') !== 'saved') {
+    let isSaved = false;
+    try {
+      isSaved = window.localStorage.getItem('cookies') === 'saved';
+    } catch {
+      // Недоступная настройка равнозначна отсутствующей: показываем уведомление.
+    }
+    if (!isSaved) {
       props.toOpenPopup();
     } else sgIsOpenMWCookies.v = false;
   }, []);

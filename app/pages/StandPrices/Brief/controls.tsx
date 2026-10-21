@@ -8,7 +8,17 @@ import FileRemoveIcon from 'assets/icons/brief/file-remove.svg?react';
 import PlusIcon from 'assets/icons/brief/plus.svg?react';
 import CheckmarkIcon from 'assets/icons/checkmark.svg?react';
 
-import { AREA_MAX, AREA_MIN, BUDGETS, FILE_ACCEPT, FILE_EXTENSIONS, FILE_MAX_COUNT, FILE_MAX_SIZE, formatRub } from './data';
+import {
+  AREA_MAX,
+  AREA_MIN,
+  BUDGETS,
+  FILE_ACCEPT,
+  FILE_EXTENSIONS,
+  FILE_MAX_COUNT,
+  FILE_MAX_SIZE,
+  FILE_MAX_TOTAL_SIZE,
+  formatRub,
+} from './data';
 
 /* ---------- Поле с нижней линией ---------- */
 
@@ -207,24 +217,31 @@ function AreaInput({ prefix, label, value, toValid, onChange }: AreaInputProps) 
 
 /* ---------- Бюджет: слайдер по фиксированным значениям ---------- */
 
+const BUDGET_KEYS = ['ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown', 'Home', 'End', 'PageUp', 'PageDown'];
+
 interface BudgetRangeProps {
-  value: number;
-  /** Галочка «Бюджет пока не определён»: слайдер серый, но на касание реагирует. */
-  disabled: boolean;
+  /** Индекс в BUDGETS; null — бюджет ещё не выбран (или отмечено «не определён»). */
+  value: number | null;
+  /** Отмечено «Бюджет пока не определён» — меняется только подпись. */
+  isUnknown: boolean;
+  /** Любое касание слайдера — это выбор, в том числе текущего (первого) значения. */
   onChange: (value: number) => void;
-  /** Слайдер тронули — галочку снимаем, значение ставится туда, куда кликнули. */
-  onTouch: () => void;
 }
 
-export function BudgetRange({ value, disabled, onChange, onTouch }: BudgetRangeProps) {
+export function BudgetRange({ value, isUnknown, onChange }: BudgetRangeProps) {
   const lastIndex = BUDGETS.length - 1;
+  const isEmpty = value === null;
+  // Пока не выбрано, бегунок стоит на первом значении
+  const position = value ?? 0;
+  // Клик/нажатие клавиши в текущее значение не даёт change — засчитываем выбор сами
+  const choose = () => isEmpty && onChange(position);
 
   return (
-    <div className={`Brief-budget ${disabled ? 'isDisabled' : ''}`}>
-      <div className="Brief-budgetTrack" style={{ '--value-ratio': value / lastIndex } as React.CSSProperties}>
+    <div className={`Brief-budget ${isEmpty ? 'isDisabled' : ''}`}>
+      <div className="Brief-budgetTrack" style={{ '--value-ratio': position / lastIndex } as React.CSSProperties}>
         <div className="Brief-budgetTicks" aria-hidden="true">
           {BUDGETS.map((budget, index) => (
-            <span key={budget} className={index <= value ? 'isActive' : ''} />
+            <span key={budget} className={!isEmpty && index <= position ? 'isActive' : ''} />
           ))}
         </div>
         <input
@@ -232,20 +249,24 @@ export function BudgetRange({ value, disabled, onChange, onTouch }: BudgetRangeP
           min={0}
           max={lastIndex}
           step={1}
-          value={value}
+          value={position}
           aria-label="Бюджет"
-          aria-valuetext={formatRub(BUDGETS[value])}
-          // pointerdown — на случай клика в текущее значение: change тогда не придёт
-          onPointerDown={() => disabled && onTouch()}
-          onChange={(event) => {
-            if (disabled) onTouch();
-            onChange(Number(event.target.value));
-          }}
+          aria-valuetext={isEmpty ? 'Не выбран' : formatRub(BUDGETS[position])}
+          onPointerDown={choose}
+          onClick={choose}
+          onKeyDown={(event) => BUDGET_KEYS.includes(event.key) && choose()}
+          onChange={(event) => onChange(Number(event.target.value))}
         />
       </div>
       <p className="Brief-budgetValue">
-        {formatRub(BUDGETS[value])}
-        {value === lastIndex && ' +'}
+        {isEmpty ? (
+          isUnknown ? 'Не определён' : 'Выберите бюджет'
+        ) : (
+          <>
+            {formatRub(BUDGETS[position])}
+            {position === lastIndex && ' +'}
+          </>
+        )}
       </p>
     </div>
   );
@@ -397,6 +418,8 @@ function CalendarChevron({ orientation = 'down', className }: { orientation?: 'u
 
 /* ---------- Файлы ---------- */
 
+const toMb = (bytes: number) => Math.round(bytes / 1024 / 1024);
+
 export function FileField({ files, onChange }: { files: File[]; onChange: (files: File[]) => void }) {
   const [error, setError] = useState('');
   const inputRef = useRef<HTMLInputElement>(null);
@@ -406,21 +429,36 @@ export function FileField({ files, onChange }: { files: File[]; onChange: (files
     event.target.value = '';
     setError('');
 
+    // Файлы, не прошедшие проверку, не добавляем; показываем первую причину
     const accepted: File[] = [];
+    let totalSize = files.reduce((sum, file) => sum + file.size, 0);
+    let firstError = '';
     for (const file of picked) {
       const extension = file.name.split('.').pop()?.toLowerCase() ?? '';
+      let fileError = '';
       if (!FILE_EXTENSIONS.includes(extension)) {
-        setError('Недопустимый формат файла');
-        continue;
+        fileError = `Недопустимый формат файла «${file.name}». Можно: ${FILE_EXTENSIONS.join(', ')}`;
+      } else if (file.size > FILE_MAX_SIZE) {
+        fileError = `Файл «${file.name}» больше ${toMb(FILE_MAX_SIZE)} МБ`;
+      } else if (files.length + accepted.length >= FILE_MAX_COUNT) {
+        fileError = `Можно прикрепить не больше ${FILE_MAX_COUNT} файлов`;
+      } else if (totalSize + file.size > FILE_MAX_TOTAL_SIZE) {
+        fileError = `Общий размер файлов — не больше ${toMb(FILE_MAX_TOTAL_SIZE)} МБ`;
       }
-      if (file.size > FILE_MAX_SIZE) {
-        setError('Максимальный размер файла 10мб');
+      if (fileError) {
+        firstError ||= fileError;
         continue;
       }
       accepted.push(file);
+      totalSize += file.size;
     }
-    // Лишние файлы сверх лимита отбрасываем с конца
-    if (accepted.length) onChange([...files, ...accepted].slice(0, FILE_MAX_COUNT));
+    setError(firstError);
+    if (accepted.length) onChange([...files, ...accepted]);
+  };
+
+  const remove = (index: number) => {
+    setError('');
+    onChange(files.filter((_, i) => i !== index));
   };
 
   const isFull = files.length >= FILE_MAX_COUNT;
@@ -434,13 +472,17 @@ export function FileField({ files, onChange }: { files: File[]; onChange: (files
           </span>
           Прикрепить файл
         </button>
-        {error && <span className="Brief-filesError">{error}</span>}
+        {error && (
+          <span className="Brief-filesError" role="alert">
+            {error}
+          </span>
+        )}
         <input ref={inputRef} type="file" multiple accept={FILE_ACCEPT} hidden onChange={addFiles} />
       </div>
       {files.length > 0 && (
         <ul className="Brief-filesList">
           {files.map((file, index) => (
-            <FileItem key={`${file.name}-${index}`} file={file} onRemove={() => onChange(files.filter((_, i) => i !== index))} />
+            <FileItem key={`${file.name}-${index}`} file={file} onRemove={() => remove(index)} />
           ))}
         </ul>
       )}
