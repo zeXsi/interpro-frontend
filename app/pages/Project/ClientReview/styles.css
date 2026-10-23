@@ -1,0 +1,103 @@
+.ProjectReview {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 8px 20px;
+  padding-top: var(--offset);
+  font-family: var(--font-family);
+  font-weight: 400;
+  letter-spacing: -0.04em;
+  color: #000;
+
+  .UserInfo {
+    grid-column: 3 / 6;
+    min-width: 0;
+
+    .UserInfo_container {
+      gap: clamp(2rem, calc(0.667rem + 2.778vw), 4rem); /* 32px @768 → 64px @1920 */
+
+      .UserInfo_description {
+        font-size: clamp(1.125rem, calc(0.542rem + 1.215vw), 2rem); /* 18px @768 → 32px @1920 */
+        line-height: 136%;
+        letter-spacing: -0.04em;
+        text-wrap: initial;
+        white-space: pre-line;
+        overflow-wrap: anywhere;
+      }
+    }
+
+    .UserInfo_footer {
+      gap: 8px;
+      max-width: 45.25rem;
+
+      > span {
+        font-size: clamp(1.125rem, calc(0.875rem + 0.521vw), 1.5rem); /* 18px @768 → 24px @1920 */
+        line-height: 136%;
+        opacity: 0.5;
+      }
+
+      .Button {
+        max-width: 100%;
+        font-size: clamp(1.5rem, calc(1.167rem + 0.694vw), 2rem); /* 24px @768 → 32px @1920 */
+        line-height: 120%;
+        text-decoration-skip-ink: none;
+        overflow-wrap: anywhere;
+      }
+    }
+  }
+}
+
+.ProjectReview-title {
+  grid-column: 1 / 3;
+  font-weight: inherit;
+  font-size: clamp(2rem, calc(0.667rem + 2.778vw), 4rem); /* 32px @768 → 64px @1920 */
+  line-height: 110%;
+}
+
+@media (max-width: 1000px) {
+  .ProjectReview {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+
+    .ProjectReview-title,
+    .UserInfo {
+      grid-column: 1 / -1;
+    }
+
+    .UserInfo {
+      max-width: 38.375rem;
+    }
+  }
+
+  .ProjectReview-title {
+    font-size: 2rem;
+    line-height: 136%;
+  }
+}
+
+@media (max-width: 768px) {
+  .ProjectReview .UserInfo {
+    .UserInfo_container {
+      gap: 2rem;
+
+      .UserInfo_description {
+        font-size: clamp(1rem, calc(0.881rem + 0.509vw), 1.125rem); /* 16px @375 → 18px @768 */
+      }
+    }
+
+    .UserInfo_footer {
+      > span {
+        font-size: clamp(1rem, calc(0.881rem + 0.509vw), 1.125rem);
+      }
+
+      .Button {
+        font-size: 1.5rem;
+      }
+    }
+  }
+}
+
+@media (max-width: 540px) {
+  .ProjectReview-title {
+    font-size: 1.5rem;
+    letter-spacing: -0.02em;
+  }
+}

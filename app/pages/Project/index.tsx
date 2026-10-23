@@ -24,6 +24,9 @@ import StartPage from 'shared/components/StartPage';
 import { decodeUnicodeEscapes } from 'shared/utils/decodeUnicodeEscapes';
 import GalleryImage from 'shared/components/GalleryImage';
 import { getOpenGraphMeta } from 'shared/seo/meta';
+import ClientReview from './ClientReview';
+import RelatedProjects from './RelatedProjects';
+import { getRelatedProjects } from 'api/projects/related.api';
 
 export async function loader({ params }: Route.LoaderArgs) {
   const project = await getProjectsById({ slug: params.slug });
@@ -32,7 +35,7 @@ export async function loader({ params }: Route.LoaderArgs) {
     throw new Response('Not found', { status: 404 });
   }
 
-  return project;
+  return { ...project, relatedProjects: (await getRelatedProjects(project.id)) ?? [] };
 }
 function getProjectSeoContext(project?: Project) {
   const projectTitle = decodeUnicodeEscapes(project?.payload?.title || project?.title?.rendered || '').trim();
@@ -177,6 +180,9 @@ export default function ProjectPage({ loaderData: data, params }: Route.Componen
             {title}
           </ImgWithText>
         ))}
+
+        <ClientReview review={data?.payload?.review} projectTitle={projectTitle} />
+        <RelatedProjects projects={data.relatedProjects} />
 
         {/* У приватного проекта нет соседей: он не попадает в список, из
             которого строится цепочка «следующий» — блок просто не выводим. */}

@@ -406,6 +406,7 @@ async function assertHydrates(origin, slug, title) {
     await page.waitForURL(`${origin}/blog`);
     assert.equal(await page.evaluate(() => window.__navigationMarker), 'article-document');
     const storyLink = page.locator('.FeedPage_container a[href="/blog/fixture-story"]');
+    await storyLink.waitFor();
     assert.equal(await storyLink.count(), 1);
     await storyLink.locator('.Article').click();
     await page.waitForURL(`${origin}/blog/fixture-story`);
