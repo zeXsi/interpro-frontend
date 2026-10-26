@@ -306,6 +306,8 @@ interface ContactsProps {
   toClosePopup: () => void;
 }
 function Contacts({ toClosePopup }: ContactsProps) {
+  // На /stand-prices #ContactForm - кнопка брифа: ссылка откроет его поп-ап (см. scrollToSection)
+  const isBriefPage = useLocation().pathname === '/stand-prices';
   const toClosePopupYM = () => {
     toClosePopup();
     (window as any).ym?.(99631636,'reachGoal','reach_contact');
@@ -314,7 +316,7 @@ function Contacts({ toClosePopup }: ContactsProps) {
     <div className="Contacts px">
       <Link to={['/', '#ContactForm']} onClick={toClosePopupYM}>
         <Button as="span" variant="link" className="Contacts-title">
-          оставить контакты
+          {isBriefPage ? 'заполнить бриф' : 'оставить контакты'}
         </Button>
       </Link>
       <div className="Contacts-wrapper">
