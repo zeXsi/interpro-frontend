@@ -3,6 +3,7 @@ import useBreakpoints from '@qtpy/use-breakpoints';
 import StartPage from 'shared/components/StartPage';
 
 import { useEffect, useRef, useState } from 'react';
+import { useLoaderData } from 'react-router';
 
 import ProjectCard, { ProjectCardProps } from './ProjectCard';
 import useEvent from '@qtpy/use-event';
@@ -25,8 +26,9 @@ import { signal } from 'shared/utils/_stm';
 import { useSignalValue } from 'shared/utils/_stm/react/react';
 import { toFilterData, toggleFilter, UserFilter } from 'store/stGlobal';
 import { sgProjects } from 'api/projects/projects.api';
+import type { Project } from 'api/projects/projects.types';
 
-import { getFilters, sgFilters } from 'api/filters';
+import { getFilters } from 'api/filters';
 import { decodeUnicodeEscapes } from 'shared/utils/decodeUnicodeEscapes';
 import JsonLd from 'shared/seo/JsonLd';
 import { getProjectsPageSchema } from 'shared/seo/schemas';
@@ -35,7 +37,7 @@ type ViewMode = 'grid' | 'list';
 export const hoveredProject = signal(-Infinity);
 
 export async function loader() {
-  await getFilters();
+  return getFilters();
 }
 
 
@@ -61,10 +63,11 @@ export function meta() {
   ];
 }
 export default function ProjectsPage() {
+  const filters = useLoaderData<typeof loader>();
   useSignalValue(sgProjects);
-  useSignalValue(sgFilters);
 
   const [switchMode, setSwitchMode] = useState<ViewMode>('grid');
+  const [isHydrated, setIsHydrated] = useState(false);
   const refContainer = useRef<HTMLDivElement>(null);
   const refImg = useRef<HTMLDivElement>(null);
 
@@ -75,18 +78,20 @@ export default function ProjectsPage() {
   const filteredData = toFilterData(sgProjects.v);
 
   const [activeIndex, setActiveIndex] = useState(0);
-  let mode = useBreakpoints<'desktop' | 'mobile'>(
+  const activeProject = filteredData[activeIndex] ?? filteredData[0];
+  const breakpoint = useBreakpoints<'desktop' | 'mobile'>(
     {
       1024: 'desktop',
       0: 'mobile',
     },
     500
   );
-  mode = `${mode}_${switchMode}` as any;
+  // Match the server's mobile layout until hydration has completed.
+  const mode = `${isHydrated ? breakpoint : 'mobile'}_${switchMode}` as SwitchModeDesktopProps['mode'];
   useEvent(
     'scroll',
-    (_, remove) => {
-      if (mode === 'mobile') return remove();
+    () => {
+      if (mode !== 'desktop_grid') return;
       const scrollTop = window.scrollY || document.documentElement.scrollTop;
       deltaY.current = scrollTop - prevScrollY.current;
       prevScrollY.current = scrollTop;
@@ -96,7 +101,7 @@ export default function ProjectsPage() {
         const el = cardRefs.getRef(key).current;
         if (!el) return;
         const offset = (n: number) => el.offsetTop - el.offsetHeight * n;
-        const isLast = i === sgProjects.v.length - 1;
+        const isLast = i === filteredData.length - 1;
 
         if (deltaY.current > 0) {
           if (isLast && offset(1.2) <= scrollTop) {
@@ -115,10 +120,12 @@ export default function ProjectsPage() {
   );
 
   useEffect(() => {
+    setIsHydrated(true);
     toggleFilter.toClear();
   }, []);
 
   const onClick: FilterProps['onClick'] = (tagName, id, isClearAll) => {
+    setActiveIndex(0);
     if (isClearAll) return toggleFilter.toClear();
     toggleFilter(tagName as keyof UserFilter, Number(id));
   };
@@ -140,7 +147,7 @@ export default function ProjectsPage() {
         </div>
 
         <div className="ProjectPage_filter-ModeSwitcher ">
-          <FilterProject onClick={onClick} items={mapFiltersToFilterProject(sgFilters.v)} />
+          <FilterProject onClick={onClick} items={mapFiltersToFilterProject(filters, sgProjects.v)} />
 
           <ModeSwitcher<ViewMode>
             startVal="grid"
@@ -158,7 +165,7 @@ export default function ProjectsPage() {
               const nextItem = arr[index + 1];
 
               return (
-                <div ref={cardRefs.getRef(`project_${index}`) as any} key={index}>
+                <div ref={cardRefs.getRef(`project_${index}`) as any} key={id}>
                   <SwitchModeDesktop
                     keyName={`project_${index}`}
                     key={`project_${id}`}
@@ -179,19 +186,15 @@ export default function ProjectsPage() {
             })}
           </div>
           <div className={`ProjectPage_container-right __${mode}`} ref={refImg}>
-            {filteredData.map(({ payload, id, slug }, index) => {
-              return (
-                //prettier-ignore
-                index === activeIndex && (
-                <Img
-                  key={ index }
-                  title={ payload.title }
-                  cover={ payload.cover }
-                  slug={ slug }
-                  id={ id } />
-              )
-              );
-            })}
+            {activeProject && (
+              <Img
+                key={activeProject.id}
+                title={activeProject.payload.title}
+                cover={activeProject.payload.cover}
+                slug={activeProject.slug}
+                id={activeProject.id}
+              />
+            )}
           </div>
         </div>
         <ContactForm />
@@ -262,42 +265,45 @@ interface ExhibitionStand {
   year_stand?: ExhibitionStandField;
 }
 
-function normalizeField(field: ExhibitionStandField): ExhibitionStandItem[] {
-  if (!field) return []; // если null, undefined или {}
-  if (Array.isArray(field)) return field;
-  if (typeof field === 'object' && Object.keys(field).length > 0) {
-    return Object.values(field);
+function normalizeField(
+  field: ExhibitionStandField,
+  projectTerms: { id: number; name: string }[]
+): { id: number; name: string }[] {
+  const items = new Map(
+    Object.values(field ?? {}).map(({ id, name }) => [id, { id, name }])
+  );
+  // A stale or incomplete facets response must not hide terms of available projects.
+  for (const term of projectTerms) {
+    if (!items.has(term.id)) items.set(term.id, { id: term.id, name: term.name });
   }
-  return [];
+  return [...items.values()];
 }
 
-function mapFiltersToFilterProject(data: ExhibitionStand): FilterItem[] {
+function mapFiltersToFilterProject(data: ExhibitionStand, projects: Project[]): FilterItem[] {
   return [
     {
       filterName: 'Выставка',
       filterType: 'exhibition_stand',
-      items: normalizeField(data.exhibition_stand).map((item) => ({
-        name: item.name,
-        id: item.id,
-      })),
+      items: normalizeField(
+        data.exhibition_stand,
+        projects.flatMap((project) => project.payload.meta.exhibition)
+      ),
     },
     {
       filterName: 'Тип стенда',
       filterType: 'type_stand',
-      items: normalizeField(data.type_stand).map((item) => ({
-        name: item.name,
-        id: item.id,
-      })),
+      items: normalizeField(
+        data.type_stand,
+        projects.flatMap((project) => project.payload.meta.type_tax)
+      ),
     },
     {
       filterName: 'Год',
       filterType: 'year_stand',
-      items: normalizeField(data.year_stand)
-        .map((item) => ({
-          name: item.name,
-          id: item.id,
-        }))
-        .sort((a, b) => Number(b.name) - Number(a.name)),
+      items: normalizeField(
+        data.year_stand,
+        projects.flatMap((project) => project.payload.meta.year ? [project.payload.meta.year] : [])
+      ).sort((a, b) => Number(b.name) - Number(a.name)),
     },
   ];
 }
