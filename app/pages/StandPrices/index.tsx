@@ -164,16 +164,18 @@ function HeroSection({ onBrief }: { onBrief: () => void }) {
 }
 
 function BriefButton({
+  id,
   className = '',
   variant = 'link',
   onClick,
 }: {
+  id?: string;
   className?: string;
   variant?: 'link' | 'ghostLink';
   onClick: () => void;
 }) {
   return (
-    <button className={`StandPrices-briefButton ${className}`} type="button" onClick={onClick}>
+    <button id={id} className={`StandPrices-briefButton ${className}`} type="button" onClick={onClick}>
       <Button.Arrow as="span" direction="right" variant={variant}>
         Заполнить бриф
       </Button.Arrow>
@@ -364,7 +366,7 @@ function BriefSection({ onBrief }: { onBrief: () => void }) {
           Заполните короткий бриф&nbsp;— 7&nbsp;вопросов, 3&nbsp;минуты. Этого достаточно чтобы наш
           дизайнер подготовил предварительную концепцию и&nbsp;точный расчёт стоимости
         </p>
-        <BriefButton className="StandPrices-briefCta" onClick={onBrief} />
+        <BriefButton id="ContactForm" className="StandPrices-briefCta" onClick={onBrief} />
       </div>
     </section>
   );

@@ -2,7 +2,7 @@ import './styles.css';
 
 import usePopup from '@qtpy/use-popup';
 import PlusSmallIcon from 'assets/icons/brief/plus-small.svg?react';
-import { sendLead } from 'api/form';
+import { sendLead, sendLeadWithFiles, type LeadData } from 'api/form';
 import { useEffect, useState, type ReactNode } from 'react';
 import { GlobalScrollLock } from 'shared/components/_helpers/GlobalScrollLock';
 import Link from 'shared/components/Link';
@@ -27,7 +27,8 @@ interface BriefState {
   area: [number, number];
   secondFloor: boolean;
   zones: string[];
-  budget: number;
+  /** Индекс в BUDGETS; null — не выбран. */
+  budget: number | null;
   budgetUnknown: boolean;
   exhibition: string;
   exhibitionDate: Date | null;
@@ -49,7 +50,7 @@ const initialState: BriefState = {
   area: [AREA_MIN, AREA_MAX],
   secondFloor: false,
   zones: [],
-  budget: 0,
+  budget: null,
   budgetUnknown: false,
   exhibition: '',
   exhibitionDate: null,
@@ -141,6 +142,8 @@ function BriefSteps({ state, setState, stepIndex, setStepIndex, isSendFailed, se
   const step: Step = STEPS[stepIndex];
   const [errors, setErrors] = useState<Partial<Record<ContactKey | 'agreed', string>>>({});
   const [isSending, setIsSending] = useState(false);
+  /** Понятная пользователю причина ошибки от бэкенда (например, файл не принят). */
+  const [sendError, setSendError] = useState('');
   const isCompact = useMediaQuery('(max-width: 1000px)');
 
   const update = <K extends keyof BriefState>(key: K, value: BriefState[K]) => {
@@ -161,7 +164,7 @@ function BriefSteps({ state, setState, stepIndex, setStepIndex, isSendFailed, se
     type: !!state.type,
     area: state.area[0] !== AREA_MIN || state.area[1] !== AREA_MAX,
     zones: state.zones.length > 0,
-    budget: true,
+    budget: state.budget !== null || state.budgetUnknown,
     exhibition: true,
     style: true,
     comment: true,
@@ -182,7 +185,7 @@ function BriefSteps({ state, setState, stepIndex, setStepIndex, isSendFailed, se
     if (Object.keys(nextErrors).length) return;
 
     setIsSending(true);
-    const response = await sendLead({
+    const lead: LeadData = {
       name: state.name.trim(),
       phone: state.phone.trim(),
       company: state.company.trim(),
@@ -191,10 +194,23 @@ function BriefSteps({ state, setState, stepIndex, setStepIndex, isSendFailed, se
       extraInfo: 'Бриф: цены на выставочные стенды',
       area: state.area[1],
       project: toProjectText(state),
-    });
+    };
+    // Без файлов — прежний JSON-запрос, с файлами — multipart
+    const response = state.files.length ? await sendLeadWithFiles(lead, state.files) : await sendLead(lead);
     setIsSending(false);
 
-    // sendLead сам пишет ошибку в консоль; здесь только показываем экран ошибки
+    const ym = typeof window !== 'undefined' ? (window as any).ym : undefined;
+    if (response.ok) {
+      const _tmr = typeof window !== 'undefined' ? window._tmr : undefined;
+      ym?.(99631636, 'reachGoal', 'request_popup_full');
+      _tmr?.push({ type: 'reachGoal', id: 3746602, goal: 'reach_goal_popup' });
+    } else {
+      ym?.(99631636, 'reachGoal', 'request_form_false');
+    }
+
+    // sendLead сам пишет ошибку в консоль; здесь только показываем экран ошибки.
+    // Текст бэкенда показываем только для ошибки файлов — остальные сообщения технические.
+    setSendError(response.code === 'lead_file_invalid' ? response.error ?? '' : '');
     setIsSendFailed(!response.ok);
     next();
   };
@@ -205,7 +221,9 @@ function BriefSteps({ state, setState, stepIndex, setStepIndex, isSendFailed, se
         <div className="Brief-done">
           <span className="Brief-doneLabel">{isSendFailed ? '( Произошла ошибка )' : '( Заявка отправлена )'}</span>
           <p className="Brief-question">
-            {isSendFailed ? (
+            {isSendFailed && sendError ? (
+              <>{sendError}</>
+            ) : isSendFailed ? (
               <>
                 Кажется, при отправке что-то пошло не&nbsp;так. Попробуйте позже либо свяжитесь с&nbsp;нами по&nbsp;данным
                 из&nbsp;подвала
@@ -286,11 +304,16 @@ function BriefSteps({ state, setState, stepIndex, setStepIndex, isSendFailed, se
             <div className="Brief-budgetWrap">
               <BudgetRange
                 value={state.budget}
-                disabled={state.budgetUnknown}
-                onChange={(value) => update('budget', value)}
-                onTouch={() => update('budgetUnknown', false)}
+                isUnknown={state.budgetUnknown}
+                // Тронули слайдер — это выбор суммы, галочку «не определён» снимаем
+                onChange={(value) => setState((prev) => ({ ...prev, budget: value, budgetUnknown: false }))}
               />
-              <Checkbox checked={state.budgetUnknown} onChange={(value) => update('budgetUnknown', value)}>
+              <Checkbox
+                checked={state.budgetUnknown}
+                onChange={(value) =>
+                  setState((prev) => ({ ...prev, budgetUnknown: value, budget: value ? null : prev.budget }))
+                }
+              >
                 Бюджет пока не определён
               </Checkbox>
             </div>
@@ -478,13 +501,17 @@ function toProjectText(state: BriefState) {
     state.area[0] === state.area[1] ? `Площадь: ${state.area[0]} м²` : `Площадь: ${state.area[0]}–${state.area[1]} м²`,
     state.secondFloor ? 'Планируется второй этаж' : '',
     state.zones.length ? `Зоны: ${state.zones.join(', ')}` : '',
-    `Бюджет: ${state.budgetUnknown ? 'пока не определён' : formatRub(BUDGETS[state.budget]) + (state.budget === BUDGETS.length - 1 ? ' и выше' : '')}`,
+    `Бюджет: ${
+      state.budgetUnknown || state.budget === null
+        ? 'не определён'
+        : formatRub(BUDGETS[state.budget]) + (state.budget === BUDGETS.length - 1 ? ' и выше' : '')
+    }`,
     state.exhibition ? `Выставка: ${state.exhibition}` : '',
     state.exhibitionDate ? `Дата открытия: ${formatDate(state.exhibitionDate)}` : '',
     state.styles.length ? `Стиль: ${state.styles.join(', ')}` : '',
     state.styleLinks ? `Ссылки на примеры: ${state.styleLinks}` : '',
     state.comment ? `Комментарий: ${state.comment}` : '',
-    state.files.length ? `Файлы (не переданы, запросить у клиента): ${state.files.map((file) => file.name).join(', ')}` : '',
+    state.files.length ? `Файлы: ${state.files.map((file) => file.name).join(', ')} (приложены к заявке)` : '',
     state.position ? `Должность: ${state.position}` : '',
     state.site ? `Сайт: ${state.site}` : '',
   ];

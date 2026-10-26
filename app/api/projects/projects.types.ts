@@ -26,6 +26,7 @@ export interface Project {
   payload: {
     title: string;
     about: string;
+    review?: { text: string; pdf?: string | null; file_name?: string | null } | null;
     cover: string;
     video: string;
     show_on_home: boolean;

@@ -8,6 +8,10 @@
   display: flex;
   flex-direction: column;
 
+  &:has(.__nextItem) .ContactForm {
+    margin-top: 0px;
+  }
+
   /* У приватного проекта блока «следующий проект» нет, а именно его
      margin-bottom отделял форму от контента — повторяем этот отступ здесь,
      значения те же, что у .__nextItem ниже. */
@@ -27,13 +31,13 @@
 
     gap: clamp(0.5rem, calc(0.257rem + 1.036vw), 1.5rem);
     /* min: 8px, max: 24px */
-    margin-top: clamp(2.75rem, calc(0.583rem + 4.514vw), 6rem);
-    /* min: 44px, max: 96px */ /* viewPort: 768-1920 */
+    margin-top: clamp(6rem, calc(8.917rem + -2.431vw), 7.75rem);
+    /* min: 96px, max: 124px */ /* viewPort: 768-1920 */
     margin-bottom: clamp(7.75rem, calc(3rem + 9.896vw), 14.875rem);
     /* min: 124px, max: 238px */ /* viewPort: 768-1920 */
     @media (max-width: 768px) {
-      margin-top: clamp(2rem, calc(1.284rem + 3.053vw), 2.75rem);
-      /* min: 32px, max: 44px */ /* viewPort: 375-768 */
+      margin-top: clamp(6rem, calc(4.33rem + 7.125vw), 7.75rem); /* min: 96px, max: 124px */
+      /* min: 96px, max: 124px */ /* viewPort: 375-768 */
       margin-bottom: clamp(6rem, calc(4.33rem + 7.125vw), 7.75rem);
       /* min: 96px, max: 124px */ /* viewPort: 375-768 */
     }
@@ -136,9 +140,7 @@
     .Tag-title {
       font-family: var(--font-family);
       font-weight: 400;
-      font-size: clamp(1.125rem, calc(1.167rem + 0.694vw), 2rem);
-      /* min: 18px, max: 32px */
-      /* viewPort: 768-1920 */
+      font-size: 32px;
       line-height: 136%;
       letter-spacing: -0.02em;
       color: #000;
@@ -192,7 +194,6 @@
     }
 
     .ProjectPage_tags.__desktop {
-
       .ProjectPage_tags-container {
         flex-direction: column;
         .ProjectPage_tag {
@@ -200,6 +201,14 @@
           flex-direction: column;
           gap: 32px;
         }
+      }
+    }
+
+    .ProjectPage-description {
+      .Tag-title {
+        font-size: clamp(1.125rem, calc(0.29rem + 3.562vw), 2rem);
+        /* min: 18px, max: 32px */
+        /* viewPort: 375-768 */
       }
     }
   }

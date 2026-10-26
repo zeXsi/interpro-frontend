@@ -39,6 +39,7 @@ import useMWForm from 'shared/components/popups/useMWForm';
 
 import { useEffect } from 'react';
 import { lenisManager } from 'shared/utils/lenis';
+import { saveUtmToStorage } from 'api/utm';
 import BTNContact from 'shared/components/BTNContact';
 import AdBanner from 'shared/components/AdBanner';
 import CopyToast from 'shared/components/CopyToast';
@@ -325,6 +326,11 @@ export default function App() {
   useEffect(() => {
     lenisManager.init();
   }, []);
+
+  // UTM из адреса входа — на любой странице, а не только там, где есть ContactForm
+  useEffect(() => {
+    saveUtmToStorage();
+  }, [location.search]);
 
   const isPresentation = location.pathname.startsWith('/presentation');
   const serviceCategorySlugs = location.pathname === '/'

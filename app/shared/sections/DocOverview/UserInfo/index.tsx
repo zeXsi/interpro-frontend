@@ -10,6 +10,9 @@ interface UserInfoProps {
   docDescription: string;
   docName: string;
   docLink?: string | null;
+  docFileName?: string;
+  plainText?: boolean;
+  documentVariant?: 'ghostLink' | 'link';
 }
 
 
@@ -25,14 +28,16 @@ export default function UserInfo(props: UserInfoProps) {
     <div className="UserInfo">
       {/* <User name={props.userName} description={props.userStatus} /> */}
       <div className="UserInfo_container">
-        <Text className='UserInfo_description'>
-          { props.docDescription }
-        </Text>
+        {props.plainText ? (
+          <p className="UserInfo_description">{props.docDescription}</p>
+        ) : (
+          <Text className="UserInfo_description">{props.docDescription}</Text>
+        )}
         {normalizedDocLink && fileExtension ? (
           <div className="UserInfo_footer">
             <span>Благодарственное письмо:</span>
             <a href={normalizedDocLink} rel="noopener noreferrer nofollow" target="_blank">
-              <Button as="span" variant="ghostLink">{`${props.docName}${fileExtension}`}</Button>
+              <Button as="span" variant={props.documentVariant ?? 'ghostLink'}>{props.docFileName || `${props.docName}${fileExtension}`}</Button>
             </a>
           </div>
         ) : (

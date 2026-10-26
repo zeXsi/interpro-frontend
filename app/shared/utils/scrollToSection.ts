@@ -25,6 +25,12 @@ export const findSection = (hash: string) => {
 
 /** Скроллит к секции с учётом фиксированного хедера */
 export const scrollToSection = (element: HTMLElement) => {
+  // A section can expose a popup opener instead of an inline form.
+  if (element.matches('button')) {
+    element.click();
+    return;
+  }
+
   const lenis = lenisManager.state.v;
 
   if (lenis) {

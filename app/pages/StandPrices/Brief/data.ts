@@ -55,11 +55,13 @@ export const EXHIBITIONS = ['Металлообработка', 'Иннопро�
 export const AREA_MIN = 9;
 export const AREA_MAX = 500;
 
+/** Лимиты совпадают с проверкой на бэкенде (POST /send с файлами). */
 export const FILE_MAX_SIZE = 10 * 1024 * 1024;
-/** Больше трёх файлов не принимаем — кнопка «Прикрепить файл» становится неактивной. */
-export const FILE_MAX_COUNT = 3;
-export const FILE_ACCEPT = '.jpg,.jpeg,.png,.webp,.pdf,.doc,.docx';
-export const FILE_EXTENSIONS = ['jpg', 'jpeg', 'png', 'webp', 'pdf', 'doc', 'docx'];
+export const FILE_MAX_TOTAL_SIZE = 25 * 1024 * 1024;
+/** Больше пяти файлов не принимаем — кнопка «Прикрепить файл» становится неактивной. */
+export const FILE_MAX_COUNT = 5;
+export const FILE_EXTENSIONS = ['pdf', 'jpg', 'jpeg', 'png', 'webp', 'doc', 'docx', 'xls', 'xlsx', 'ppt', 'pptx', 'zip'];
+export const FILE_ACCEPT = FILE_EXTENSIONS.map((extension) => `.${extension}`).join(',');
 
 /** Шагов с вопросами — по ним считается прогресс. Контакты идут восьмым экраном. */
 export const QUESTION_STEPS = 7;
