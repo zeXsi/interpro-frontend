@@ -182,6 +182,21 @@ function createMockApi() {
     }
 
     if (url.pathname.endsWith('/projects')) {
+      if (url.searchParams.getAll('slug[]').includes('moskovskij-urbanisticheskij-forum')) {
+        sendJson(response, [{
+          id: 2364,
+          slug: 'moskovskij-urbanisticheskij-forum',
+          title: { rendered: 'Urban forum' },
+          payload: {
+            title: 'Urban forum',
+            about: 'Urban forum description',
+            cover: 'https://api.interpro.pro/wp-content/uploads/forum.webp',
+            meta: { exhibition: [], type_tax: [], year: null },
+            seo: { title: 'Urban forum' },
+          },
+        }]);
+        return;
+      }
       sendJson(response, [
         {
           id: 901,
@@ -654,6 +669,24 @@ test('parallel SSR requests isolate route state and hydrate without mismatch', {
     );
 
     await assertHomeHydratesAndNavigates(appOrigin);
+
+    mockApi.clearRequestPaths();
+    const museumResponse = await fetch(`${appOrigin}/museum-spaces`, {
+      headers: { 'user-agent': 'Googlebot' },
+    });
+    const museumHtml = await museumResponse.text();
+    assert.equal(museumResponse.status, 200, `museum selection renders successfully\n${serverOutput}`);
+    assertSSRLink(
+      museumHtml,
+      '/projects/moskovskij-urbanisticheskij-forum',
+      /Urban forum/,
+      'museum forum project'
+    );
+    const museumProjectQuery = mockApi.requestPaths
+      .map((pathname) => new URL(pathname, mockOrigin))
+      .find((url) => url.searchParams.getAll('slug[]').includes('moskovskij-urbanisticheskij-forum'));
+    assert.ok(museumProjectQuery, 'museum selection requests the corrected forum slug');
+    assert.doesNotMatch(mockApi.requestPaths.join('\n'), /moskovskij-urbanisticeskij-forum/);
 
     for (const pathname of ['/services', '/services/full-service']) {
       const response = await fetch(`${appOrigin}${pathname}`, {

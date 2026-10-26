@@ -32,7 +32,7 @@ const POLL_INTERVAL_MS = envMs('SSR_QUERY_POLL_INTERVAL_MS', DEFAULT_POLL_INTERV
 const MARKER_TIMEOUT_MS = envMs('SSR_QUERY_MARKER_TIMEOUT_MS', 10_000);
 
 const MUSEUM_PROJECT_SLUGS = [
-  'moskovskij-urbanisticeskij-forum',
+  'moskovskij-urbanisticheskij-forum',
   'muzej-vtoroj-mirovoj-vojny',
 ] as const;
 const OFFICE_PROJECT_SLUGS = ['kontrastnyj-open-space', 'mnogozonal-nyj-ofis'] as const;
