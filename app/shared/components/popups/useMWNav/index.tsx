@@ -13,6 +13,7 @@ import { useSignalValue } from 'shared/utils/_stm/react/react';
 import { sgHomeData } from 'api/home/home.api';
 import type { HomeServiceNavigationNode } from 'api/home/home.types';
 import { useLocation } from 'react-router';
+import { MWBrief } from 'pages/StandPrices/Brief';
 
 type NavigationCategory = {
   slug: string;
@@ -306,19 +307,16 @@ interface ContactsProps {
   toClosePopup: () => void;
 }
 function Contacts({ toClosePopup }: ContactsProps) {
-  // На /stand-prices #ContactForm - кнопка брифа: ссылка откроет его поп-ап (см. scrollToSection)
-  const isBriefPage = useLocation().pathname === '/stand-prices';
-  const toClosePopupYM = () => {
+  const openBrief = () => {
     toClosePopup();
     (window as any).ym?.(99631636,'reachGoal','reach_contact');
-  }
+    MWBrief.v.open();
+  };
   return (
     <div className="Contacts px">
-      <Link to={['/', '#ContactForm']} onClick={toClosePopupYM}>
-        <Button as="span" variant="link" className="Contacts-title">
-          {isBriefPage ? 'заполнить бриф' : 'оставить контакты'}
-        </Button>
-      </Link>
+      <Button variant="link" className="Contacts-title" onClick={openBrief}>
+        заполнить бриф
+      </Button>
       <div className="Contacts-wrapper">
         <Link to={import.meta.env.VITE_PHONE} typeLink="external">
           <Button as="span" variant="link" underline="left-right" className="Contacts-items">

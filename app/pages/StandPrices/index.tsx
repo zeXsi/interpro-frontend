@@ -20,7 +20,7 @@ import { Swiper, SwiperSlide } from 'swiper/react';
 import type { Swiper as SwiperInstance } from 'swiper';
 import 'swiper/css';
 
-import useBriefPopup from './Brief';
+import { MWBrief } from './Brief';
 import type { Route } from './+types';
 
 const PROJECT_DESCRIPTION_MAX_PARAGRAPHS = 2;
@@ -92,7 +92,7 @@ export function meta() {
 }
 
 export default function StandPrices({ loaderData }: Route.ComponentProps) {
-  const brief = useBriefPopup();
+  const openBrief = () => MWBrief.v.open();
 
   return (
     <StartPage>
@@ -104,13 +104,12 @@ export default function StandPrices({ loaderData }: Route.ComponentProps) {
             стенды
           </h1>
         </div>
-        <HeroSection onBrief={brief.open} />
+        <HeroSection onBrief={openBrief} />
         <PriceFactorsSection />
         <ProjectsSection projects={toStandProjects(loaderData.projects)} />
         <PriceFaqSection />
-        <BriefSection onBrief={brief.open} />
+        <BriefSection onBrief={openBrief} />
       </main>
-      {brief.popup}
     </StartPage>
   );
 }

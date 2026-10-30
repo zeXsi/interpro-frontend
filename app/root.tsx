@@ -36,6 +36,7 @@ import Footer from 'shared/sections/Footer';
 import ErrorNotFound from 'pages/ErrorNotFound';
 import useCookies from 'shared/components/popups/useCookies';
 import useMWForm from 'shared/components/popups/useMWForm';
+import useBriefPopup from 'pages/StandPrices/Brief';
 
 import { useEffect } from 'react';
 import { lenisManager } from 'shared/utils/lenis';
@@ -322,6 +323,7 @@ export default function App() {
   const location = useLocation();
   const cookies = useCookies();
   const form = useMWForm();
+  const brief = useBriefPopup();
 
   useEffect(() => {
     lenisManager.init();
@@ -358,6 +360,7 @@ export default function App() {
             <cookies.Popup />
             <AdBanner />
             <form.Popup />
+            {brief.popup}
             <BTNContact />
             <RouteGuard
               isValidRoutes={['/', '/privacy', '/museum-spaces', '/office-renovation']}
