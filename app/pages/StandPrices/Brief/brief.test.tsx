@@ -117,6 +117,7 @@ test('budget interaction, file validation/removal and brief submission', async (
   };
   const briefModule = load('app/pages/StandPrices/Brief/index.tsx', {
     './data': data, './controls': controls, 'api/form': api,
+    'shared/utils/_stm': { signal: (value: any) => ({ v: value }) },
     '@qtpy/use-popup': { default: () => ({ Popup: 'popup', toOpenPopup: () => {}, toClosePopup: () => {} }) },
   });
   const hook = () => { cursor = 0; return briefModule.default(); };
@@ -161,19 +162,21 @@ test('budget interaction, file validation/removal and brief submission', async (
       assert.equal(slots[1], 8);
     };
     await submit();
-    assert.equal(calls[0][0], 'json');
-    assert.equal(calls[0][1].consent, false);
-    assert.match(calls[0][1].project, /Бюджет: 500/);
-    assert.deepEqual(calls[1], ['ym', 99631636, 'reachGoal', 'request_popup_full']);
-    assert.deepEqual(calls[2], ['tmr', { type: 'reachGoal', id: 3746602, goal: 'reach_goal_popup' }]);
+    assert.deepEqual(calls[0], ['ym', 99631636, 'reachGoal', 'request_form_all']);
+    assert.equal(calls[1][0], 'json');
+    assert.equal(calls[1][1].consent, false);
+    assert.match(calls[1][1].project, /Бюджет: 500/);
+    assert.deepEqual(calls[2], ['ym', 99631636, 'reachGoal', 'request_popup_full']);
+    assert.deepEqual(calls[3], ['tmr', { type: 'reachGoal', id: 3746602, goal: 'reach_goal_popup' }]);
     slots[0] = { ...slots[0], budget: null, budgetUnknown: true, files: [file('plan.pdf')] };
     response = { ok: false, code: 'lead_file_invalid', error: 'Файл не принят' };
     calls.length = 0;
     await submit();
-    assert.equal(calls[0][0], 'files');
-    assert.match(calls[0][1].project, /Бюджет: не определён/);
-    assert.match(calls[0][1].project, /Файлы: plan.pdf \(приложены к заявке\)/);
-    assert.deepEqual(calls[1], ['ym', 99631636, 'reachGoal', 'request_form_false']);
+    assert.deepEqual(calls[0], ['ym', 99631636, 'reachGoal', 'request_form_all']);
+    assert.equal(calls[1][0], 'files');
+    assert.match(calls[1][1].project, /Бюджет: не определён/);
+    assert.match(calls[1][1].project, /Файлы: plan.pdf \(приложены к заявке\)/);
+    assert.deepEqual(calls[2], ['ym', 99631636, 'reachGoal', 'request_form_false']);
     popup = hook(); tree = renderSteps();
     assert.ok(find(tree, (node) => node.props.children === 'Файл не принят'));
     popup.open();

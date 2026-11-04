@@ -23,7 +23,7 @@
     line-height: 110%;
     letter-spacing: -0.04em;
     color: #000;
-    padding-bottom: clamp(0.063rem, calc(-0.116rem + 0.763vw), 0.25rem);
+    /* padding-bottom: clamp(0.063rem, calc(-0.116rem + 0.763vw), 0.25rem); */
     /* min: 1px, max: 4px */
     /* viewPort: 768-1920 */
     .Button {

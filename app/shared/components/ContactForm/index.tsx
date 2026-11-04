@@ -302,6 +302,8 @@ export default function ContactForm({
   const refSend = useRef<HTMLSpanElement>(null);
 
   const submit = () => {
+    // Цель на любое нажатие «отправить заявку» — до валидации, заполнение не обязательно
+    (typeof window !== 'undefined' ? (window as any).ym : undefined)?.(99631636, 'reachGoal', 'request_form_all');
     form.onSubmit(async (data: any) => {
       refSend.current?.toggleAttribute('disabled', true);
       const name = normalizeName(data.username);

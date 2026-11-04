@@ -28,15 +28,13 @@ import { sgFeedbacks } from 'api/feedbacks/feedbacks.api';
 import { useSignalValue } from 'shared/utils/_stm/react/react';
 import { getOpenGraphMeta } from 'shared/seo/meta';
 
-
 export function meta() {
-  const title = "Interpro: о компании и нашей миссии";
+  const title = 'Interpro: о компании и нашей миссии';
   const description =
-    "Узнайте больше о компании Interpro: наша миссия, ценности, команда и опыт реализации успешных проектов для бизнеса.";
+    'Узнайте больше о компании Interpro: наша миссия, ценности, команда и опыт реализации успешных проектов для бизнеса.';
 
   return getOpenGraphMeta({ title, description, pathname: '/about-us' });
 }
-
 
 export default function AboutUs() {
   useSignalValue(sgFaqs);
@@ -71,19 +69,21 @@ export default function AboutUs() {
         )}
       />
       <JsonLd data={getFeedbackReviewSchemas(sgFeedbacks.v)} />
-      
+
       <div className="AboutUs px" style={{ background: isInViewProjects ? '#EBEBEB' : '#FFF' }}>
         <TitlePage title={'О компании'} className="title-1" />
         <ServicesDesc title="что делаем">
-          Проектируем и строим выставочные стенды любого масштаба — от лаконичных решений до сложных
-          архитектурных объектов
+          Более 9 лет проектируем и строим выставочные стенды под ключ: от разработки концепции до
+          производства и монтажа. За годы работы построили более 1000 стендов общей площадью свыше
+          75 500 м². Собственное производство площадью 3 500 м² позволяет контролировать качество и
+          ключевые этапы реализации проектов
         </ServicesDesc>
-        {/* <div className="AboutUs-info">
-        <TagCounter title={ '37' } subTitle="лет на рынке" />
-        <TagCounter title={ '48' } subTitle="специалистов" />
-        <TagCounter title={ '200+' } subTitle="проектов" />
-        <TagCounter title={ '50+' } subTitle="выставок охвачено" />
-      </div> */}
+        <div className="AboutUs-info">
+          <TagCounter title={'9'} subTitle="лет на рынке" />
+          <TagCounter title={'1000+'} subTitle="стендов построено" />
+          <TagCounter title={'75 500 м²'} subTitle=" застроено" />
+          <TagCounter title={'3 500 м²'} subTitle="собственного производство" />
+        </div>
 
         <MediaSection
           className="AboutUs-mediaSection"

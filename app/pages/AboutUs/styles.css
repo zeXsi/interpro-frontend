@@ -25,7 +25,7 @@
   }
   .AboutUs-info {
     display: grid;
-    grid-template-columns: repeat(5, 1fr);
+    grid-template-columns: repeat(4, 1fr);
     justify-content: space-between;
 
     --gap-y: clamp(2.75rem, calc(1.557rem + 5.089vw), 4rem);

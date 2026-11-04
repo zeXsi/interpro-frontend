@@ -71,7 +71,8 @@
   /* @media (min-width: 769px) { */
   .SectionHeader {
     .SectionHeader-title {
-      font-size: clamp(3rem, calc(2.333rem + 1.389vw), 4rem); /* min: 48px, max: 64px */
+      /* font-size: clamp(3rem, calc(2.333rem + 1.389vw), 4rem); */ /* min: 48px, max: 64px */
+      font-size: clamp(3rem, calc(1rem + 4.167vw), 6rem); /* min: 48px, max: 96px */
     }
   }
   /* } */
@@ -83,7 +84,8 @@
       /* min: 8px, max: 16px */
 
       .SectionHeader-title {
-        font-size: clamp(1.625rem, calc(0.313rem + 5.598vw), 3rem); /* min: 26px, max: 48px */
+        /* font-size: clamp(1.625rem, calc(0.313rem + 5.598vw), 3rem); /* min: 26px, max: 48px */
+        font-size: clamp(2rem, calc(1.046rem + 4.071vw), 3rem); /* min: 32px, max: 48px */
       }
     }
   }

@@ -2,6 +2,9 @@
   --offset: clamp(2.75rem, calc(0.583rem + 4.514vw), 6rem);
   /* min: 44px, max: 96px */
   /* viewPort: 768-1920 */
+  --offsetMini: clamp(2.75rem, calc(1.917rem + 1.736vw), 4rem);
+  /* min: 44px, max: 64px */
+  /* viewPort: 768-1920 */
 }
 
 .ProjectPage {
@@ -99,7 +102,7 @@
     grid-template-columns: 1fr 1fr 1fr 1fr 1fr;
     justify-content: space-between;
     &.isDesc {
-      margin-bottom: clamp(2.75rem, calc(0.583rem + 4.514vw), 6rem);
+      /* margin-bottom: clamp(2.75rem, calc(0.583rem + 4.514vw), 6rem); */
       /* min: 44px, max: 96px */
       /* viewPort: 768-1920 */
     }
@@ -123,6 +126,13 @@
 
       .Tag {
         gap: clamp(0.5rem, calc(0.167rem + 0.694vw), 1rem); /* min: 8px, max: 16px */
+        justify-content: space-between;
+
+        @media (min-width: 1024px) {
+          .Tag-title:has(.Degree) {
+            margin-top: -7px;
+          }
+        }
       }
     }
 
@@ -218,24 +228,24 @@
   font-family: var(--font-family);
   font-weight: 400;
 
-  font-size: clamp(2rem, calc(0.667rem + 2.778vw), 4rem);
-  /* min: 32px, max: 64px */
-  /* viewPort: 768-1920 */
-  @media (max-width: 768px) {
-    font-size: clamp(1.5rem, calc(1.023rem + 2.036vw), 2rem);
-    /* min: 24px, max: 32px */
-    /* viewPort: 375-768 */
-  }
+  font-size: clamp(1.5rem, calc(1.023rem + 2.036vw), 2rem); /* min: 24px, max: 32px */
+  /* min: 24px, max: 32px */
+  /* viewPort: 375-768 */
+
   line-height: 136%;
   letter-spacing: -0.04em;
   color: #000;
 }
 
+.ProjectPage_tags + .ImgWithText {
+  margin-top: var(--offset);
+}
+
 .ImgWithText {
   display: flex;
   flex-direction: column;
-  margin-top: var(--offset);
-  gap: var(--offset);
+  margin-top: var(--offsetMini);
+  gap: var(--offsetMini);
 
   &.isLastText .ImgWithText-text {
     /* order: 2; */

@@ -4,6 +4,7 @@ import usePopup from '@qtpy/use-popup';
 import PlusSmallIcon from 'assets/icons/brief/plus-small.svg?react';
 import { sendLead, sendLeadWithFiles, type LeadData } from 'api/form';
 import { useEffect, useState, type ReactNode } from 'react';
+import { signal } from 'shared/utils/_stm';
 import { GlobalScrollLock } from 'shared/components/_helpers/GlobalScrollLock';
 import Link from 'shared/components/Link';
 import Button from 'shared/components/Button';
@@ -67,6 +68,9 @@ const initialState: BriefState = {
   agreed: false,
 };
 
+/** Открывалка брифа: попап живёт в root, поэтому доступен с любой страницы. */
+export const MWBrief = signal({ open: () => {} });
+
 type ContactKey = 'name' | 'company' | 'position' | 'phone' | 'email';
 
 const STEPS = ['type', 'area', 'zones', 'budget', 'exhibition', 'style', 'comment', 'contacts', 'done'] as const;
@@ -125,6 +129,11 @@ export default function useBriefPopup() {
     </Popup>
   );
 
+  // open замыкает актуальное состояние шагов, поэтому обновляем после каждого рендера
+  useEffect(() => {
+    MWBrief.v.open = open;
+  });
+
   return { open, popup };
 }
 
@@ -173,6 +182,8 @@ function BriefSteps({ state, setState, stepIndex, setStepIndex, isSendFailed, se
   };
 
   const submit = async () => {
+    // Цель на любое нажатие финальной кнопки — до валидации, заполнение не обязательно
+    (typeof window !== 'undefined' ? (window as any).ym : undefined)?.(99631636, 'reachGoal', 'request_form_all');
     const nextErrors: typeof errors = {};
     if (!state.name.trim()) nextErrors.name = 'Укажите имя';
     if (!state.company.trim()) nextErrors.company = 'Укажите компанию';

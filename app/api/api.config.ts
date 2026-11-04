@@ -16,8 +16,12 @@ export const config = {
   },
 };
 
+// В браузере список /projects (~320 КБ) на медленной сети не укладывается в 3 с,
+// и таймаут превращался в пустой список. SSR оставляем с коротким таймаутом.
+const REQUEST_TIMEOUT_MS = typeof window === 'undefined' ? 3000 : 20000;
+
 export const instance = axios.create({
-  timeout: 3000,
+  timeout: REQUEST_TIMEOUT_MS,
   baseURL: wpApiBaseURL,
   // In local/SSR Node runtime axios picks up HTTP(S)_PROXY from env.
   // Our WordPress API should be requested directly, otherwise the proxy returns 400.
