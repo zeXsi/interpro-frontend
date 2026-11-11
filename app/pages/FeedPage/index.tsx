@@ -6,18 +6,8 @@ import Article from 'shared/components/Article';
 import { useSearchParams } from 'react-router';
 import Link from 'shared/components/Link';
 
-import { useRef, useState } from 'react';
-
 import IsNot from 'shared/components/IsNot';
-
-import { FeedCategory, FeedItem } from 'api/feed/feed.types';
-import {
-  FeedList,
-  getFeedBlog,
-  getFeedBlogCategory,
-  getFeedNews,
-  getFeedNewsCategory,
-} from 'api/feed/feed.api';
+import type { FeedPageData, QParams } from './types';
 
 import { useLocation } from 'react-router';
 import formatDateToRussian from 'shared/utils/formatDateToRussian';
@@ -25,17 +15,6 @@ import StartPage from 'shared/components/StartPage';
 import { getOpenGraphMeta } from 'shared/seo/meta';
 
 export type Params = { slug: 'blog' | 'news' };
-export type QParams = Partial<Record<'news_category' | 'blog_category', number>> & {
-  per_page: number;
-  page: number;
-};
-export type FeedData = {
-  category: FeedCategory[];
-  feed: {
-    articles: FeedItem[];
-    totalPage: number;
-  };
-};
 
 export const getRouteFeedName = (route: Params['slug']) => {
   return route === 'blog' ? 'блог' : 'новости';
@@ -44,49 +23,6 @@ export const getRouteFeedName = (route: Params['slug']) => {
 const isRoute = (slug: Params['slug'], str: string) => {
   return new RegExp(slug, 'g').test(str);
 };
-
-export async function _loader(_url: string) {
-  const url = new URL(_url);
-  const search = url.searchParams;
-
-  const page = Number(search.get('page') ?? '1');
-  const per_page = Number(search.get('per_page') ?? '10');
-
-  const isBlog = isRoute('blog', _url);
-  const categoryKey: 'blog_category' | 'news_category' = isBlog ? 'blog_category' : 'news_category';
-
-  const categoryId = search.get(categoryKey);
-
-  const qparams: QParams = {
-    page,
-    per_page,
-    ...(categoryId ? { [categoryKey]: Number(categoryId) } : {}),
-  };
-
-  if (isBlog) {
-    const [feed, category] = await Promise.all([
-      getFeedBlog.fetch(qparams),
-      getFeedBlogCategory.fetch(),
-    ]);
-
-    return {
-      feed,
-      category,
-      qparams,
-    };
-  } else {
-    const [feed, category] = await Promise.all([
-      getFeedNews.fetch(qparams),
-      getFeedNewsCategory.fetch(),
-    ]);
-    
-    return {
-      feed,
-      category,
-      qparams,
-    };
-  }
-}
 
 export function _meta(type: Params['slug']) {
   const isBlog = type === 'blog';
@@ -101,11 +37,7 @@ export function _meta(type: Params['slug']) {
 }
 
 
-export type Props = {
-  feed: FeedList;
-  category: FeedCategory[];
-  qparams: QParams;
-};
+export type Props = FeedPageData;
 
 export default function FeedPage({ data }: { data: Props }) {
   const { feed, category, qparams } = data;
@@ -113,8 +45,9 @@ export default function FeedPage({ data }: { data: Props }) {
   const { pathname } = useLocation();
   const typeFeed = isRoute('blog', pathname) ? 'blog' : 'news';
 
-  const [currPage, setPage] = useState(qparams.page ?? 1);
-  const refItemId = useRef(qparams.blog_category ?? 0);
+  const currPage = qparams.page;
+  const categoryId = qparams.blog_category ?? qparams.news_category;
+  const selectedCategory = category.find((item) => item.id === categoryId)?.name ?? 'все';
 
   const setParams = (qparams: QParams & { category?: number }) => {
     const next = new URLSearchParams(searchParams);
@@ -134,10 +67,9 @@ export default function FeedPage({ data }: { data: Props }) {
   const onChangePage = (index: number) => {
     setParams({
       page: index,
-      per_page: 10,
-      category: refItemId.current || undefined,
+      per_page: qparams.per_page,
+      category: categoryId,
     });
-    setPage(index);
   };
 
   return (
@@ -162,32 +94,30 @@ export default function FeedPage({ data }: { data: Props }) {
 
         <IsNot value={(category?.length || 0) >= 2}>
           <Filter
-            startItem="все"
+            startItem={selectedCategory}
             items={['все', ...(category?.map((item) => item?.name) || [])]}
             onClick={(value) => {
               if (value === 'все') {
-                refItemId.current = 0;
-                setParams({ page: currPage, per_page: 10 });
+                setParams({ page: 1, per_page: qparams.per_page });
                 return;
               }
 
               const item = category.find((item) => item.name === value);
               if (!item?.slug) return;
 
-              refItemId.current = item.id;
               setParams({
                 category: item.id,
-                page: currPage,
-                per_page: 10,
+                page: 1,
+                per_page: qparams.per_page,
               });
             }}
           />
         </IsNot>
 
         <div className="FeedPage_container">
-          {feed?.articles.map(({ payload, slug }, index) => (
+          {feed?.articles.map(({ id, payload, slug }) => (
             <Article
-              key={index}
+              key={id}
               srcImg={payload.cover?.url ?? ''}
               date={formatDateToRussian(payload.date)}
               title={payload.title}

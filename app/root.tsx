@@ -7,28 +7,19 @@ import {
   Scripts,
   ScrollRestoration,
   type ShouldRevalidateFunctionArgs,
-  useLoaderData,
+  useRouteLoaderData,
 } from 'react-router';
 import './globals.css';
 import 'swiper/swiper-bundle.css';
 
 import type { Route } from './+types/root';
-import { getProjects } from 'api/projects/projects.api';
-import { getFaqs } from 'api/faq/faq.api';
-import { getFeedNews, getFeedBlog } from 'api/feed/feed.api';
-import { getFeedbacks } from 'api/feedbacks/feedbacks.api';
-import { getLicenses } from 'api/licenses/license.api';
-import {
-  getServiceCategories,
-  getServices,
-  sgServiceCategories,
-} from 'api/services/services.api';
+import { getShellData } from 'api/pageData.server';
+import { EMPTY_SHELL_DATA, ShellDataContext, useShellData } from 'shared/components/ShellData';
 import { useLocation } from 'react-router';
 
 import { getSSRStore } from 'shared/utils/_stm';
 import Header from 'shared/components/Header';
 
-import seoScheme from 'api/seoScheme';
 import RouteGuard from 'shared/components/_helpers/RouteGuard';
 import NavigationTracker from 'shared/components/NavigationTracker';
 import ParallaxFooter from 'shared/components/ParallaxFooter';
@@ -54,7 +45,6 @@ import {
 import { getOpenGraphMeta } from 'shared/seo/meta';
 import { getCanonicalUrl, normalizeCanonicalPathname } from 'shared/seo/canonical';
 import { runWithSSRRequestState } from 'shared/utils/_stm/ssr.server';
-import { getHomeData } from 'api/home/home.api';
 import heroCover from 'assets/imgs/hero.webp';
 
 export const middleware: Route.MiddlewareFunction[] = [
@@ -142,16 +132,9 @@ const mailRuTopScript = `
 `;
 
 export function Layout({ children }: { children: React.ReactNode }) {
-  const data = useLoaderData();
+  const data = useRouteLoaderData<typeof loader>('root') ?? EMPTY_SHELL_DATA;
   const location = useLocation();
   const isPresentationRoute = location.pathname.startsWith('/presentation');
-  const serviceCategorySlugs = location.pathname === '/'
-    ? []
-    : sgServiceCategories.v.map((category) => category.slug);
-  const isCustomStructuredDataRoute = hasCustomStructuredData(
-    location.pathname,
-    serviceCategorySlugs
-  );
   const isPresentationPrint =
     isPresentationRoute &&
     (location.pathname.endsWith('/print') ||
@@ -191,12 +174,6 @@ export function Layout({ children }: { children: React.ReactNode }) {
           media="(prefers-color-scheme: dark)"
         />
 
-        {!isPresentationRoute && !isCustomStructuredDataRoute && (
-          <script
-            type="application/ld+json"
-            dangerouslySetInnerHTML={{ __html: seoScheme(data.projects) }}
-          />
-        )}
         {/* Yandex.Metrika counter */}
         <script type="text/javascript" dangerouslySetInnerHTML={{ __html: yandexMetrikaScript }} /> 
 
@@ -227,7 +204,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
             </div>
           </noscript>
         )}
-        {children}
+        <ShellDataContext.Provider value={data}>{children}</ShellDataContext.Provider>
         {!isPresentationPrint && <CopyToast />}
         {!isPresentationPrint && <ScrollRestoration />}
         {!isPresentationPrint && (
@@ -279,48 +256,18 @@ export async function loader(args: Route.LoaderArgs) {
     throw redirect(`${normalizedPathname}${url.search}`, { status: 301 });
   }
 
-  return loadRootData(url.pathname);
-}
-
-export async function clientLoader(args: Route.ClientLoaderArgs) {
-  return loadRootData(new URL(args.request.url).pathname);
+  if (url.pathname.startsWith('/presentation')) return EMPTY_SHELL_DATA;
+  return getShellData();
 }
 
 export function shouldRevalidate(args: ShouldRevalidateFunctionArgs) {
-  return rootDataMode(args.currentUrl.pathname) !== rootDataMode(args.nextUrl.pathname)
+  return args.currentUrl.pathname.startsWith('/presentation') !== args.nextUrl.pathname.startsWith('/presentation')
     || args.defaultShouldRevalidate;
-}
-
-async function loadRootData(pathname: string) {
-  if (pathname.startsWith('/presentation')) return { projects: [] };
-
-  if (pathname === '/') {
-    await getHomeData();
-    return { projects: [] };
-  }
-
-  const [projects] = await Promise.all([
-    getProjects(),
-    getServiceCategories(),
-    getServices(),
-    getFeedNews.fetch({}),
-    getFeedBlog.fetch({}),
-    getLicenses(),
-    getFeedbacks(),
-    getFaqs(),
-  ]);
-  return {
-    projects: projects ?? [],
-  };
-}
-
-function rootDataMode(pathname: string) {
-  if (pathname.startsWith('/presentation')) return 'presentation';
-  return pathname === '/' ? 'home' : 'full';
 }
 
 export default function App() {
   const location = useLocation();
+  const shell = useShellData();
   const cookies = useCookies();
   const form = useMWForm();
   const brief = useBriefPopup();
@@ -335,9 +282,7 @@ export default function App() {
   }, [location.search]);
 
   const isPresentation = location.pathname.startsWith('/presentation');
-  const serviceCategorySlugs = location.pathname === '/'
-    ? []
-    : sgServiceCategories.v.map((category) => category.slug);
+  const serviceCategorySlugs = shell.servicesNavigation.map((category) => category.slug);
   const isCustomStructuredDataRoute = hasCustomStructuredData(
     location.pathname,
     serviceCategorySlugs
@@ -384,8 +329,8 @@ const FooterC = () => (
 );
 
 export function ErrorBoundary({ error }: Route.ErrorBoundaryProps) {
-  let message = 'Oops!';
-  let details = 'An unexpected error occurred.';
+  let message = 'Не удалось загрузить страницу';
+  let details = 'Данные временно недоступны. Повторите загрузку страницы.';
   let stack: string | undefined;
 
   if (isRouteErrorResponse(error) && error.status === 404) {
@@ -414,6 +359,7 @@ export function ErrorBoundary({ error }: Route.ErrorBoundaryProps) {
     <main className="pt-16 p-4 container mx-auto">
       <h1>{message}</h1>
       <p>{details}</p>
+      <button type="button" onClick={() => window.location.reload()}>Повторить загрузку</button>
       {stack && (
         <pre className="w-full p-4 overflow-x-auto">
           <code>{stack}</code>

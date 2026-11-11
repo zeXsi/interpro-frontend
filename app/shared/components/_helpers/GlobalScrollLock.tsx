@@ -3,6 +3,7 @@ import React, { useRef, useLayoutEffect, useEffect } from 'react';
 import { glLenis, lenisManager } from 'shared/utils/lenis';
 
 const useIsomorphicLayoutEffect = typeof window !== 'undefined' ? useLayoutEffect : useEffect;
+const activeContainers = new Set<HTMLElement>();
 
 type GlobalScrollLockProps = {
   children?: React.ReactNode;
@@ -28,25 +29,30 @@ export const GlobalScrollLock: React.FC<GlobalScrollLockProps> = ({
     if (!active) return;
     if (typeof window === 'undefined' || typeof document === 'undefined') return;
 
-    lenisManager.init();
-
-    const root = glLenis.v;
     const wrapper = containerRef.current;
     const localManager = localManagerRef.current;
 
-    if (!root || !wrapper || !localManager) return;
+    if (!wrapper || !localManager) return;
 
     const content = wrapper.firstElementChild as HTMLElement | null;
     if (!content) return;
 
-    lenisManager.stopRaf();
-    root.stop();
+    activeContainers.add(wrapper);
+    const stopRoot = () => {
+      if (!activeContainers.has(wrapper)) return;
+      lenisManager.stopRaf();
+      glLenis.v?.stop();
+    };
+    const initialization = lenisManager.init();
+    stopRoot();
+    // The global Lenis instance may still be loading when the popup opens.
+    if (initialization) void initialization.then(stopRoot);
     localManager.create(wrapper, content);
 
     const isInsideContainer = (target: EventTarget | null): boolean => {
-      if (!containerRef.current) return false;
       if (!(target instanceof Node)) return false;
-      return containerRef.current.contains(target);
+      const topContainer = Array.from(activeContainers).at(-1);
+      return topContainer?.contains(target) ?? false;
     };
 
     const preventScroll = (event: WheelEvent | TouchEvent) => {
@@ -81,8 +87,11 @@ export const GlobalScrollLock: React.FC<GlobalScrollLockProps> = ({
       controller.abort();
       unlockBodyScroll();
       localManager.destroy();
-      lenisManager.startRaf();
-      root.start();
+      activeContainers.delete(wrapper);
+      if (!activeContainers.size) {
+        lenisManager.startRaf();
+        glLenis.v?.start();
+      }
     };
   }, [active]);
 
@@ -93,18 +102,17 @@ export const GlobalScrollLock: React.FC<GlobalScrollLockProps> = ({
   );
 };
 
-function isMobileLike() {
-  if (typeof window === 'undefined') return false;
-  const coarse = window.matchMedia('(pointer: coarse)').matches;
-  const hover = window.matchMedia('(hover: hover)').matches;
-  const narrow = window.matchMedia('(max-width: 768px)').matches;
-
-  return coarse || narrow || hover;
-}
+let bodyLockCount = 0;
+let previousBodyStyles: { htmlOverflow: string; bodyOverflow: string; touchAction: string } | null = null;
 
 export function lockBodyScroll() {
   if (typeof document === 'undefined') return;
-  if (!isMobileLike()) return;
+  if (bodyLockCount++ > 0) return;
+  previousBodyStyles = {
+    htmlOverflow: document.documentElement.style.overflow,
+    bodyOverflow: document.body.style.overflow,
+    touchAction: document.body.style.touchAction,
+  };
   document.documentElement.style.overflow = 'hidden';
   document.body.style.overflow = 'hidden';
   document.body.style.touchAction = 'none';
@@ -112,9 +120,11 @@ export function lockBodyScroll() {
 
 export function unlockBodyScroll() {
   if (typeof document === 'undefined') return;
-  document.documentElement.style.overflow = '';
-  document.body.style.overflow = '';
-  document.body.style.touchAction = '';
+  if (!bodyLockCount || --bodyLockCount > 0) return;
+  document.documentElement.style.overflow = previousBodyStyles?.htmlOverflow ?? '';
+  document.body.style.overflow = previousBodyStyles?.bodyOverflow ?? '';
+  document.body.style.touchAction = previousBodyStyles?.touchAction ?? '';
+  previousBodyStyles = null;
 }
 
 export class LocalLenisManager {

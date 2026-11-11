@@ -23,10 +23,33 @@ import StartPage from 'shared/components/StartPage';
 
 import JsonLd from 'shared/seo/JsonLd';
 import { getFaqSchema, getFeedbackReviewSchemas } from 'shared/seo/schemas';
-import { sgFaqs } from 'api/faq/faq.api';
-import { sgFeedbacks } from 'api/feedbacks/feedbacks.api';
-import { useSignalValue } from 'shared/utils/_stm/react/react';
+import { getFaqs } from 'api/faq/faq.api';
+import { getFeedbacks } from 'api/feedbacks/feedbacks.api';
+import { getLicenses } from 'api/licenses/license.api';
+import feedbacksToItems from 'shared/sections/DocOverview/feedbacksToItems';
+import type { Route } from './+types';
 import { getOpenGraphMeta } from 'shared/seo/meta';
+
+export async function loader() {
+  const [faqs, feedbacks, licenses] = await Promise.all([getFaqs(), getFeedbacks(), getLicenses()]);
+  return {
+    faqs: faqs.slice(0, 4).map(({ payload }) => ({ question: payload.question, answer: payload.answer })),
+    feedbacks: feedbacks.slice(0, 4).map(({ payload }) => ({ payload: {
+      title: payload.title,
+      company: payload.company,
+      person: payload.person ? { name: payload.person.name, position: payload.person.position } : payload.person,
+      text: payload.text,
+      pdf: payload.pdf,
+      date: payload.date,
+    } })),
+    licenses: licenses.slice(0, 2).map(({ payload }) => ({
+      title: payload.title,
+      file_name: payload.file_name,
+      file_url: payload.file_url,
+      preview_url: payload.preview_url,
+    })),
+  };
+}
 
 export function meta() {
   const title = 'Interpro: о компании и нашей миссии';
@@ -36,10 +59,7 @@ export function meta() {
   return getOpenGraphMeta({ title, description, pathname: '/about-us' });
 }
 
-export default function AboutUs() {
-  useSignalValue(sgFaqs);
-  useSignalValue(sgFeedbacks);
-
+export default function AboutUs({ loaderData }: Route.ComponentProps) {
   const configMedia = useBreakpoints(
     {
       500: { srcVideo2, srcVideo2Cover, aspectRatio: '1920/1080' },
@@ -61,14 +81,9 @@ export default function AboutUs() {
   return (
     <StartPage>
       <JsonLd
-        data={getFaqSchema(
-          sgFaqs.v.slice(0, 4).map(({ payload }) => ({
-            question: payload.question,
-            answer: payload.answer,
-          }))
-        )}
+        data={getFaqSchema(loaderData.faqs)}
       />
-      <JsonLd data={getFeedbackReviewSchemas(sgFeedbacks.v)} />
+      <JsonLd data={getFeedbackReviewSchemas(loaderData.feedbacks)} />
 
       <div className="AboutUs px" style={{ background: isInViewProjects ? '#EBEBEB' : '#FFF' }}>
         <TitlePage title={'О компании'} className="title-1" />
@@ -103,7 +118,7 @@ export default function AboutUs() {
             </Button.Arrow>
           </Link>
         </div>
-        <DocOverview />
+        <DocOverview items={feedbacksToItems(loaderData.feedbacks)} showAllLink />
         <div ref={refISO}>
           <div className="AboutUs_iso">
             <div className="AboutUs_iso-head">
@@ -115,7 +130,7 @@ export default function AboutUs() {
               </Link>
             </div>
 
-            <Certificates qntyPreview={2} />
+            <Certificates items={loaderData.licenses} qntyPreview={2} />
             <Link to={'/about-us/certificates'}>
               <Button.Arrow as="span" className="AboutUs_companies-btn __bottom" direction="right">
                 Все сертификаты
@@ -123,7 +138,7 @@ export default function AboutUs() {
             </Link>
           </div>
         </div>
-        <FAQSection qntyPreview={4} />
+        <FAQSection items={loaderData.faqs} qntyPreview={4} showAllLink />
         <ContactForm />
       </div>
     </StartPage>

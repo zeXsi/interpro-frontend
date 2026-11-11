@@ -7,12 +7,11 @@ import Button from 'shared/components/Button';
 import Link from 'shared/components/Link';
 import { DocOverviewProps } from '..';
 import IsNot from 'shared/components/IsNot';
-import feedbacksToItems from '../feedbacksToItems';
 
 export default function DesktopTemplate({ isNotPage, items }: DocOverviewProps) {
   const [activeClient, setActiveClient] = useState<number>(0);
 
-  const list = items ?? feedbacksToItems(isNotPage);
+  const list = items;
   const active = list[activeClient];
 
   return (

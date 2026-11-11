@@ -105,11 +105,14 @@
   background: #fff;
 
   .Brief-modalInner {
-    display: contents;
+    display: flex;
+    flex-direction: column;
+    min-height: 100%;
   }
 }
 
 .Brief-step {
+  flex: 1;
   min-height: 100%;
   padding: clamp(1.5rem, calc(1.167rem + 0.694vw), 2rem); /* 24px @768 → 32px @1920 */
   display: flex;

@@ -16,13 +16,7 @@ import { useNavigate } from 'shared/components/NavigationTracker';
 import { lenisManager } from 'shared/utils/lenis';
 
 import type { FeedItem } from 'api/feed/feed.types';
-import {
-  getFeedNews,
-  getFeedNewsArticle,
-  getFeedBlog,
-  getFeedBlogArticle,
-  type FeedList,
-} from 'api/feed/feed.api';
+import type { FeedCard } from '../FeedPage/types';
 
 import formatDateToRussian from 'shared/utils/formatDateToRussian';
 import StartPage from 'shared/components/StartPage';
@@ -31,12 +25,12 @@ import InfoList from 'shared/components/InfoList';
 import JsonLd from 'shared/seo/JsonLd';
 import { getArticleSchema } from 'shared/seo/schemas';
 import { getOpenGraphMeta } from 'shared/seo/meta';
-import { sgServiceCategories } from 'api/services/services.api';
+import { useShellData } from 'shared/components/ShellData';
 
 export type ArticleData = {
   slug: 'news' | 'blog';
   article: FeedItem;
-  articles: FeedItem[];
+  articles: FeedCard[];
 };
 
 type AnchorLink = {
@@ -69,42 +63,6 @@ function getReadingTime(article: FeedItem): string {
   return '30+ мин';
 }
 
-export async function _loader(_url: string): Promise<ArticleData> {
-  const url = new URL(_url);
-  const parts = url.pathname.split('/').filter(Boolean);
-  const [slug, id] = parts as ['news' | 'blog', string];
-
-  const isBlog = slug === 'blog';
-
-  if (isBlog) {
-    const article = await getFeedBlogArticle.fetch({ slug: id });
-    if (!article) {
-      throw new Response('Not found', { status: 404 });
-    }
-
-    const feed: FeedList = await getFeedBlog.fetch({ page: 1, per_page: 10 });
-
-    return {
-      slug: 'blog',
-      article,
-      articles: feed.articles,
-    };
-  } else {
-    const article = await getFeedNewsArticle.fetch({ slug: id });
-    if (!article) {
-      throw new Response('Not found', { status: 404 });
-    }
-
-    const feed: FeedList = await getFeedNews.fetch({ page: 1, per_page: 10 });
-
-    return {
-      slug: 'news',
-      article,
-      articles: feed.articles,
-    };
-  }
-}
-
 export function _meta(data: ArticleData, pathname: string) {
   const defaultTitle = `Interpro: ${data.article?.payload?.title ?? ''}`;
   const title = data.slug === 'blog' ? data.article.payload.seo?.title?.trim() || defaultTitle : defaultTitle;
@@ -132,7 +90,7 @@ export default function FeedArticle({ data }: { data: ArticleData }) {
   const author = article.payload.author;
   const hasAuthor = Boolean(author?.name?.trim() || author?.about?.trim() || author?.image?.url);
   const relatedServices = article?.payload?.related_services ?? [];
-  const hasSingleServiceCategory = sgServiceCategories.v.length === 1;
+  const hasSingleServiceCategory = useShellData().servicesNavigation.length === 1;
   const anchorLinks = contentBlocks.reduce<AnchorLink[]>((acc, block, index) => {
     const title = block.title?.trim();
     if (!title) return acc;

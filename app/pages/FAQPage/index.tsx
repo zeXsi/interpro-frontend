@@ -6,9 +6,14 @@ import TitlePage from 'shared/components/TitlePage';
 
 import JsonLd from 'shared/seo/JsonLd';
 import { getFaqSchema } from 'shared/seo/schemas';
-import { sgFaqs } from 'api/faq/faq.api';
-import { useSignalValue } from 'shared/utils/_stm/react/react';
+import { getFaqs } from 'api/faq/faq.api';
+import type { Route } from './+types';
 import { getOpenGraphMeta } from 'shared/seo/meta';
+
+export async function loader() {
+  const faqs = await getFaqs();
+  return { faqs: faqs.map(({ payload }) => ({ question: payload.question, answer: payload.answer })) };
+}
 
 export function meta() {
   const title = "Interpro: ответы на часто задаваемые вопросы";
@@ -18,21 +23,15 @@ export function meta() {
   return getOpenGraphMeta({ title, description, pathname: '/faq' });
 }
 
-export default function FAQPage() {
-  useSignalValue(sgFaqs);
+export default function FAQPage({ loaderData }: Route.ComponentProps) {
   return (
     <StartPage>
       <JsonLd
-        data={getFaqSchema(
-          sgFaqs.v.map(({ payload }) => ({
-            question: payload.question,
-            answer: payload.answer,
-          }))
-        )}
+        data={getFaqSchema(loaderData.faqs)}
       />
       <div className="FAQPage px">
         <TitlePage title="Частые вопросы" />
-        <FAQSection />
+        <FAQSection items={loaderData.faqs} />
         <ContactForm />
       </div>
     </StartPage>

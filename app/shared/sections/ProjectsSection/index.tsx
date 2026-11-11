@@ -13,7 +13,6 @@ import Degree from 'shared/components/Degree';
 
 import IsNot from 'shared/components/IsNot';
 
-import { sgProjects } from 'api/projects/projects.api';
 import { signal } from 'shared/utils/_stm';
 import { useSignalValue, useWatch } from 'shared/utils/_stm/react/react';
 import { decodeUnicodeEscapes } from 'shared/utils/decodeUnicodeEscapes';
@@ -22,22 +21,14 @@ import type { HomeProject } from 'api/home/home.types';
 export const hoveredProject = signal(-Infinity);
 
 interface ProjectsSectionProps {
-  items?: HomeProject[];
-  total?: number;
+  items: HomeProject[];
+  total: number;
 }
 
 export default function ProjectsSection({ items, total }: ProjectsSectionProps) {
   const refsProjects = useRefMap<ProjectRef>();
 
-  const dataMax: ProjectPreview[] = items ?? sgProjects.v.slice(0, 5).map((project) => ({
-    id: project.id,
-    slug: project.slug,
-    title: project.payload.title,
-    exhibition: project.payload.meta?.exhibition[0]?.name ?? null,
-    year: project.payload.meta?.year?.name ?? null,
-    area: project.payload.meta?.area ?? 0,
-    cover: project.payload.cover ? { url: project.payload.cover } : null,
-  }));
+  const dataMax: ProjectPreview[] = items;
 
   return (
     <div className="ProjectsSection px">
@@ -68,7 +59,7 @@ export default function ProjectsSection({ items, total }: ProjectsSectionProps) 
         </Link>
         <Link to="/projects">
           <Button as="span" variant="link" className="Projects_footer-qty">
-            {total ?? sgProjects.v.length}
+            {total}
           </Button>
         </Link>
       </div>

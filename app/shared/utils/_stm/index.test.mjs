@@ -115,3 +115,24 @@ test('parallel request scopes isolate signal reads and serialized snapshots', as
 test('server serialization fails closed outside a request scope once SSR is configured', () => {
   assert.throws(() => getSSRStore(), /active SSR request scope/);
 });
+
+test('nonserialized signals remain request isolated without changing ordinary SSR signals', async () => {
+  const content = ssrSignal([], 'server-content', { serialize: false });
+  content.v = ['process-only'];
+  const first = runWithSSRRequestState(async () => {
+    assert.deepEqual(content.v, []);
+    content.v = ['first'];
+    await Promise.resolve();
+    assert.deepEqual(content.v, ['first']);
+    const ui = ssrSignal(false, 'serializable-ui');
+    ui.v = true;
+    return executeSSRStore(getSSRStore());
+  });
+  const second = runWithSSRRequestState(() => {
+    assert.deepEqual(content.v, []);
+    content.v = ['second'];
+    return executeSSRStore(getSSRStore());
+  });
+  assert.deepEqual(await first, { 'serializable-ui': true });
+  assert.deepEqual(second, {});
+});

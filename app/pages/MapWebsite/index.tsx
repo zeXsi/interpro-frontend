@@ -2,11 +2,46 @@ import './styles.css';
 import InfoList from 'shared/components/InfoList';
 import ContactForm from 'shared/components/ContactForm';
 
-import { sgProjects } from 'api/projects/projects.api';
-import { sgServiceCategories } from 'api/services/services.api';
-import { sgFeedBlogs, sgFeedNews } from 'api/feed/feed.api';
+import { getProjectCards } from 'api/pageData.server';
+import { getServiceCategories } from 'api/services/services.api';
+import { getFeedBlog, getFeedNews } from 'api/feed/feed.api';
+import { useLoaderData } from 'react-router';
 import StartPage from 'shared/components/StartPage';
 import { decodeUnicodeEscapes } from 'shared/utils/decodeUnicodeEscapes';
+
+export async function loader() {
+  const [projects, categories, news, blogs] = await Promise.all([
+    getProjectCards(),
+    getServiceCategories(),
+    getFeedNews.fetch({ per_page: 100 }),
+    getFeedBlog.fetch({ per_page: 100 }),
+  ]);
+  const hasSingleServiceCategory = categories.length === 1;
+
+  return {
+    projects: projects.map((item): [string, string] => [
+      decodeUnicodeEscapes(item.payload.title), `/projects/${item.slug}`,
+    ]),
+    services: categories.flatMap((item) =>
+      (item.payload?.posts ?? []).map((post): [string[], string] => [
+        [item.payload.name, post.title],
+        hasSingleServiceCategory
+          ? `/services/${post.slug}`
+          : `/services/${item.slug}/${post.slug}`,
+      ])
+    ),
+    serviceCategories: categories.map((item): [string, string] => [
+      item.payload.name,
+      hasSingleServiceCategory ? '/services' : `/services/${item.slug}`,
+    ]),
+    news: news.articles.map((item): [string, string] => [
+      item.payload.title, `/news/${item.slug}`,
+    ]),
+    blogs: blogs.articles.map((item): [string, string] => [
+      item.payload.title, `/blog/${item.slug}`,
+    ]),
+  };
+}
 
 export function meta() {
   const title = 'Interpro: карта сайта';
@@ -31,7 +66,7 @@ export function meta() {
 }
 
 export default function MapWebsite() {
-  const hasSingleServiceCategory = sgServiceCategories.v.length === 1;
+  const data = useLoaderData<typeof loader>();
 
   return (
     <StartPage>
@@ -55,25 +90,12 @@ export default function MapWebsite() {
             <InfoList
               title="проекты:"
               isModeSlug={true}
-              items={sgProjects.v?.map((item) => [
-                decodeUnicodeEscapes(item.payload.title),
-                `/projects/${item.slug}`,
-              ])}
+              items={data.projects}
             />
             <InfoList
               title="услуги:"
               isModeSlug={true}
-              items={sgServiceCategories.v?.flatMap((item) =>
-                item.payload?.posts?.map(
-                  (_item) =>
-                    [
-                      [item.payload.name, _item.title] as any,
-                      hasSingleServiceCategory
-                        ? `/services/${_item.slug}`
-                        : `/services/${item.slug}/${_item.slug}`,
-                    ] as [string, string]
-                )
-              )}
+              items={data.services}
             />
           </div>
 
@@ -81,26 +103,17 @@ export default function MapWebsite() {
             <InfoList
               title="Категории услуг:"
               isModeSlug={true}
-              items={sgServiceCategories.v?.map((item) => [
-                item.payload.name,
-                hasSingleServiceCategory ? '/services' : `/services/${item.slug}`,
-              ])}
+              items={data.serviceCategories}
             />
             <InfoList
               title="новости:"
               isModeSlug={true}
-              items={sgFeedNews.v.articles?.map((item) => [
-                item.payload.title,
-                `/news/${item.slug}`,
-              ])}
+              items={data.news}
             />
             <InfoList
               title="блог:"
               isModeSlug={true}
-              items={sgFeedBlogs.v.articles?.map((item) => [
-                item.payload.title,
-                `/blog/${item.slug}`,
-              ])}
+              items={data.blogs}
             />
           </div>
         </div>

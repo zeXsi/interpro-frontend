@@ -13,16 +13,17 @@ export interface ReviewItem {
 
 export interface DocOverviewProps {
   isNotPage?: boolean;
-  items?: ReviewItem[];
+  items: ReviewItem[];
   subtitle?: string;
+  showAllLink?: boolean;
 }
 
-function DocOverview({ isNotPage = true, items, subtitle = '( Что говорят клиенты )' }: DocOverviewProps) {
+function DocOverview({ isNotPage = true, items, subtitle = '( Что говорят клиенты )', showAllLink = false }: DocOverviewProps) {
   return (
     <div className="DocOverview px" id="DocOverview">
       <Subtitle>{subtitle}</Subtitle>
       <DesktopTemplate isNotPage={isNotPage} items={items} />
-      <TableTemplate isNotPage={isNotPage} items={items} />
+      <TableTemplate isNotPage={isNotPage} items={items} showAllLink={showAllLink} />
     </div>
   );
 }

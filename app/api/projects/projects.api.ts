@@ -72,5 +72,8 @@ const qProjectById = createQuery<Project | undefined, { slug: string }, Project[
 });
 
 export const sgCurrProject = qProjectById.sg;
-export const getProjectsById = (params: { slug: string }): Promise<Project | undefined> =>
-  qProjectById.fetch(params);
+export const getProjectsById = async (params: { slug: string }): Promise<Project | undefined> => {
+  // Populate the request-scoped parent with the cached list's next-project ordering.
+  await getProjects();
+  return qProjectById.fetch(params);
+};

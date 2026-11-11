@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState, type ChangeEvent, type ReactNode } from 'react';
 import { DayPicker } from 'react-day-picker';
 import { ru } from 'react-day-picker/locale';
+import { usePhoneMask } from 'shared/utils/usePhoneMask';
 
 import FileDocxIcon from 'assets/icons/brief/file-docx.svg?react';
 import FilePdfIcon from 'assets/icons/brief/file-pdf.svg?react';
@@ -34,6 +35,7 @@ interface FieldProps {
 }
 
 export function Field({ label, value, onChange, type = 'text', inputMode, autoComplete, error, className = '' }: FieldProps) {
+  const { formatted, handleChange, handleKeyDown } = usePhoneMask(value, onChange);
   return (
     <label className={`Brief-field ${error ? 'isError' : ''} ${className}`}>
       <input
@@ -42,8 +44,9 @@ export function Field({ label, value, onChange, type = 'text', inputMode, autoCo
         autoComplete={autoComplete}
         placeholder={label}
         aria-label={label}
-        value={value}
-        onChange={(event) => onChange(event.target.value)}
+        value={type === 'tel' ? formatted : value}
+        onChange={type === 'tel' ? handleChange : (event) => onChange(event.target.value)}
+        onKeyDown={type === 'tel' ? handleKeyDown : undefined}
       />
       {error && <span className="Brief-fieldError">{error}</span>}
     </label>

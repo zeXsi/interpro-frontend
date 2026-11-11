@@ -36,6 +36,7 @@ function project(id, exhibition, type, year) {
       seo: { title, description: `${title} description` },
       meta: { exhibition: [exhibition], type_tax: [type], year, area: 42 },
       blocks: {
+        private_fixture: 'PROJECT_DETAIL_ONLY_SENTINEL',
         intro: { title, photos: [] }, drawings: [],
         viz3d: { image: '', size: '', area: 42 }, details: [],
       },
@@ -267,6 +268,11 @@ async function withPage(browser, origin, mockOrigin, mobile, callback) {
     const page = await context.newPage();
     page.setDefaultTimeout(10_000);
     const errors = [];
+    const browserContentRequests = [];
+    const routePayloads = [];
+    page.on('response', (response) => {
+      if (new URL(response.url()).pathname.endsWith('.data')) routePayloads.push(response);
+    });
     page.on('pageerror', (error) => errors.push(error.message));
     page.on('console', (message) => {
       if (message.type() === 'error' && /hydration|hydrated|did not match|server rendered html|Minified React error #(418|423|425)/i.test(message.text())) {
@@ -279,6 +285,7 @@ async function withPage(browser, origin, mockOrigin, mobile, callback) {
     await page.route('**/*', async (route) => {
       const request = route.request();
       const url = new URL(request.url());
+      if (/\/wp-json\//.test(url.pathname)) browserContentRequests.push(request.url());
       if (request.resourceType() === 'image' && /\/wp-content\/uploads\//.test(url.pathname)) {
         await route.fulfill({ status: 200, contentType: 'image/svg+xml', body: svg });
       } else if (url.origin === origin || url.origin === mockOrigin) {
@@ -289,6 +296,10 @@ async function withPage(browser, origin, mockOrigin, mobile, callback) {
     });
     await callback(page);
     assert.deepStrictEqual(errors, [], 'no runtime or hydration errors');
+    assert.deepStrictEqual(browserContentRequests, [], 'content is loaded by the server, never by browser WordPress calls');
+    for (const response of routePayloads) {
+      assert.doesNotMatch(await response.text(), /PROJECT_DETAIL_ONLY_SENTINEL/, 'route payloads omit project detail blocks');
+    }
   } finally {
     await context.close();
   }
@@ -362,6 +373,13 @@ test('/projects production navigation, facets and filtered images', { timeout: 3
           await toggle(page, 'Год', '2026');
           await assertProjects(page, [1]);
           await assertImage(page, 1, mobile);
+          await page.locator('.Header_list-li.__logo a[href="/"] svg').click();
+          await page.waitForURL(`${origin}/`);
+          await page.locator('.Project-title-button:visible, .Project-title:visible')
+            .filter({ hasText: 'Fixture project 1' }).waitFor();
+          await page.locator('.Project a[href="/projects/fixture-project-1"]').waitFor({ state: 'visible' });
+          assert.equal(await page.locator('.Header .qntyProjects').textContent(), '5');
+          assert.equal(await page.evaluate(() => window.__projectsDocumentMarker), 'home-document', 'return navigation stays in the same document');
         });
       });
 
@@ -369,6 +387,9 @@ test('/projects production navigation, facets and filtered images', { timeout: 3
         await withPage(browser, origin, mockOrigin, mobile, async (page) => {
           const response = await page.goto(`${origin}/projects`, { waitUntil: 'load' });
           assert.equal(response.status(), 200);
+          const html = await response.text();
+          assert.doesNotMatch(html, /PROJECT_DETAIL_ONLY_SENTINEL/, 'initial React Router hydration excludes project detail blocks');
+          assert.doesNotMatch(await page.evaluate(() => JSON.stringify(window.__SSR_STATE__)), /fixture-project-|home-data/, 'content does not leak through legacy SSR signals');
           await assertProjects(page, [1, 2, 3, 4, 5]);
           // Use an actual state-changing click to prove the SSR markup hydrated.
           await assertOptions(page);

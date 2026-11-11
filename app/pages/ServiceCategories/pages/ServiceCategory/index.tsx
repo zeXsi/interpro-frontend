@@ -122,8 +122,13 @@ export default function ServiceCategoryPage({ loaderData, params }: Route.Compon
   return <ServiceCategoryContent data={loaderData.data} categorySlug={params.slug} />;
 }
 
+export type ServiceCategoryDisplay = Pick<
+  ServiceCategory,
+  'id' | 'slug' | 'name' | 'description' | 'nextItem' | 'payload'
+>;
+
 interface ServiceCategoryContentProps {
-  data: ServiceCategory;
+  data: ServiceCategoryDisplay;
   categorySlug: string;
   title?: string;
   setCategoryCrumb?: boolean;

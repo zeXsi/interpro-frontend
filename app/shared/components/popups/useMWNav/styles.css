@@ -366,6 +366,10 @@
   top: calc(var(--heightHeader) + var(--adBanner-height));
   height: calc(100vh - var(--heightHeader) - var(--adBanner-height));
   z-index: 99;
+  /* Контейнер уезжает вверх за верхнюю границу попапа, то есть под хедер (z-index 100).
+     Без обрезки он остаётся белым под прозрачным хедером до удаления попапа из DOM
+     и в конце пропадает скачком. */
+  overflow: hidden;
   &::before {
     background: rgb(0, 0, 0, 0.8);
     transition: 0.3s ease-out;

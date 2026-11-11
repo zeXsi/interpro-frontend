@@ -1,14 +1,15 @@
 import ISOCard from 'shared/components/ISOCard';
 import './styles.css';
-import { sgLicenses } from 'api/licenses/license.api';
+import type { License } from 'api/licenses/license.types';
 
 interface Props {
   qntyPreview?: number;
+  items: License['payload'][];
 }
-function Certificates({ qntyPreview = Infinity }: Props) {
+function Certificates({ qntyPreview = Infinity, items }: Props) {
   return (
     <div className="Certificates">
-      {sgLicenses.v.slice(0, qntyPreview).map(({ payload }, index) => {
+      {items.slice(0, qntyPreview).map((payload, index) => {
         return (
           <ISOCard
             key={index}

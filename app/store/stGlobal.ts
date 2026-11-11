@@ -24,10 +24,12 @@ toggleFilter.toClear = () => {
   sgUserFilter.v = {};
 };
 
-export function toFilterData(data: Project[]) {
+type FilterableProject = Pick<Project, 'exhibition-stand' | 'type-stand' | 'year-stand'>;
+
+export function toFilterData<T extends FilterableProject>(data: T[]) {
   useSignalValue(sgUserFilter);
 
-  const map: Record<keyof UserFilter, keyof Project> = {
+  const map: Record<keyof UserFilter, keyof FilterableProject> = {
     exhibition_stand: 'exhibition-stand',
     type_stand: 'type-stand',
     year_stand: 'year-stand',

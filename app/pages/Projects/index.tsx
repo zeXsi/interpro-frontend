@@ -23,10 +23,9 @@ import toFormatNames from 'shared/utils/toFormatNames';
 
 import Link from 'shared/components/Link';
 import { signal } from 'shared/utils/_stm';
-import { useSignalValue } from 'shared/utils/_stm/react/react';
 import { toFilterData, toggleFilter, UserFilter } from 'store/stGlobal';
-import { sgProjects } from 'api/projects/projects.api';
-import type { Project } from 'api/projects/projects.types';
+import { getProjectCards } from 'api/pageData.server';
+import type { ProjectCard as ProjectCardData } from 'api/pageData.types';
 
 import { getFilters } from 'api/filters';
 import { decodeUnicodeEscapes } from 'shared/utils/decodeUnicodeEscapes';
@@ -37,7 +36,8 @@ type ViewMode = 'grid' | 'list';
 export const hoveredProject = signal(-Infinity);
 
 export async function loader() {
-  return getFilters();
+  const [projects, filters] = await Promise.all([getProjectCards(), getFilters()]);
+  return { projects, filters };
 }
 
 
@@ -63,8 +63,7 @@ export function meta() {
   ];
 }
 export default function ProjectsPage() {
-  const filters = useLoaderData<typeof loader>();
-  useSignalValue(sgProjects);
+  const { projects, filters } = useLoaderData<typeof loader>();
 
   const [switchMode, setSwitchMode] = useState<ViewMode>('grid');
   const [isHydrated, setIsHydrated] = useState(false);
@@ -75,7 +74,7 @@ export default function ProjectsPage() {
 
   const prevScrollY = useRef(0);
   const deltaY = useRef(0);
-  const filteredData = toFilterData(sgProjects.v);
+  const filteredData = toFilterData(projects);
 
   const [activeIndex, setActiveIndex] = useState(0);
   const activeProject = filteredData[activeIndex] ?? filteredData[0];
@@ -134,7 +133,7 @@ export default function ProjectsPage() {
       <JsonLd
         data={getProjectsPageSchema({
           description: PROJECTS_DESCRIPTION,
-          projects: sgProjects.v.map((project) => ({
+          projects: projects.map((project) => ({
             slug: project.slug,
             name: project.payload?.title || project.title?.rendered,
           })),
@@ -147,7 +146,7 @@ export default function ProjectsPage() {
         </div>
 
         <div className="ProjectPage_filter-ModeSwitcher ">
-          <FilterProject onClick={onClick} items={mapFiltersToFilterProject(filters, sgProjects.v)} />
+          <FilterProject onClick={onClick} items={mapFiltersToFilterProject(filters, projects)} />
 
           <ModeSwitcher<ViewMode>
             startVal="grid"
@@ -279,7 +278,7 @@ function normalizeField(
   return [...items.values()];
 }
 
-function mapFiltersToFilterProject(data: ExhibitionStand, projects: Project[]): FilterItem[] {
+function mapFiltersToFilterProject(data: ExhibitionStand, projects: ProjectCardData[]): FilterItem[] {
   return [
     {
       filterName: 'Выставка',

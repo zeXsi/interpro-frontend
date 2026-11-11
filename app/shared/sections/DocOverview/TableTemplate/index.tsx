@@ -9,9 +9,8 @@ import Button from 'shared/components/Button';
 import Link from 'shared/components/Link';
 import IsNot from 'shared/components/IsNot';
 import { DocOverviewProps } from '..';
-import feedbacksToItems from '../feedbacksToItems';
 
-export default function TableTemplate({ isNotPage, items }: DocOverviewProps) {
+export default function TableTemplate({ isNotPage, items, showAllLink }: DocOverviewProps) {
   const { getRef } = useRefMap<RefAnimatedLabel>();
 
   const [activated, setActive] = useState(-1);
@@ -21,7 +20,7 @@ export default function TableTemplate({ isNotPage, items }: DocOverviewProps) {
     getRef(`feedback_${index}`).current?.setIsActive?.(v);
   };
 
-  const list = items ?? feedbacksToItems(isNotPage);
+  const list = items;
 
   return (
     <div className="TableTemplate">
@@ -49,7 +48,7 @@ export default function TableTemplate({ isNotPage, items }: DocOverviewProps) {
           </Accordion>
         );
       })}
-      <IsNot value={isNotPage && !items}>
+      <IsNot value={isNotPage && showAllLink}>
         <Link to="/about-us/feedbacks">
           <Button as="span" className="btn-allFeedbacks" variant="ghostLink" children="Все отзывы" />
         </Link>

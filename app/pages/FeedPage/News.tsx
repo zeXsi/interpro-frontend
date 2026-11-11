@@ -1,5 +1,6 @@
 import { Route } from './+types/News';
-import FeedPage, { _meta, _loader } from './index';
+import FeedPage, { _meta } from './index';
+import { _loader } from './loader.server';
 
 export async function loader({ request }: Route.LoaderArgs) {
   return await _loader(request.url);

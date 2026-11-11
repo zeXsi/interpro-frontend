@@ -10,6 +10,20 @@ const qHomeData = createQuery<HomeData, void>({
   family: QUERY_FAMILIES.home,
   stateKey: 'home-data',
   initial: EMPTY_HOME_DATA,
+  map: (data) => {
+    if (
+      data?.schema_version !== 1 ||
+      !Number.isFinite(data?.projects?.total) ||
+      data.projects.total < 0 ||
+      !Array.isArray(data.projects.items) ||
+      !Array.isArray(data.services_navigation) ||
+      !Array.isArray(data.feedbacks) ||
+      !Array.isArray(data.faqs)
+    ) {
+      throw new Error('Invalid home data response or unsupported schema version');
+    }
+    return data;
+  },
 });
 
 export const sgHomeData = qHomeData.sg;

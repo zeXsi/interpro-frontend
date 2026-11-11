@@ -1,4 +1,3 @@
-'use server';
 import './styles.css';
 import './detailInfo.css';
 import TeamBoostSection from 'shared/sections/TeamBoostSection';
@@ -33,10 +32,14 @@ import {
   getFeedbackReviewSchemas,
   getHomePageSchema,
 } from 'shared/seo/schemas';
-import { useSignalValue } from 'shared/utils/_stm/react/react';
+import { useLoaderData } from 'react-router';
 import { getOpenGraphMeta } from 'shared/seo/meta';
 import { toCdnMediaUrl } from 'shared/utils/toCdnMediaUrl';
-import { sgHomeData } from 'api/home/home.api';
+import { getHomeData } from 'api/home/home.api';
+
+export async function loader() {
+  return getHomeData();
+}
 
 // HLS видео пути
 const srcVideo2 = toCdnMediaUrl('/videos/video_2/hls/video.m3u8');
@@ -452,7 +455,7 @@ function useElementInView(
 }
 
 export default function Home() {
-  const homeData = useSignalValue(sgHomeData);
+  const homeData = useLoaderData<typeof loader>();
 
   const refProjects = useRef<HTMLDivElement>(null);
   const refFAQSection = useRef<HTMLDivElement>(null);

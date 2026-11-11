@@ -15,51 +15,13 @@ import { email, pipe, safeParse, string } from 'valibot';
 import { MWForm } from '../popups/useMWForm';
 import { signal } from 'shared/utils/_stm';
 import { saveUtmToStorage } from 'api/utm';
+import { isValidRuPhone, phoneErrorMessage, usePhoneMask } from 'shared/utils/usePhoneMask';
 
 function vld<T>(schema: any) {
   return (value: T) => safeParse(schema, value).success;
 }
 
 const emailSchema = pipe(string(), email());
-
-// Маска телефона: +7 (XXX) XXX-XX-XX
-function normalizePhoneDigits(str: string): string {
-  let digits = str.replace(/\D/g, '');
-  if (digits.startsWith('8')) digits = '7' + digits.slice(1);
-  else if (digits.startsWith('9') && digits.length <= 10) digits = '7' + digits;
-  else if (digits.length && !digits.startsWith('7')) digits = '7' + digits;
-  return digits.slice(0, 11);
-}
-
-function formatPhoneDisplay(digits: string): string {
-  if (!digits) return '';
-  const rest = digits.startsWith('7') ? digits.slice(1) : digits;
-  if (rest.length <= 3) return `+7 (${rest}`;
-  if (rest.length <= 6) return `+7 (${rest.slice(0, 3)}) ${rest.slice(3)}`;
-  if (rest.length <= 8) return `+7 (${rest.slice(0, 3)}) ${rest.slice(3, 6)}-${rest.slice(6)}`;
-  return `+7 (${rest.slice(0, 3)}) ${rest.slice(3, 6)}-${rest.slice(6, 8)}-${rest.slice(8, 10)}`;
-}
-
-// Индекс цифры для удаления: перед курсором (Backspace) или после (Delete)
-function getDigitIndexToRemove(
-  formatted: string,
-  cursorPos: number,
-  forBackspace: boolean
-): number {
-  let digitIndex = -1;
-  for (let i = 0; i < formatted.length; i++) {
-    if (/\d/.test(formatted[i])) {
-      digitIndex++;
-      if (forBackspace && i >= cursorPos) return digitIndex > 0 ? digitIndex - 1 : -1;
-      if (!forBackspace && i >= cursorPos) return digitIndex;
-    }
-  }
-  return forBackspace ? digitIndex : -1;
-}
-
-// Валидация российского номера: 11 цифр, начинается с 7
-const isValidRuPhone = (value: string) => /^7\d{10}$/.test(String(value ?? '').replace(/\D/g, ''));
-const phoneErrorMessage = 'Введите полный номер в формате +7 (XXX) XXX-XX-XX';
 
 // Имя: слова из букв, между ними пробел, дефис или апостроф («Данил Тест», «Анна-Мария», «O'Neil»)
 const nameLetters = 'A-Za-zА-Яа-яЁё';
@@ -642,7 +604,7 @@ function ServiceLandingPhoneInput({
   const field = form.useField('phone');
   const digits = String(useSignalValue(field.sg.value) ?? '');
   const isSubmitted = useSignalValue(form.isSubmitted);
-  const { formatted, handleChange, handleKeyDown } = usePhoneMask(field, digits);
+  const { formatted, handleChange, handleKeyDown } = usePhoneMask(digits, (value) => { field.sg.value.v = value; });
   const isError = (!!digits || !!isSubmitted) && !form.validateField('phone');
 
   return (
@@ -878,37 +840,6 @@ interface PhoneInputProps {
   form: Form<any>;
 }
 
-/** Общая логика маски +7 (XXX) XXX-XX-XX для основной формы и форм лендингов */
-function usePhoneMask(field: ReturnType<Form<any>['useField']>, digits: string) {
-  const formatted = formatPhoneDisplay(digits);
-
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    field.sg.value.v = normalizePhoneDigits(e.target.value);
-  };
-
-  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    const cursorPos = e.currentTarget.selectionStart ?? 0;
-    const charToDelete =
-      e.key === 'Backspace'
-        ? formatted[cursorPos - 1]
-        : e.key === 'Delete'
-          ? formatted[cursorPos]
-          : null;
-
-    if (charToDelete && !/\d/.test(charToDelete)) {
-      e.preventDefault();
-      const idx = getDigitIndexToRemove(formatted, cursorPos, e.key === 'Backspace');
-      if (idx >= 0) {
-        const arr = digits.split('');
-        arr.splice(idx, 1);
-        field.sg.value.v = arr.join('');
-      }
-    }
-  };
-
-  return { formatted, handleChange, handleKeyDown };
-}
-
 const PhoneInput = React.memo(({ form }: PhoneInputProps) => {
   const name = 'phone' as const;
   const field = form.useField(name);
@@ -934,7 +865,7 @@ const PhoneInput = React.memo(({ form }: PhoneInputProps) => {
   });
 
   const errorMessage = useSignalValue(field.sg.errorMessage) ?? '';
-  const { formatted, handleChange, handleKeyDown } = usePhoneMask(field, String(digits));
+  const { formatted, handleChange, handleKeyDown } = usePhoneMask(String(digits), (value) => { field.sg.value.v = value; });
 
   return (
     <div className="Input" ref={ref}>

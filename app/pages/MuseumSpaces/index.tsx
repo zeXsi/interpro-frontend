@@ -171,7 +171,7 @@ const creationCards = [
 export async function loader() {
   const projects = await getProjectsBySlugs(MUSEUM_PROJECT_SLUGS);
   return {
-    projects: projects ?? [],
+    projects: toShowcaseProjects(projects ?? []),
   };
 }
 
@@ -184,7 +184,6 @@ export function meta() {
 }
 
 export default function MuseumSpaces({ loaderData }: Route.ComponentProps) {
-  const selectedProjects = getSelectedProjects(loaderData.projects);
 
   return (
     <StartPage>
@@ -226,7 +225,7 @@ export default function MuseumSpaces({ loaderData }: Route.ComponentProps) {
 
         <section className="MuseumSpaces-projects px">
           <h2 className="MuseumSpaces-sectionTitle">Наши проекты</h2>
-          <ProjectShowcase projects={toShowcaseProjects(selectedProjects)} />
+          <ProjectShowcase projects={loaderData.projects} />
         </section>
 
         <MuseumCycleSection />
@@ -754,10 +753,6 @@ function ProjectMetaItem({ title, value }: { title: string; value?: string | num
       <p>{value}</p>
     </div>
   );
-}
-
-function getSelectedProjects(projects: Project[]) {
-  return projects;
 }
 
 function toShowcaseProjects(projects: Project[]): ShowcaseProject[] {

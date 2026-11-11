@@ -178,7 +178,7 @@ export async function loader() {
   const projects = await getProjectsBySlugs(officeProjectSlugs);
 
   return {
-    projects: projects ?? [],
+    projects: getOfficeProjects(projects ?? []),
   };
 }
 
@@ -191,7 +191,7 @@ export function meta() {
 }
 
 export default function OfficeRenovation({ loaderData }: Route.ComponentProps) {
-  const selectedProjects = getOfficeProjects(loaderData.projects);
+  const selectedProjects = loaderData.projects;
 
   return (
     <StartPage>

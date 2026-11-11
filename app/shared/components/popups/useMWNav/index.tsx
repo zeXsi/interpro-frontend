@@ -6,13 +6,10 @@ import Button from 'shared/components/Button';
 import Accordion from 'shared/components/Accordion';
 import { IconPlus } from 'shared/components/IconPlus';
 import Link from 'shared/components/Link';
-import { sgServiceCategories } from 'api/services/services.api';
-import { sgProjects } from 'api/projects/projects.api';
 import { signal } from 'shared/utils/_stm';
 import { useSignalValue } from 'shared/utils/_stm/react/react';
-import { sgHomeData } from 'api/home/home.api';
+import { useShellData } from 'shared/components/ShellData';
 import type { HomeServiceNavigationNode } from 'api/home/home.types';
-import { useLocation } from 'react-router';
 import { MWBrief } from 'pages/StandPrices/Brief';
 
 type NavigationCategory = {
@@ -82,18 +79,6 @@ function compactNavigation(nodes: HomeServiceNavigationNode[]): NavigationCatego
   }));
 }
 
-function fullNavigation(): NavigationCategory[] {
-  const convert = (categories: typeof sgServiceCategories.v): NavigationCategory[] =>
-    categories.map((category) => ({
-      slug: category.slug,
-      name: category.name,
-      posts: category.payload?.posts ?? [],
-      children: convert(category.payload?.children ?? []),
-    }));
-
-  return convert(sgServiceCategories.v);
-}
-
 type unionTypes = 'nav' | 'contacts';
 interface ImpMethods {
   getData: () => unionTypes;
@@ -116,16 +101,23 @@ const getNextMWNavHostId = () => {
 };
 
 export default function useMWNav() {
-  const location = useLocation();
-  const isHome = location.pathname === '/';
-  const navigationSource = isHome ? sgHomeData.v.services_navigation : sgServiceCategories.v;
+  const { servicesNavigation, projectCount } = useShellData();
   // Стабильная ссылка обязательна: navigation входит в deps Popup.Memo,
-  // новый массив на каждом рендере пересоздаёт Popup и перезапускает анимацию открытия.
-  const navigation = useMemo(
-    () => (isHome ? compactNavigation(sgHomeData.v.services_navigation) : fullNavigation()),
-    [isHome, navigationSource]
+  // новый массив пересоздаёт Popup и перезапускает анимацию открытия.
+  // Root loader перезапрашивается при каждой навигации и отдаёт новый объект с тем же содержимым,
+  // поэтому ссылка обновляется только при реальном изменении данных.
+  const compactedNavigation = useMemo(
+    () => compactNavigation(servicesNavigation),
+    [servicesNavigation]
   );
-  const projectCount = isHome ? sgHomeData.v.projects.total : sgProjects.v.length;
+  const stableNavigationRef = useRef(compactedNavigation);
+  if (
+    stableNavigationRef.current !== compactedNavigation &&
+    JSON.stringify(stableNavigationRef.current) !== JSON.stringify(compactedNavigation)
+  ) {
+    stableNavigationRef.current = compactedNavigation;
+  }
+  const navigation = stableNavigationRef.current;
   const instanceIdRef = useRef(0);
   if (!instanceIdRef.current) {
     mwNavControllerId += 1;

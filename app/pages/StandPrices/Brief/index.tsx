@@ -4,10 +4,12 @@ import usePopup from '@qtpy/use-popup';
 import PlusSmallIcon from 'assets/icons/brief/plus-small.svg?react';
 import { sendLead, sendLeadWithFiles, type LeadData } from 'api/form';
 import { useEffect, useState, type ReactNode } from 'react';
+import { email, pipe, safeParse, string } from 'valibot';
 import { signal } from 'shared/utils/_stm';
 import { GlobalScrollLock } from 'shared/components/_helpers/GlobalScrollLock';
 import Link from 'shared/components/Link';
 import Button from 'shared/components/Button';
+import { isValidRuPhone, phoneErrorMessage } from 'shared/utils/usePhoneMask';
 
 // timeUntil пока не используется: подсказка «До выставки…» на согласовании
 import { AreaRange, BudgetRange, Checkbox, Consent, DateField, Field, FileField, formatDate } from './controls';
@@ -75,6 +77,7 @@ type ContactKey = 'name' | 'company' | 'position' | 'phone' | 'email';
 
 const STEPS = ['type', 'area', 'zones', 'budget', 'exhibition', 'style', 'comment', 'contacts', 'done'] as const;
 type Step = (typeof STEPS)[number];
+const emailSchema = pipe(string(), email());
 
 /**
  * Поп-ап брифа. Состояние живёт выше портала, поэтому случайное закрытие
@@ -188,9 +191,9 @@ function BriefSteps({ state, setState, stepIndex, setStepIndex, isSendFailed, se
     if (!state.name.trim()) nextErrors.name = 'Укажите имя';
     if (!state.company.trim()) nextErrors.company = 'Укажите компанию';
     if (!state.position.trim()) nextErrors.position = 'Укажите должность';
-    if (state.phone.replace(/\D/g, '').length < 10) nextErrors.phone = 'Укажите телефон';
+    if (!isValidRuPhone(state.phone)) nextErrors.phone = phoneErrorMessage;
     if (!state.email.trim()) nextErrors.email = 'Укажите email';
-    else if (!/^\S+@\S+\.\S+$/.test(state.email)) nextErrors.email = 'Проверьте email';
+    else if (!safeParse(emailSchema, state.email).success) nextErrors.email = 'Проверьте email';
     if (!state.agreed) nextErrors.agreed = 'Для отправки формы необходимо подтвердить согласие';
     setErrors(nextErrors);
     if (Object.keys(nextErrors).length) return;

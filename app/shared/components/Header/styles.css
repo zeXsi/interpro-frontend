@@ -1,3 +1,24 @@
+/* Белая подложка, которая плавно гаснет после закрытия меню (0.15s).
+   Вынесена из .Header: на самом .Header после снятия isOpenNav включается
+   mix-blend-mode: exclusion, и гаснущий белый фон на светлой странице инвертировался бы в чёрный. */
+.Header_fade {
+  position: fixed;
+  top: var(--adBanner-height);
+  left: 0;
+  width: 100%;
+  height: var(--heightHeader);
+  background: #fff;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.15s ease-out;
+  z-index: 100;
+
+  &.isOpenNav {
+    opacity: 1;
+    transition: none;
+  }
+}
+
 .Header {
   position: fixed;
   display: grid;
@@ -103,7 +124,8 @@
   }
 
   &.isOpenNav {
-    background: white;
+    /* Открытие: фон белеет мгновенно; при закрытии он снимается сразу, гаснет .Header_fade */
+    background-color: #fff;
     .__menu-self {
       opacity: 0.5;
     }

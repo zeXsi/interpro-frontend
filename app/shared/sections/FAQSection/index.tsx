@@ -4,8 +4,6 @@ import Accordion from 'shared/components/Accordion';
 import Button from 'shared/components/Button';
 import InfoList from 'shared/components/InfoList';
 import Link from 'shared/components/Link';
-import { useSignalValue } from 'shared/utils/_stm/react/react';
-import { sgFaqs } from 'api/faq/faq.api';
 
 export interface FAQItem {
   question: string;
@@ -14,27 +12,12 @@ export interface FAQItem {
 
 interface Props {
   qntyPreview?: number;
-  items?: FAQItem[];
+  items: FAQItem[];
   showAllLink?: boolean;
 }
 
-export default function FAQSection({ qntyPreview = Infinity, items, showAllLink = false }: Props) {
-  if (items) {
-    return <FAQContent items={items} showAllLink={showAllLink} />;
-  }
-
-  return <FAQSignalContent qntyPreview={qntyPreview} />;
-}
-
-function FAQSignalContent({ qntyPreview }: { qntyPreview: number }) {
-  useSignalValue(sgFaqs);
-
-  const items = sgFaqs.v.slice(0, qntyPreview).map(({ payload }) => ({
-    question: payload.question,
-    answer: payload.answer,
-  }));
-
-  return <FAQContent items={items} showAllLink={qntyPreview !== Infinity} />;
+export default function FAQSection({ items, showAllLink = false }: Props) {
+  return <FAQContent items={items} showAllLink={showAllLink} />;
 }
 
 function FAQContent({ items, showAllLink }: { items: FAQItem[]; showAllLink: boolean }) {

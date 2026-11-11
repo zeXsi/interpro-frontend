@@ -9,6 +9,7 @@ import { brotliCompressSync, constants as zlibConstants } from 'node:zlib';
 import test from 'node:test';
 
 import { chromium } from 'playwright';
+import { UNSAFE_decodeViaTurboStream as decodeViaTurboStream } from 'react-router';
 
 const projectRoot = path.resolve(import.meta.dirname, '..');
 const npmCommand = process.platform === 'win32' ? 'npm.cmd' : 'npm';
@@ -104,6 +105,7 @@ function createMockApi() {
   const releaseFirstList = deferred();
   let articleRequestCount = 0;
   let listRequestCount = 0;
+  let failProjects = false;
   const requestPaths = [];
 
   const homeData = {
@@ -182,6 +184,11 @@ function createMockApi() {
     }
 
     if (url.pathname.endsWith('/projects')) {
+      if (failProjects) {
+        response.writeHead(503, { 'content-type': 'application/json' });
+        response.end(JSON.stringify({ message: 'Fixture upstream unavailable' }));
+        return;
+      }
       if (url.searchParams.getAll('slug[]').includes('moskovskij-urbanisticheskij-forum')) {
         sendJson(response, [{
           id: 2364,
@@ -202,7 +209,14 @@ function createMockApi() {
           id: 901,
           slug: 'full-project',
           title: { rendered: 'Full project' },
-          payload: { title: 'Full project', seo: { title: 'Full project' } },
+          'type-stand': [], 'year-stand': [], 'exhibition-stand': [],
+          payload: {
+            title: 'Full project', about: 'Full project description',
+            cover: 'https://api.interpro.pro/wp-content/uploads/full-project.webp',
+            meta: { exhibition: [], type_tax: [], year: null, area: 42 },
+            blocks: { fixture: 'UNRELATED_PROJECT_DETAIL_SENTINEL' },
+            seo: { title: 'Full project' },
+          },
         },
       ]);
       return;
@@ -237,6 +251,11 @@ function createMockApi() {
     }
 
     if (url.pathname.endsWith('/service')) {
+      if (slug === 'upstream-failure') {
+        response.writeHead(503, { 'content-type': 'application/json' });
+        response.end(JSON.stringify({ message: 'Fixture upstream unavailable' }));
+        return;
+      }
       sendJson(response, !slug || slug === 'full-service' ? [
         {
           id: 904,
@@ -265,7 +284,7 @@ function createMockApi() {
     const isArticleList =
       url.pathname.endsWith('/blog') &&
       url.searchParams.get('page') === '1' &&
-      url.searchParams.get('per_page') === '10' &&
+      ['4', '10'].includes(url.searchParams.get('per_page')) &&
       !slug;
 
     if (isArticleList) {
@@ -293,6 +312,7 @@ function createMockApi() {
     requestPaths,
     homeEndpointDecodedBytes: Buffer.byteLength(JSON.stringify(homeData), 'utf8'),
     clearRequestPaths: () => requestPaths.splice(0),
+    setProjectsFailure: (value) => { failProjects = value; },
   };
 }
 
@@ -357,6 +377,30 @@ function readSSRState(html) {
   return JSON.parse(match[1]);
 }
 
+async function readLoaderData(html) {
+  const chunks = [...html.matchAll(/window\.__reactRouterContext\.streamController\.enqueue\(("(?:\\.|[^"\\])*")\)/g)]
+    .map((match) => JSON.parse(match[1]));
+  assert.ok(chunks.length, 'React Router hydration payload is present');
+  const { value } = await decodeViaTurboStream(new Response(chunks.join('')).body, globalThis);
+  assert.ok(value.loaderData, 'React Router payload contains loaderData');
+  return value.loaderData;
+}
+
+function routeData(loaderData, key) {
+  const matches = Object.values(loaderData).filter((data) => data && Object.hasOwn(data, key));
+  assert.equal(matches.length, 1, `one route owns ${key}`);
+  return matches[0];
+}
+
+function assertCompactState(html, loaderData) {
+  const state = readSSRState(html);
+  assert.doesNotMatch(JSON.stringify(state), /home-data|parent-\/|"\/(projects|service|blog|news|faqs|licenses|feedbacks)/);
+  const shell = loaderData.root;
+  assert.deepStrictEqual(Object.keys(shell).sort(), ['projectCount', 'servicesNavigation']);
+  assert.equal(shell.projectCount, 12);
+  assert.doesNotMatch(JSON.stringify(loaderData), /UNRELATED_PROJECT_DETAIL_SENTINEL/);
+}
+
 function assertSSRLink(html, href, contentPattern, label) {
   const links = [...html.matchAll(/<a\b([^>]*)>(.*?)<\/a>/gs)];
   assert.ok(
@@ -380,6 +424,7 @@ async function assertHydrates(origin, slug, title) {
   try {
     const page = await browser.newPage({ serviceWorkers: 'block' });
     const hydrationErrors = [];
+    const browserContentRequests = [];
     const hydrationPattern =
       /hydration|hydrated|server rendered html|did not match|Minified React error #(418|423|425)/i;
 
@@ -393,6 +438,9 @@ async function assertHydrates(origin, slug, title) {
     });
 
     await page.route('**/*', async (route) => {
+      if (/\/wp-json\//.test(new URL(route.request().url()).pathname)) {
+        browserContentRequests.push(route.request().url());
+      }
       const requestOrigin = new URL(route.request().url()).origin;
       if (requestOrigin === origin || requestOrigin.startsWith('http://127.0.0.1:')) {
         await route.continue();
@@ -430,6 +478,7 @@ async function assertHydrates(origin, slug, title) {
     );
     assert.equal(await page.evaluate(() => window.__navigationMarker), 'article-document');
     assert.deepStrictEqual(hydrationErrors, []);
+    assert.deepStrictEqual(browserContentRequests, [], 'article navigation uses same-origin route loaders, not browser WP requests');
   } finally {
     await browser.close();
   }
@@ -443,6 +492,7 @@ async function assertHomeHydratesAndNavigates(origin) {
       await popup.locator('.MWImage-close').click();
     });
     const hydrationErrors = [];
+    const browserContentRequests = [];
     const hydrationPattern =
       /hydration|hydrated|server rendered html|did not match|Minified React error #(418|423|425)/i;
 
@@ -455,6 +505,9 @@ async function assertHomeHydratesAndNavigates(origin) {
       if (hydrationPattern.test(error.message)) hydrationErrors.push(error.message);
     });
     await page.route('**/*', async (route) => {
+      if (/\/wp-json\//.test(new URL(route.request().url()).pathname)) {
+        browserContentRequests.push(route.request().url());
+      }
       const requestOrigin = new URL(route.request().url()).origin;
       if (requestOrigin === origin || requestOrigin.startsWith('http://127.0.0.1:')) {
         await route.continue();
@@ -489,6 +542,18 @@ async function assertHomeHydratesAndNavigates(origin) {
     } finally {
       await popup.close();
     }
+    const projectsPayload = page.waitForResponse((response) => new URL(response.url()).pathname === '/projects.data');
+    await page.locator('.Header a[href="/projects"] .__projects').click();
+    await page.waitForURL(`${origin}/projects`);
+    assert.equal((await projectsPayload).status(), 200);
+    await page.locator('.ProjectCard-title').filter({ hasText: 'Full project' }).waitFor();
+    assert.equal(await page.evaluate(() => window.__navigationMarker), 'home-document');
+    await page.locator('.Header_list-li.__logo a[href="/"] svg').click();
+    await page.waitForURL(`${origin}/`);
+    // Desktop renders the animated title; .Project-title is mobile-only.
+    await page.locator('.Project-title-button:visible, .Project-title:visible')
+      .filter({ hasText: 'COMPACT PROJECT' }).waitFor();
+    await page.locator('.Project a[href="/projects/compact-project"]').waitFor({ state: 'visible' });
     await page.locator('.Header .__menu-self').hover();
     const desktopMenu = page.locator('.MWNav_desktop');
     await desktopMenu.locator('a[href="/services"] span').hover();
@@ -536,6 +601,17 @@ async function assertHomeHydratesAndNavigates(origin) {
     );
     assert.equal(await page.locator('.Header .qntyProjects').textContent(), '12');
     assert.equal(await page.evaluate(() => window.__navigationMarker), 'home-document');
+    await page.locator('.Header .__menu-self').hover();
+    await desktopMenu.locator('a[href="/about-us"] span').click();
+    await page.waitForURL(`${origin}/about-us`);
+    await page.locator('.AboutUs .FAQSection').waitFor();
+    assert.match(await page.locator('.AboutUs .FAQSection').textContent(), /Full question\?/);
+    assert.equal(await page.evaluate(() => window.__navigationMarker), 'home-document');
+    // Desktop links close the shared menu on a 500 ms timer. Let that close
+    // finish before opening the same menu in its mobile layout.
+    await desktopMenu.waitFor({ state: 'hidden' });
+    await page.locator('.Header_list-li.__logo a[href="/"] svg').click();
+    await page.waitForURL(`${origin}/`);
     await page.setViewportSize({ width: 390, height: 844 });
     // Avoid desktop mouseenter opening the menu before the mobile click toggles it.
     await page.locator('.Header .__menu-self').dispatchEvent('click');
@@ -549,6 +625,7 @@ async function assertHomeHydratesAndNavigates(origin) {
     await page.waitForURL(`${origin}/faq`);
     assert.equal(await page.evaluate(() => window.__navigationMarker), 'home-document');
     assert.deepStrictEqual(hydrationErrors, []);
+    assert.deepStrictEqual(browserContentRequests, [], 'home/projects/return/services/FAQ/about never request WP content in the browser');
   } finally {
     await browser.close();
   }
@@ -605,15 +682,16 @@ test('parallel SSR requests isolate route state and hydrate without mismatch', {
     const homeResponse = await fetch(appOrigin, { headers: { 'user-agent': 'Googlebot' } });
     assert.equal(homeResponse.status, 200);
     const homeHtml = await homeResponse.text();
-    const homeState = readSSRState(homeHtml);
-    assert.deepStrictEqual(Object.keys(homeState), ['home-data']);
-    assert.equal(homeState['home-data'].projects.total, 12);
-    assert.equal(homeState['home-data'].projects.items.length, 1);
+    const homeLoaders = await readLoaderData(homeHtml);
+    assertCompactState(homeHtml, homeLoaders);
+    const homeData = routeData(homeLoaders, 'schema_version');
+    assert.equal(homeData.projects.total, 12);
+    assert.equal(homeData.projects.items.length, 1);
     assert.equal(
-      homeState['home-data'].projects.items[0].cover.url,
+      homeData.projects.items[0].cover.url,
       'https://cdn.interpro.pro/wp-content/uploads/compact-project.webp'
     );
-    assert.equal((homeHtml.match(/"schema_version":1/g) ?? []).length, 1);
+    assert.equal(Object.values(homeLoaders).filter((data) => data?.schema_version === 1).length, 1);
     assert.match(homeHtml, /qntyProjects[^>]*>12</);
     assert.match(homeHtml, /Compact question\?/);
     assert.match(homeHtml, /Compact company/);
@@ -662,13 +740,46 @@ test('parallel SSR requests isolate route state and hydrate without mismatch', {
         coldHomeWordPressRequests: mockApi.requestPaths.length,
       })}`
     );
-    assert.deepStrictEqual(mockApi.requestPaths, ['/wp-json/interpro/v1/home']);
+    assert.ok(mockApi.requestPaths.length > 0, 'cold home loads its compact endpoint');
+    assert.ok(mockApi.requestPaths.every((pathname) => pathname === '/wp-json/interpro/v1/home'),
+      'home and shell only request the compact home endpoint (cache intentionally disabled)');
     assert.doesNotMatch(
       mockApi.requestPaths.join('\n'),
       /\/wp-json\/wp\/v2\/(projects|service(?:_category)?|news|blog|licenses)/
     );
 
     await assertHomeHydratesAndNavigates(appOrigin);
+
+    for (const pathname of ['/projects', '/services', '/faq', '/about-us']) {
+      const response = await fetch(`${appOrigin}${pathname}`, { headers: { 'user-agent': 'Googlebot' } });
+      assert.equal(response.status, 200, `${pathname} renders its route data`);
+      const html = await response.text();
+      const loaderData = await readLoaderData(html);
+      assertCompactState(html, loaderData);
+      if (pathname !== '/projects') {
+        assert.doesNotMatch(JSON.stringify(loaderData), /full-project/, `${pathname} does not serialize the unrelated projects collection`);
+      } else {
+        const data = routeData(loaderData, 'projects');
+        assert.equal(data.projects.length, 1);
+        assert.equal(data.projects[0].payload.title, 'Full project');
+        assert.equal(Object.hasOwn(data.projects[0].payload, 'blocks'), false);
+      }
+    }
+
+    mockApi.setProjectsFailure(true);
+    try {
+      const response = await fetch(`${appOrigin}/projects`, { headers: { 'user-agent': 'Googlebot' } });
+      assert.ok(response.status >= 500, 'upstream projects failure is not a successful empty projects page');
+      assert.doesNotMatch(await response.text(), /ProjectPage-title[^]*?\(\s*0\s*\)/);
+    } finally {
+      mockApi.setProjectsFailure(false);
+    }
+    for (const [slug, expected] of [['truly-missing', 404], ['upstream-failure', 500]]) {
+      const response = await fetch(`${appOrigin}/services/${slug}`, { headers: { 'user-agent': 'Googlebot' } });
+      if (expected === 404) assert.equal(response.status, 404, 'successful empty selected lookup returns 404');
+      else assert.ok(response.status >= 500, 'failed selected lookup must not become 404');
+      await response.body?.cancel();
+    }
 
     mockApi.clearRequestPaths();
     const museumResponse = await fetch(`${appOrigin}/museum-spaces`, {
@@ -744,22 +855,29 @@ test('parallel SSR requests isolate route state and hydrate without mismatch', {
     mockApi.releaseFirstList();
     const alphaHtml = await alphaHtmlPromise;
 
-    const alphaState = readSSRState(alphaHtml);
-    const betaState = readSSRState(betaHtml);
+    const alphaLoaders = await readLoaderData(alphaHtml);
+    const betaLoaders = await readLoaderData(betaHtml);
+    assertCompactState(alphaHtml, alphaLoaders);
+    assertCompactState(betaHtml, betaLoaders);
+    const alphaState = routeData(alphaLoaders, 'article');
+    const betaState = routeData(betaLoaders, 'article');
 
     assert.match(alphaHtml, /<h1[^>]*>ALPHA<\/h1>/);
     assert.match(betaHtml, /<h1[^>]*>BETA<\/h1>/);
-    assert.equal(alphaState['parent-/blog'].slug, 'alpha');
-    assert.equal(alphaState['parent-/blog'].payload.title, 'ALPHA');
-    assert.equal(betaState['parent-/blog'].slug, 'beta');
-    assert.equal(betaState['parent-/blog'].payload.title, 'BETA');
+    assert.equal(alphaState.article.slug, 'alpha');
+    assert.equal(alphaState.article.payload.title, 'ALPHA');
+    assert.equal(betaState.article.slug, 'beta');
+    assert.equal(betaState.article.payload.title, 'BETA');
     assert.equal(
-      alphaState['parent-/blog'].payload.cover.url,
+      alphaState.article.payload.cover.url,
       'https://cdn.interpro.pro/wp-content/uploads/alpha.webp'
     );
     assert.match(alphaHtml, /https:\/\/cdn\.interpro\.pro\/wp-content\/uploads\/alpha\.webp/);
     assert.doesNotMatch(JSON.stringify(alphaState), /BETA|"beta"/);
     assert.doesNotMatch(JSON.stringify(betaState), /ALPHA|"alpha"/);
+    assert.ok(alphaState.articles.length <= 3);
+    assert.ok(betaState.articles.length <= 3);
+    assert.equal(Object.hasOwn(alphaState.articles[0].payload, 'blocks'), false, 'related cards omit full article bodies');
     assertSSRLink(alphaHtml, '/blog/fixture-story', /class="Article"/, 'related blog article');
     assertSSRLink(betaHtml, '/blog/fixture-story', /class="Article"/, 'related blog article');
 

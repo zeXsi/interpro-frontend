@@ -2,6 +2,8 @@ import assert from 'node:assert/strict';
 import test from 'node:test';
 import { readFileSync } from 'node:fs';
 import ts from 'typescript';
+import * as phoneMask from '../../../shared/utils/usePhoneMask';
+import * as valibot from 'valibot';
 
 test('contact form links activate popup buttons and keep inline form scrolling', () => {
   const output = ts.transpileModule(readFileSync('app/shared/utils/scrollToSection.ts', 'utf8'), {
@@ -26,6 +28,92 @@ test('contact form links activate popup buttons and keep inline form scrolling',
   assert.equal(nativeScrolls, 1);
   module.exports.scrollToSection(popupOpener);
   assert.equal(clicks, 2);
+});
+
+test('popup scroll locks survive delayed Lenis initialization and overlapping popups', async () => {
+  const names = ['window', 'document', 'Node', 'requestAnimationFrame', 'cancelAnimationFrame'] as const;
+  const originals = names.map((name) => Object.getOwnPropertyDescriptor(globalThis, name));
+  class Element {
+    firstElementChild = {};
+    contains(target: unknown) { return target === this; }
+  }
+  const listeners: { type: string; handler: (event: any) => void; signal: AbortSignal }[] = [];
+  const addEventListener = (type: string, handler: (event: any) => void, options: any) => {
+    listeners.push({ type, handler, signal: options.signal });
+  };
+  const documentMock = {
+    documentElement: { style: { overflow: 'clip' } },
+    body: { style: { overflow: 'auto', touchAction: 'pan-y' } },
+    activeElement: null,
+    addEventListener,
+  };
+  const globals = [{ addEventListener }, documentMock, Element, () => 1, () => {}];
+  names.forEach((name, index) => Object.defineProperty(globalThis, name, { configurable: true, value: globals[index] }));
+  try {
+    let stopped = false;
+    let rafRunning = true;
+    let initialize!: () => void;
+    const initialization = new Promise<void>((resolve) => { initialize = resolve; });
+    const glLenis = { v: null as any };
+    const lenisManager = {
+      init: () => glLenis.v ? undefined : initialization,
+      stopRaf: () => { rafRunning = false; },
+      startRaf: () => { rafRunning = true; },
+    };
+    let wrapper: Element;
+    let cleanup: (() => void) | undefined;
+    let refIndex = 0;
+    const effect = (callback: () => (() => void) | undefined) => { cleanup = callback(); };
+    const output = ts.transpileModule(readFileSync('app/shared/components/_helpers/GlobalScrollLock.tsx', 'utf8'), {
+      compilerOptions: { module: ts.ModuleKind.CommonJS, jsx: ts.JsxEmit.ReactJSX },
+    }).outputText;
+    const module = { exports: {} as any };
+    new Function('require', 'module', 'exports', output)((id: string) => {
+      if (id === 'react') return {
+        useRef: () => ({ current: refIndex++ === 0 ? wrapper : null }),
+        useLayoutEffect: effect, useEffect: effect,
+      };
+      if (id === 'react/jsx-runtime') return { jsx: () => null };
+      if (id === 'shared/utils/lenis') return { glLenis, lenisManager };
+      if (id === 'lenis') return { default: class MockLenis { raf() {} destroy() {} } };
+      throw new Error(id);
+    }, module, module.exports);
+    const mount = () => {
+      wrapper = new Element(); refIndex = 0;
+      module.exports.GlobalScrollLock({});
+      return { element: wrapper, close: cleanup! };
+    };
+    const first = mount();
+    assert.equal(documentMock.documentElement.style.overflow, 'hidden');
+    glLenis.v = { stop: () => { stopped = true; }, start: () => { stopped = false; } };
+    initialize(); await initialization;
+    assert.equal(stopped, true);
+    assert.equal(rafRunning, false);
+    const second = mount();
+    first.close();
+    assert.equal(stopped, true);
+    assert.equal(rafRunning, false);
+    assert.equal(documentMock.documentElement.style.overflow, 'hidden');
+    for (const target of [new Element(), second.element]) {
+      let prevented = false;
+      for (const listener of listeners.filter((item) => item.type === 'wheel' && !item.signal.aborted)) {
+        listener.handler({ target, preventDefault: () => { prevented = true; } });
+      }
+      assert.equal(prevented, target !== second.element);
+    }
+    second.close();
+    assert.equal(stopped, false);
+    assert.equal(rafRunning, true);
+    assert.equal(documentMock.documentElement.style.overflow, 'clip');
+    assert.equal(documentMock.body.style.overflow, 'auto');
+    assert.equal(documentMock.body.style.touchAction, 'pan-y');
+    assert.ok(listeners.every((listener) => listener.signal.aborted));
+  } finally {
+    names.forEach((name, index) => {
+      if (originals[index]) Object.defineProperty(globalThis, name, originals[index]!);
+      else Reflect.deleteProperty(globalThis, name);
+    });
+  }
 });
 
 // Exercise the rendered controls and their event handlers without a DOM or new test dependencies.
@@ -55,9 +143,42 @@ test('budget interaction, file validation/removal and brief submission', async (
     return module.exports;
   };
   const data = load('app/pages/StandPrices/Brief/data.ts');
-  const controls = load('app/pages/StandPrices/Brief/controls.tsx', { './data': data });
+  const controls = load('app/pages/StandPrices/Brief/controls.tsx', {
+    './data': data, 'shared/utils/usePhoneMask': phoneMask,
+  });
   const nodes = (node: any): any[] => !node || typeof node !== 'object' ? [] : [node, ...[node.props?.children].flat(Infinity).flatMap(nodes)];
   const find = (tree: any, predicate: (node: any) => boolean) => nodes(tree).find(predicate);
+  let phone = '';
+  const renderPhone = () => find(controls.Field({
+    label: 'Телефон', type: 'tel', value: phone, onChange: (value: string) => { phone = value; },
+  }), (node) => node.type === 'input');
+  assert.equal(renderPhone().props.value, '');
+  for (const input of ['9123456789', '8 (912) 345-67-89', '+7 (912) 345-67-89', '9123456789999']) {
+    renderPhone().props.onChange({ target: { value: input } });
+    assert.equal(phone, '79123456789');
+    assert.equal(renderPhone().props.value, '+7 (912) 345-67-89');
+    assert.equal(phoneMask.isValidRuPhone(phone), true);
+  }
+  for (const [key, selectionStart, expected] of [
+    ['Backspace', 13, '7912346789'],
+    ['Delete', 12, '7912345789'],
+  ] as const) {
+    phone = '79123456789';
+    let prevented = false;
+    renderPhone().props.onKeyDown({ key, currentTarget: { selectionStart }, preventDefault: () => { prevented = true; } });
+    assert.equal(prevented, true);
+    assert.equal(phone, expected);
+    assert.equal(phoneMask.isValidRuPhone(phone), false);
+  }
+  for (const input of ['9', '8', 'abc', '']) {
+    renderPhone().props.onChange({ target: { value: input } });
+    assert.equal(phoneMask.isValidRuPhone(phone), false);
+  }
+  assert.equal(phone, '');
+  assert.equal(renderPhone().props.value, '');
+  const emailField = find(controls.Field({ label: 'Email', type: 'email', value: 'a@b.ru', onChange: () => {} }), (node) => node.type === 'input');
+  assert.equal(emailField.props.value, 'a@b.ru');
+  assert.equal(emailField.props.onKeyDown, undefined);
   let chosen: any = null;
   const budget = controls.BudgetRange({ value: null, isUnknown: false, onChange: (value: any) => { chosen = value; } });
   assert.match(budget.props.className, /isDisabled/);
@@ -117,6 +238,8 @@ test('budget interaction, file validation/removal and brief submission', async (
   };
   const briefModule = load('app/pages/StandPrices/Brief/index.tsx', {
     './data': data, './controls': controls, 'api/form': api,
+    valibot,
+    'shared/utils/usePhoneMask': phoneMask,
     'shared/utils/_stm': { signal: (value: any) => ({ v: value }) },
     '@qtpy/use-popup': { default: () => ({ Popup: 'popup', toOpenPopup: () => {}, toClosePopup: () => {} }) },
   });
@@ -155,7 +278,31 @@ test('budget interaction, file validation/removal and brief submission', async (
     _tmr: { push: (goal: any) => calls.push(['tmr', goal]) },
   } });
   try {
-    slots[0] = { ...slots[0], name: 'Иван', company: 'Компания', position: 'Директор', phone: '1234567890', email: 'a@b.ru', agreed: true };
+    slots[0] = { ...slots[0], name: 'Иван', company: 'Компания', position: 'Директор', phone: '', email: 'a@b.ru', agreed: true };
+    for (const invalidPhone of ['', '7912345678', '1234567890', '89123456789', '791234567890']) {
+      slots[0].phone = invalidPhone;
+      slots[1] = 7; popup = hook(); tree = renderSteps();
+      await find(tree, (node) => node.props.children === 'Получить дизайн проект и расчет').props.onClick();
+      assert.equal(slots[1], 7);
+      assert.equal(calls.some(([kind]) => kind === 'json' || kind === 'files'), false);
+      popup = hook(); tree = renderSteps();
+      assert.equal(find(tree, (node) => node.type === controls.Field && node.props.type === 'tel').props.error, phoneMask.phoneErrorMessage);
+    }
+    calls.length = 0;
+    const phoneField = find(tree, (node) => node.type === controls.Field && node.props.type === 'tel');
+    find(phoneField.type(phoneField.props), (node) => node.type === 'input').props.onChange({ target: { value: '8 (912) 345-67-89' } });
+    assert.equal(slots[0].phone, '79123456789');
+    for (const invalidEmail of ['', ' ', 'a@@example.com', 'a@example.c', 'a@-example.com', 'a b@example.com']) {
+      slots[0].email = invalidEmail;
+      slots[1] = 7; popup = hook(); tree = renderSteps();
+      await find(tree, (node) => node.props.children === 'Получить дизайн проект и расчет').props.onClick();
+      assert.equal(slots[1], 7);
+      assert.equal(calls.some(([kind]) => kind === 'json' || kind === 'files'), false);
+      popup = hook(); tree = renderSteps();
+      assert.equal(find(tree, (node) => node.type === controls.Field && node.props.type === 'email').props.error, invalidEmail.trim() ? 'Проверьте email' : 'Укажите email');
+    }
+    slots[0].email = 'name+brief@example.co.uk';
+    calls.length = 0;
     const submit = async () => {
       slots[1] = 7; popup = hook(); tree = renderSteps();
       await find(tree, (node) => node.props.children === 'Получить дизайн проект и расчет').props.onClick();
@@ -165,6 +312,8 @@ test('budget interaction, file validation/removal and brief submission', async (
     assert.deepEqual(calls[0], ['ym', 99631636, 'reachGoal', 'request_form_all']);
     assert.equal(calls[1][0], 'json');
     assert.equal(calls[1][1].consent, false);
+    assert.equal(calls[1][1].phone, '79123456789');
+    assert.equal(calls[1][1].email, 'name+brief@example.co.uk');
     assert.match(calls[1][1].project, /Бюджет: 500/);
     assert.deepEqual(calls[2], ['ym', 99631636, 'reachGoal', 'request_popup_full']);
     assert.deepEqual(calls[3], ['tmr', { type: 'reachGoal', id: 3746602, goal: 'reach_goal_popup' }]);

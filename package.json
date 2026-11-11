@@ -7,7 +7,7 @@
     "deploy:prod": "bash scripts/deploy.sh --deploy",
     "dev": "react-router dev",
     "rollback:prod": "bash scripts/deploy.sh --rollback",
-    "test": "node --test app/shared/utils/_stm/index.test.mjs app/shared/utils/toCdnMediaUrl.test.mjs app/shared/components/Header/navigation.test.mjs tests/ssr-concurrency.test.mjs && npm run test:brief && npm run test:projects",
+    "test": "node --test app/shared/utils/_stm/index.test.mjs app/shared/utils/querySignal.test.mjs app/api/pageData.test.mjs app/api/projects/projects.api.test.mjs app/pages/Projects/routeData.test.mjs app/pages/AboutUs/data.test.mjs app/pages/FeedPage/loader.test.mjs app/shared/utils/toCdnMediaUrl.test.mjs app/shared/components/Header/navigation.test.mjs tests/ssr-concurrency.test.mjs && npm run test:brief && npm run test:projects",
     "test:brief": "node -e \"const ts=require('typescript'); for(const ext of ['.ts','.tsx']) require.extensions[ext]=(m,f)=>m._compile(ts.transpileModule(require('fs').readFileSync(f,'utf8'),{compilerOptions:{module:ts.ModuleKind.CommonJS,jsx:ts.JsxEmit.ReactJSX,esModuleInterop:true}}).outputText,f); require('./app/api/form.test.ts'); require('./app/pages/StandPrices/Brief/brief.test.tsx');\"",
     "test:ssr": "node --test tests/ssr-concurrency.test.mjs",
     "test:projects": "node --test tests/projects.test.mjs",

@@ -1,4 +1,5 @@
-import FeedArticle, { _loader, _meta } from './index';
+import FeedArticle, { _meta } from './index';
+import { _loader } from './loader.server';
 import { Route } from './+types/News';
 
 export async function loader({ request }: Route.LoaderArgs) {

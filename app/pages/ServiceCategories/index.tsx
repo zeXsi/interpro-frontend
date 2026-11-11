@@ -4,9 +4,55 @@ import ContactForm from 'shared/components/ContactForm';
 import ServicesDesc from 'shared/components/ServicesDesc';
 import TitlePage from 'shared/components/TitlePage';
 import Link from 'shared/components/Link';
-import { sgServiceCategories } from 'api/services/services.api';
+import { getServiceCategories } from 'api/services/services.api';
 import StartPage from 'shared/components/StartPage';
 import { ServiceCategoryContent } from './pages/ServiceCategory';
+import type { ServiceCategoryDisplay } from './pages/ServiceCategory';
+import type { Route } from './+types';
+
+export async function loader() {
+  const categories = await getServiceCategories();
+  return { categories: categories.map((category): ServiceCategoryDisplay => {
+    const { payload } = category;
+    const isSingleCategory = categories.length === 1;
+    return {
+      id: category.id,
+      slug: category.slug,
+      name: category.name,
+      description: category.description,
+      nextItem: isSingleCategory && category.nextItem ? {
+        slug: category.nextItem.slug,
+        title: category.nextItem.title,
+      } : undefined,
+      payload: {
+        id: payload.id,
+        slug: payload.slug,
+        name: payload.name,
+        parent: payload.parent,
+        description: payload.description,
+        cover: isSingleCategory ? payload.cover : null,
+        order: payload.order,
+        count: payload.count,
+        tags: [],
+        children: [],
+        posts: isSingleCategory ? payload.posts.map(({ id, slug, title }) => ({ id, slug, title })) : [],
+        accordion: isSingleCategory ? payload.accordion?.map(({ title, content }) => ({ title, content })) : undefined,
+        content_blocks: isSingleCategory ? payload.content_blocks?.map(({ title, content }) => ({ title, content })) : undefined,
+        price: isSingleCategory ? payload.price : undefined,
+        projects: isSingleCategory ? payload.projects?.map(({ id, slug, name, full_image }) => ({
+          id, slug, name, full_image: full_image ? { url: full_image.url } : full_image,
+        })) : undefined,
+        reviews: isSingleCategory ? payload.reviews?.map(({ title, content_plain, content, pdf }) => ({
+          title, content_plain, content, pdf: pdf ? { url: pdf.url } : pdf,
+        })) : undefined,
+        faq: isSingleCategory ? payload.faq?.map(({ question, answer }) => ({ question, answer })) : undefined,
+        news: isSingleCategory ? payload.news?.map(({ id, slug, title, name, permalink, full_image }) => ({
+          id, slug, title, name, permalink, full_image: full_image ? { url: full_image.url } : full_image,
+        })) : undefined,
+      },
+    };
+  }) };
+}
 
 export function meta() {
   const title = 'Interpro: услуги';
@@ -23,8 +69,8 @@ export function meta() {
   ];
 }
 
-export default function ServiceCategories({}) {
-  const categories = sgServiceCategories.v;
+export default function ServiceCategories({ loaderData }: Route.ComponentProps) {
+  const { categories } = loaderData;
 
   if (categories.length === 1) {
     const category = categories[0];

@@ -469,8 +469,9 @@ function nextId() {
   return `ssr_${ssrIdCounter}`;
 }
 export type SSRSignal<T> = Signal<T> & { __ssrId: string };
-export function ssrSignal<T>(initial: T, explicitId?: string): SSRSignal<T> {
+export function ssrSignal<T>(initial: T, explicitId?: string, options?: { serialize?: boolean }): SSRSignal<T> {
   const id = explicitId ?? nextId();
+  const serialize = options?.serialize !== false;
   const sg = signal<T>(initial) as SSRSignal<T>;
   sg.__ssrId = id;
 
@@ -479,7 +480,7 @@ export function ssrSignal<T>(initial: T, explicitId?: string): SSRSignal<T> {
     const g = window as any;
     const state = g.__SSR_STATE__ as Record<string, any> | undefined;
 
-    if (state && Object.prototype.hasOwnProperty.call(state, id)) {
+    if (serialize && state && Object.prototype.hasOwnProperty.call(state, id)) {
       sg.v = state[id] as T;
       delete state[id];
     }
@@ -487,7 +488,7 @@ export function ssrSignal<T>(initial: T, explicitId?: string): SSRSignal<T> {
     return sg;
   }
 
-  if (!Object.prototype.hasOwnProperty.call(__SSR_STATE__, id)) {
+  if (serialize && !Object.prototype.hasOwnProperty.call(__SSR_STATE__, id)) {
     __SSR_STATE__[id] = initial;
   }
 
@@ -508,7 +509,8 @@ export function ssrSignal<T>(initial: T, explicitId?: string): SSRSignal<T> {
       get() {
         const state = getSSRRequestState?.();
         if (state) {
-          state.usedIds.add(id);
+          if (!state.values.has(id)) state.values.set(id, initial);
+          if (serialize) state.usedIds.add(id);
           return state.values.get(id) as T;
         }
 
@@ -518,16 +520,16 @@ export function ssrSignal<T>(initial: T, explicitId?: string): SSRSignal<T> {
         const state = getSSRRequestState?.();
         if (state) {
           state.values.set(id, value);
-          state.usedIds.add(id);
+          if (serialize) state.usedIds.add(id);
           return;
         }
 
         desc.set!.call(this, value as any);
-        __SSR_STATE__[id] = value;
+        if (serialize) __SSR_STATE__[id] = value;
       },
     });
   } else {
-    __SSR_STATE__[id] = initial;
+    if (serialize) __SSR_STATE__[id] = initial;
   }
 
   return sg;

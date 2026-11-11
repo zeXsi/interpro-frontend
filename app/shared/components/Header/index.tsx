@@ -8,15 +8,10 @@ import Link from '../Link';
 
 import { memo, useEffect, useRef } from 'react';
 import { useSignalValue } from 'shared/utils/_stm/react/react';
-import { sgProjects } from 'api/projects/projects.api';
-import { sgHomeData } from 'api/home/home.api';
-import { useLocation } from 'react-router';
+import { useShellData } from 'shared/components/ShellData';
 
 function Header() {
-  const location = useLocation();
-  const projectCount = location.pathname === '/'
-    ? sgHomeData.v.projects.total
-    : sgProjects.v.length;
+  const { projectCount } = useShellData();
   const { clIsHidePreload } = useHidePreloader();
   const mode = useSignalValue(MWNavMode);
   const { Popup, toOpenPopup, toClosePopup, showWithData, isShowed } = useMWNav();
@@ -70,6 +65,7 @@ function Header() {
 
   return (
     <>
+      <div className={`Header_fade ${clIsOpenNav}`} aria-hidden="true" />
       <ul
         ref={refHeader}
         className={`Header px ${clIsOpenNav} ${clIsHidePreload} opacityBeforePreloader`}

@@ -1,4 +1,3 @@
-import { useEffect, useState } from 'react';
 import './styles.css';
 
 interface FilterProps<T extends readonly string[]> {
@@ -8,18 +7,13 @@ interface FilterProps<T extends readonly string[]> {
 }
 
 export default function Filter<T extends readonly string[]>({ items, startItem, onClick }: FilterProps<T>) {
-  const [selectedItem, setSelectedItem] = useState(startItem);
   const toClick = (tag: T[number]) => {
-    setSelectedItem(tag);
     onClick?.(tag);
   };
-  useEffect(() => { 
-    toClick(startItem)
-  }, [startItem])
   return (
     <ul className="Filter">
       { items.map((tag, index) => {
-        const clIsActive = selectedItem === tag ? 'active' : '';
+        const clIsActive = startItem === tag ? 'active' : '';
         return (
           <li
             children={ tag }

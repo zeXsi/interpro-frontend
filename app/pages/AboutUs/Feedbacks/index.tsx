@@ -5,9 +5,22 @@ import TitlePage from 'shared/components/TitlePage';
 
 import JsonLd from 'shared/seo/JsonLd';
 import { getFeedbackReviewSchemas } from 'shared/seo/schemas';
-import { sgFeedbacks } from 'api/feedbacks/feedbacks.api';
-import { useSignalValue } from 'shared/utils/_stm/react/react';
+import { getFeedbacks } from 'api/feedbacks/feedbacks.api';
+import feedbacksToItems from 'shared/sections/DocOverview/feedbacksToItems';
+import type { Route } from './+types';
 import { getOpenGraphMeta } from 'shared/seo/meta';
+
+export async function loader() {
+  const feedbacks = await getFeedbacks();
+  return { feedbacks: feedbacks.map(({ payload }) => ({ payload: {
+    title: payload.title,
+    company: payload.company,
+    person: payload.person ? { name: payload.person.name, position: payload.person.position } : payload.person,
+    text: payload.text,
+    pdf: payload.pdf,
+    date: payload.date,
+  } })) };
+}
 
 export function meta() {
   const title = 'Interpro: отзывы';
@@ -17,13 +30,12 @@ export function meta() {
   return getOpenGraphMeta({ title, description, pathname: '/about-us/feedbacks' });
 }
 
-export default function Feedbacks() {
-  useSignalValue(sgFeedbacks);
+export default function Feedbacks({ loaderData }: Route.ComponentProps) {
   return (
     <div className="Feedbacks px">
-      <JsonLd data={getFeedbackReviewSchemas(sgFeedbacks.v)} />
+      <JsonLd data={getFeedbackReviewSchemas(loaderData.feedbacks)} />
       <TitlePage title="Отзывы" />
-      <DocOverview isNotPage={false} />
+      <DocOverview isNotPage={false} items={feedbacksToItems(loaderData.feedbacks)} />
       <ContactForm />
     </div>
   );

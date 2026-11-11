@@ -119,7 +119,7 @@ export function createQuery<TData, TParams = any, TParent = any>(
   const ttlMs = opts.ttlMs ?? DEFAULT_TTL_MS;
   const swrMs = opts.swrMs ?? DEFAULT_SWR_MS;
   const stateKey = opts.stateKey ?? (parent ? `parent-${endpoint}` : endpoint);
-  const sg = ssrSignal<TData>(initial, stateKey);
+  const sg = ssrSignal<TData>(initial, stateKey, { serialize: false });
 
   async function request(params: TParams, timeout?: number): Promise<TData> {
     const resp = await instance.get(endpoint, { params, timeout });
@@ -183,7 +183,7 @@ export function createQuery<TData, TParams = any, TParent = any>(
           return data;
         } catch (err) {
           console.error(`Query error (${endpoint}):`, err);
-          return fallback(useCache, key);
+          return fallback(useCache, key, err);
         }
       }
     }
@@ -197,7 +197,7 @@ export function createQuery<TData, TParams = any, TParent = any>(
     } catch (err) {
       // Ошибки не кэшируем — следующий запрос попробует сеть заново.
       console.error(`Query error (${endpoint}):`, err);
-      return fallback(useCache, key);
+      return fallback(useCache, key, err);
     }
   }
 
@@ -226,11 +226,13 @@ export function createQuery<TData, TParams = any, TParent = any>(
   }
 
   /** При server cache miss не подменяем результат значением другого cache key. */
-  function fallback(useCache: boolean, key: string): TData {
-    if (!useCache) return sg.v;
-
-    const stale = cache.get(key);
-    return stale && stale.staleUntil > Date.now() ? (stale.data as TData) : initial;
+  function fallback(useCache: boolean, key: string, error: unknown): TData {
+    const stale = useCache ? cache.get(key) : undefined;
+    if (stale && stale.staleUntil > Date.now()) {
+      setSignal(stale.data as TData, stale.generation);
+      return stale.data as TData;
+    }
+    throw error;
   }
 
   /** Один сетевой поход на ключ: пишет в кэш, дедуплицирует параллельные вызовы. */

@@ -2,23 +2,15 @@ import './styles.css';
 import Tabs from 'shared/components/Tabs';
 import Button from 'shared/components/Button';
 import { memo } from 'react';
-import { sgServiceCategories } from 'api/services/services.api';
 import Link from 'shared/components/Link';
 import type { HomeServiceNavigationNode } from 'api/home/home.types';
 
 interface TeamBoostSectionProps {
-  items?: HomeServiceNavigationNode[];
+  items: HomeServiceNavigationNode[];
 }
 
 function TeamBoostSection({ items }: TeamBoostSectionProps) {
-  const categories = items ?? sgServiceCategories.v.map((item) => ({
-    id: item.id,
-    slug: item.slug,
-    name: item.payload.name,
-    description: item.payload.description,
-    children: [],
-    posts: item.payload.posts,
-  }));
+  const categories = items;
   const hasSingleCategory = categories.length === 1;
 
   return (
