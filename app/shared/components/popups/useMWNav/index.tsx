@@ -350,15 +350,15 @@ function Desktop({
       link: '/services',
       children: servicesTree,
     },
-    {
-      label: 'Блог',
-      link: '/blog',
-      // children: [{ label: 'О компании', link: '/about-us', children: [{ label: 'О компании', link: '/about-us' }], }],
-    },
-    {
-      label: 'Новости',
-      link: '/news',
-    },
+    // {
+    //   label: 'Блог',
+    //   link: '/blog',
+    //   // children: [{ label: 'О компании', link: '/about-us', children: [{ label: 'О компании', link: '/about-us' }], }],
+    // },
+    // {
+    //   label: 'Новости',
+    //   link: '/news',
+    // },
     {
       label: 'О нас',
       link: '/about-us',
@@ -524,16 +524,16 @@ function Mobile({
           direction="right"
           className="MWNav_list-li nested"
         />
-        <Link to="/blog" onClick={() => toNavigate('/blog')}>
+        {/* <Link to="/blog" onClick={() => toNavigate('/blog')}>
           <span className="ButtonArrow isHideUnderline MWNav_list-li normal right link">
             <span className="Button link">Блог</span>
           </span>
-        </Link>
-        <Link to="/news" onClick={() => toNavigate('/news')}>
+        </Link> */}
+        {/* <Link to="/news" onClick={() => toNavigate('/news')}>
           <span className="ButtonArrow isHideUnderline MWNav_list-li normal right link">
             <span className="Button link">Новости</span>
           </span>
-        </Link>
+        </Link> */}
         <Button.Arrow
           variant="link"
           underline={false}

@@ -105,7 +105,7 @@ export default function MapWebsite() {
               isModeSlug={true}
               items={data.serviceCategories}
             />
-            <InfoList
+            {/* <InfoList
               title="новости:"
               isModeSlug={true}
               items={data.news}
@@ -114,7 +114,7 @@ export default function MapWebsite() {
               title="блог:"
               isModeSlug={true}
               items={data.blogs}
-            />
+            /> */}
           </div>
         </div>
         <ContactForm />

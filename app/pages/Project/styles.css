@@ -211,6 +211,10 @@
           flex-direction: column;
           gap: 32px;
         }
+
+        .ProjectPage-description {
+          display: none;
+        }
       }
     }
 
@@ -228,8 +232,8 @@
   font-family: var(--font-family);
   font-weight: 400;
 
-  font-size: clamp(1.5rem, calc(1.023rem + 2.036vw), 2rem); /* min: 24px, max: 32px */
-  /* min: 24px, max: 32px */
+  font-size: clamp(1.125rem, calc(0.29rem + 3.562vw), 2rem);
+  /* min: 18px, max: 32px */
   /* viewPort: 375-768 */
 
   line-height: 136%;
