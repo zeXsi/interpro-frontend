@@ -13,4 +13,11 @@ const relatedProjects = createQuery<RelatedProject[], { id: number }>({
   ttlMs: 0,
 });
 
-export const getRelatedProjects = (id: number) => relatedProjects.fetch({ id });
+export async function getRelatedProjects(id: number): Promise<RelatedProject[]> {
+  try {
+    return await relatedProjects.fetch({ id });
+  } catch {
+    // Related cards are optional and must not prevent the project from rendering.
+    return [];
+  }
+}

@@ -132,3 +132,39 @@ test('slug upstream failure propagates rather than becoming a missing detail', a
     await assert.rejects(api.getProjectsById({ slug: 'missing' }), (actual) => actual === error);
   });
 });
+
+test('related projects preserve previews and request the current project without caching', async () => {
+  const previews = [{ id: 2, slug: 'related', title: 'Related project' }];
+  let requested;
+  const api = loadModule('./related.api.ts', {
+    'api/queryFamilies': { QUERY_FAMILIES: { projects: 'projects' } },
+    'shared/utils/querySignal': {
+      createQuery(options) {
+        assert.equal(options.endpoint, '/project-related');
+        assert.equal(options.ttlMs, 0);
+        return { fetch: async (params) => { requested = params.id; return previews; } };
+      },
+    },
+  });
+  assert.equal(await api.getRelatedProjects(17), previews);
+  assert.equal(requested, 17);
+});
+
+test('related project failures return an empty list and allow subsequent requests to recover', async () => {
+  const previews = [{ id: 2, slug: 'related' }];
+  let attempts = 0;
+  const api = loadModule('./related.api.ts', {
+    'api/queryFamilies': { QUERY_FAMILIES: { projects: 'projects' } },
+    'shared/utils/querySignal': {
+      createQuery: () => ({
+        async fetch() {
+          if (++attempts === 1) throw new Error('Related projects unavailable');
+          return previews;
+        },
+      }),
+    },
+  });
+  assert.equal((await api.getRelatedProjects(17)).length, 0);
+  assert.equal(await api.getRelatedProjects(17), previews);
+  assert.equal(attempts, 2);
+});
